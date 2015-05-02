@@ -11,7 +11,7 @@ struct	FakeHandleElementPolicy
 	static bool	HandleElement(ElementType * element)
 	{
 		bool returnValue(element != 0x0);
-		GCL::tscout.Print("[-] : Consumer : ", std::this_thread::get_id(), " : [0x", element, "] => [", *element, "]");
+		THREAD_SAFE_STDCOUT("[-] : Consumer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
 		delete element;
 		std::this_thread::sleep_for(std::chrono::milliseconds(300));
 		return returnValue;
@@ -64,6 +64,17 @@ protected:
 	std::vector<std::future<void> >	_asyncFutures;
 };
 
+template <typename ElementType>
+struct FakeUniqueRscCreationPolicy
+{
+	using _ElementType = ElementType;
+
+	static ElementType * GetNewInstance(void)
+	{
+		return new ElementType();
+	}
+};
+
 int	main(int ac, char* av[])
 {
 	using ElementType = int;
@@ -71,19 +82,20 @@ int	main(int ac, char* av[])
 	using HandleElementPolicy = FakeHandleElementPolicy < ElementType > ;
 	using ConsumerType = GCL::Consumer < QueueType, HandleElementPolicy > ;
 
-	QueueType	queue;
+	// [Producer]
+	/*QueueType	queue;
 	auto		producingAsync = std::async(std::launch::async, [&queue](QueueType & queue) mutable
 	{
 		ElementType * element;
 		for (size_t i = 0; i < 100; ++i)
 		{
 			element = new ElementType(i);
-			GCL::tscout.Print("[+] : Producer : ", std::this_thread::get_id(), " : [0x", element, "] => [", *element, "]");
+			THREAD_SAFE_STDCOUT("[+] : Producer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
 			queue.Push(element);
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	}, std::ref(queue));
-
+*/
 	// [1 consumer]
 	//GCL::Consumer<QueueType, HandleElementPolicy> consumer(queue);
 	//auto		consumerAsync = std::async(std::launch::async, [&consumer](GCL::Consumer<QueueType, HandleElementPolicy> & consumer) mutable
@@ -94,18 +106,33 @@ int	main(int ac, char* av[])
 	//consumer.RequiereStopIfLazy();
 	//consumerAsync.get();
 
-	ConsumerPool<QueueType, ConsumerType, 2> consumers(queue);
-	consumers.LauchASync();
+	// [n(2) consumers]
+	//ConsumerPool<QueueType, ConsumerType, 2> consumers(queue);
+	//consumers.LauchASync();
+	//producingAsync.get();
+	//consumers.Apply(std::function<void(ConsumerType &)>([&](ConsumerType & consumer) mutable -> void
+	//{
+	//	consumer.RequiereStopIfLazy();
+	//}));
+	//queue.StopAllPendingWait();
+	//consumers.GetSync();
 
-	producingAsync.get();
-
-	consumers.Apply(std::function<void(ConsumerType &)>([&](ConsumerType & consumer) mutable -> void
+	// [Unique Rcs] (trash test)
+	GCL::Thread::UniqueRsc<ElementType, FakeUniqueRscCreationPolicy<ElementType> >	uniqueRsc;
+	std::vector<std::future<void>>	_vec;
+	for (size_t i = 0; i < 10; ++i)
 	{
-		consumer.RequiereStopIfLazy();
-	}));
-
-	queue.StopAllPendingWait();
-	consumers.GetSync();
+		_vec.emplace_back(std::async(std::launch::async, [&uniqueRsc](void) -> void
+		{ 
+			for (size_t i = 0; i < 5; ++i)
+			{
+				THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << &(uniqueRsc.Get()) << ']');
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+		}));
+	}
+	for (auto & elem : _vec)
+		elem.get();
 
 	system("pause");
 	return 0;
