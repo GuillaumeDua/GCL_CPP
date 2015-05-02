@@ -117,7 +117,7 @@ int	main(int ac, char* av[])
 	//queue.StopAllPendingWait();
 	//consumers.GetSync();
 
-	// [Unique Rcs] (very trash test !)
+	// [Unique Rcs] (very trash test)
 	GCL::Thread::UniqueRsc<ElementType, FakeUniqueRscCreationPolicy<ElementType> >	uniqueRsc;
 	std::vector<std::future<void>>	_vec;
 	for (size_t i = 0; i < 10; ++i)
