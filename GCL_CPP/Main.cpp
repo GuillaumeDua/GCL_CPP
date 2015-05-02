@@ -117,11 +117,10 @@ int	main(int ac, char* av[])
 	//queue.StopAllPendingWait();
 	//consumers.GetSync();
 
-	// [Unique Rcs] (trash test)
+	// [Unique Rcs] (very trash test !)
 	GCL::Thread::UniqueRsc<ElementType, FakeUniqueRscCreationPolicy<ElementType> >	uniqueRsc;
 	std::vector<std::future<void>>	_vec;
 	for (size_t i = 0; i < 10; ++i)
-	{
 		_vec.emplace_back(std::async(std::launch::async, [&uniqueRsc](void) -> void
 		{ 
 			for (size_t i = 0; i < 5; ++i)
@@ -130,7 +129,6 @@ int	main(int ac, char* av[])
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}
 		}));
-	}
 	for (auto & elem : _vec)
 		elem.get();
 
