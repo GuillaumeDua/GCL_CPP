@@ -58,8 +58,7 @@ namespace Log
 				*elem << data;
 			return *this;
 		}
-		template <>
-		Channel & operator << <T_SteamManipulator>(const T_SteamManipulator & manipulator)
+		Channel operator << (T_SteamManipulator manipulator)
 		{
 			for (auto & elem : _records)
 				manipulator(*elem);
@@ -88,7 +87,7 @@ namespace Log
 		}*/
 
 		template <typename T>
-		System & operator<<(const T & data) // data or steam manipulator
+		System & operator<<(const T & data)
 		{
 			for (auto & elem : _channels)
 				elem.second << data;
@@ -108,7 +107,7 @@ namespace Log
 			,	{ static_cast<ChannelName>(ChannelName::STD_LOG), Channel{ std::clog } }
 		});
 	};
-
+	
 	namespace Test
 	{
 		void	Process()
