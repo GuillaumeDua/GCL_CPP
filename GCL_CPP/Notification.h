@@ -12,8 +12,6 @@ namespace GCL
 {
 	namespace Notification
 	{
-		// Warning : Make sure that Notifications's callbacks captured variable have life-length that are bigger than this object.
-		// [Todo] : Replace std::string by template parameter
 		template <typename T_EventIDType = std::string>
 		struct Notifiable
 		{
