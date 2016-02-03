@@ -44,7 +44,6 @@ namespace GCL
 
 				elem.on(Notification::OnDestructionINotify::DTOR_EVENT_NAME) += [this, &elem]()
 				{
-					std::cout << "Event triggered" << std::endl;
 					this->remove(elem);
 				};
 
@@ -83,7 +82,7 @@ namespace GCL
 			struct Toto : GCL::Notification::OnDestructionINotify
 			{};
 
-			void	Process()
+			bool	Proceed()
 			{
 				try
 				{
@@ -101,6 +100,7 @@ namespace GCL
 						std::cout << "[+] Removing 1 element    : " << intContainer.size() << std::endl;
 					}
 					std::cout << "[+] Destroying 4 elements : " << intContainer.size() << std::endl;
+					return (intContainer.size() == 4);
 				}
 				catch (const std::exception & ex)
 				{
@@ -110,7 +110,7 @@ namespace GCL
 				{
 					std::cerr << "[Error] : Unknown exception catch" << std::endl;
 				}
-				std::cout << "[+] : OK" << std::endl;
+				return false;
 			}
 		}
 	}

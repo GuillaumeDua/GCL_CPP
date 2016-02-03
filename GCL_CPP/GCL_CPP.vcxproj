@@ -64,7 +64,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ProdConsum.h" />
+    <ClInclude Include="Maths.h" />
+    <ClInclude Include="Notification.h" />
+    <ClInclude Include="SelfUpdate.h" />
+    <ClInclude Include="Task.h" />
+    <ClInclude Include="Thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />

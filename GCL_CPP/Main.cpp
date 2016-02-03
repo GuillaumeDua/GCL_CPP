@@ -1,5 +1,6 @@
 # include "Task.h"
 # include "Maths.h"
+# include "Notification.h"
 
 # include <chrono>
 # include <thread>
@@ -36,7 +37,8 @@ bool	TestComponent(void)
 int	main(int ac, char* av[])
 {
 	// TestComponent<GCL::Task::Test>();
-	TestComponent<GCL::Maths::Test>();
+	// TestComponent<GCL::Maths::Test>();
+	TestComponent<GCL::Notification::Test>();
 
 	system("pause");
 	return 0;

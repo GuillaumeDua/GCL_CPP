@@ -48,7 +48,7 @@ namespace GCL
 			std::queue<T_EventID>			_pendingStatus;
 		};
 
-		namespace Test
+		struct Test
 		{
 			struct Toto : public Notifiable<>
 			{
@@ -72,7 +72,7 @@ namespace GCL
 				}
 			};
 
-			void	Process()
+			static bool	Proceed()
 			{
 				Toto toto;
 				toto.on("Collision") += [](){ std::cout << "Collision events triggered" << std::endl; };
@@ -87,8 +87,10 @@ namespace GCL
 				toto.TriggerEvent("Collision");
 
 				toto.TriggerEvent("Collision");
+
+				return true;
 			}
-		}
+		};
 	}
 }
 
