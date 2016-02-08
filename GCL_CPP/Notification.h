@@ -1,7 +1,8 @@
 #ifndef __GCL_NOTIFICATION__
 # define __GCL_NOTIFICATION__
 
-# include "./Vector.h"
+# include "Vector.h"
+# include "Preprocessor.h"
 
 # include <map>
 # include <queue>
@@ -54,7 +55,7 @@ namespace GCL
 			{
 				void	DoStuff(void)
 				{
-					std::cout << "Toto::DoStuff" << std::endl;
+					_GCL_DEBUG_INSTRUCTION(std::cout << "Toto::DoStuff" << std::endl);
 				}
 				void	IncrI(void)
 				{
@@ -68,14 +69,14 @@ namespace GCL
 			{
 				void	Report(const int i)
 				{
-					std::cout << "[0x" << this << "] : CollisionNotificationLogger::Report : " << i << std::endl;
+					_GCL_DEBUG_INSTRUCTION(std::cout << "[0x" << this << "] : CollisionNotificationLogger::Report : " << i << std::endl);
 				}
 			};
 
 			static bool	Proceed()
 			{
 				Toto toto;
-				toto.on("Collision") += [](){ std::cout << "Collision events triggered" << std::endl; };
+				toto.on("Collision") += [](){ _GCL_DEBUG_INSTRUCTION(std::cout << "Collision events triggered" << std::endl); };
 				toto.on("Collision") += [&toto](){ toto.DoStuff(); };
 				toto.on("Collision") += [&toto]()  { toto.IncrI(); };
 				toto.on("Collision") += [toto]()  mutable { toto.IncrI(); };

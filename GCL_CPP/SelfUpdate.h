@@ -5,13 +5,16 @@
 # include <vector>
 # include <functional>
 # include <iostream>
+# include <algorithm>
+
 # include "Notification.h"
+# include "Preprocessor.h"
 
 namespace GCL
 {
 	namespace Notification
 	{
-		struct OnDestructionINotify : public GCL::Notification::Notifiable < std::string >
+		struct OnDestructionINotify : public GCL::Notification::Notifiable<>
 		{
 			static const std::string DTOR_EVENT_NAME;
 
@@ -21,6 +24,12 @@ namespace GCL
 			}
 		};
 		const std::string OnDestructionINotify::DTOR_EVENT_NAME = "dtor";
+
+
+		void	Make_OnDestructionINotify(GCL::Notification::Notifiable<> & obj)
+		{
+		}
+
 	}
 	namespace Container
 	{
@@ -77,12 +86,12 @@ namespace GCL
 			T_Container	_content;
 		};
 
-		namespace Test
+		struct Test
 		{
 			struct Toto : GCL::Notification::OnDestructionINotify
 			{};
 
-			bool	Proceed()
+			static bool	Proceed(void)
 			{
 				try
 				{
@@ -95,12 +104,12 @@ namespace GCL
 						intContainer += totos.at(1);
 						intContainer += totos.at(2);
 						intContainer += totos.at(3);
-						std::cout << "[+] Adding 4 elements     : " << intContainer.size() << std::endl;
+						_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Adding 4 elements     : " << intContainer.size() << std::endl);
 						intContainer -= totos.at(1);
-						std::cout << "[+] Removing 1 element    : " << intContainer.size() << std::endl;
+						_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Removing 1 element    : " << intContainer.size() << std::endl);
 					}
-					std::cout << "[+] Destroying 4 elements : " << intContainer.size() << std::endl;
-					return (intContainer.size() == 4);
+					_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Destroying 4 elements : " << intContainer.size() << std::endl);
+					return (intContainer.size() == 0);
 				}
 				catch (const std::exception & ex)
 				{
@@ -112,7 +121,7 @@ namespace GCL
 				}
 				return false;
 			}
-		}
+		};
 	}
 }
 #endif // __GCL__SELF_UPDATE__

@@ -11,6 +11,7 @@
 # include <iomanip>
 
 # include "Thread.h"
+# include "Preprocessor.h"
 
 namespace GCL
 {
@@ -215,7 +216,7 @@ namespace GCL
 				}
 			};
 
-			bool Proceed(void)
+			static bool Proceed(void)
 			{
 				using ElementType = int;
 				using QueueType = GCL::Task::Queue < ElementType > ;
@@ -265,7 +266,8 @@ namespace GCL
 				{
 					for (size_t i = 0; i < 5; ++i)
 					{
-						THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << &(uniqueRsc.Get()) << ']');
+						const int * unique_rcs_ptr = &(uniqueRsc.Get());
+						_GCL_DEBUG_INSTRUCTION(THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << unique_rcs_ptr << ']'));
 						std::this_thread::sleep_for(std::chrono::seconds(1));
 					}
 				}));
