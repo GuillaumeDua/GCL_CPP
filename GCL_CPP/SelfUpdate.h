@@ -12,30 +12,28 @@
 
 namespace GCL
 {
-	namespace Notification
+	struct OnDestructionCalledStdFunction : public std::function<void()>
 	{
-		struct OnDestructionINotify : public GCL::Notification::Notifiable<>
+		explicit OnDestructionCalledStdFunction(std::function<void()> && func)
 		{
-			static const std::string DTOR_EVENT_NAME;
-
-			~OnDestructionINotify()
-			{
-				this->TriggerEvent(DTOR_EVENT_NAME);
-			}
-		};
-		const std::string OnDestructionINotify::DTOR_EVENT_NAME = "dtor";
-
-
-		void	Make_OnDestructionINotify(GCL::Notification::Notifiable<> & obj)
-		{
+			func.swap(*this);
 		}
+		OnDestructionCalledStdFunction(const OnDestructionCalledStdFunction & w)
+		{
+			const_cast<OnDestructionCalledStdFunction &>(w).swap(*this);
+		}
+		~OnDestructionCalledStdFunction()
+		{
+			if (*this)
+				(*this)();
+		}
+	};
 
-	}
 	namespace Container
 	{
+		template <typename T_Element>
 		struct SelfUpdate
 		{
-			using T_Element = Notification::OnDestructionINotify;
 			using T_Container = std::set < T_Element * > ;	// Only ordered
 
 			SelfUpdate() = default;
@@ -51,7 +49,7 @@ namespace GCL
 				if (ret.second == false)
 					std::cerr << "[Warning] : Attempt to register an existing element" << std::endl;
 
-				elem.on(Notification::OnDestructionINotify::DTOR_EVENT_NAME) += [this, &elem]()
+				elem.on(Notification::DTOR_EVENT_NAME) += [this, &elem]()
 				{
 					this->remove(elem);
 				};
@@ -88,28 +86,17 @@ namespace GCL
 
 		struct Test
 		{
-			struct Toto : GCL::Notification::OnDestructionINotify
-			{};
-
 			static bool	Proceed(void)
 			{
 				try
 				{
-					SelfUpdate	intContainer;
-
+					bool was_cb_called(false);
 					{
-						std::vector<Toto>	totos(4);
-
-						intContainer += totos.at(0);
-						intContainer += totos.at(1);
-						intContainer += totos.at(2);
-						intContainer += totos.at(3);
-						_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Adding 4 elements     : " << intContainer.size() << std::endl);
-						intContainer -= totos.at(1);
-						_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Removing 1 element    : " << intContainer.size() << std::endl);
+						GCL::Notification::Notifiable<> notifiable;
+						notifiable.on("__destruction__").emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
 					}
-					_GCL_DEBUG_INSTRUCTION(std::cout << "[+] Destroying 4 elements : " << intContainer.size() << std::endl);
-					return (intContainer.size() == 0);
+
+					return was_cb_called;
 				}
 				catch (const std::exception & ex)
 				{

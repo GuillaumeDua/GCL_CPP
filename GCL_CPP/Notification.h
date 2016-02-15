@@ -16,6 +16,20 @@ namespace GCL
 		template <typename T_EventIDType = std::string>
 		struct Notifiable
 		{
+			explicit Notifiable() = default;
+			Notifiable(Notifiable && obj)
+				: _events(std::move(obj._events))
+				, _pendingStatus(std::move(obj._pendingStatus))
+			{}
+			virtual ~Notifiable(){}
+			Notifiable & operator=(Notifiable && obj)
+			{
+				_events = std::move(obj._events);
+				_pendingStatus = std::move(obj._pendingStatus);
+				return *this;
+			}
+
+
 			using T_EventID = typename T_EventIDType;
 			using EventContainer = typename std::map<typename T_EventID, GCL::Vector<std::function<void()> > >;
 
@@ -44,7 +58,7 @@ namespace GCL
 					elem();
 			}
 
-		protected:
+		// protected:
 			EventContainer					_events;
 			std::queue<T_EventID>			_pendingStatus;
 		};
