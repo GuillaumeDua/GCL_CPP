@@ -72,7 +72,7 @@ namespace GCL
 			SelfUpdate &	operator-=(T_Element & elem)
 			{
 				this->remove(elem);
-				elem.on(Notification::OnDestructionINotify::DTOR_EVENT_NAME).clear();
+				elem.on(Notification::DTOR_EVENT_NAME).clear();
 
 				return *this;
 			}
@@ -101,7 +101,7 @@ namespace GCL
 					{
 						GCL::Notification::Notifiable<> notifiable;
 						{
-							notifiable.on("__destruction__").emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
+							notifiable.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
 						}
 						if (was_cb_called)
 							return false;

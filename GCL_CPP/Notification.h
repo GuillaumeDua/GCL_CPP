@@ -37,11 +37,11 @@ namespace GCL
 			{
 				return _events[name];
 			}
-			void							Notify(const T_EventID & name)
+			void									Notify(const T_EventID & name)
 			{
 				_pendingStatus.push(name);
 			}
-			void							ResolvePendingNotifications(void)
+			void									ResolvePendingNotifications(void)
 			{
 				while (!_pendingStatus.empty())
 				{
@@ -49,7 +49,7 @@ namespace GCL
 					_pendingStatus.pop();
 				}
 			}
-			void							TriggerEvent(const T_EventID & name)
+			void									TriggerEvent(const T_EventID & name)
 			{
 				if (_events.find(name) == _events.end())
 					return;

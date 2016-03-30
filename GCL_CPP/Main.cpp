@@ -4,6 +4,7 @@
 # include "Maths.h"
 # include "Notification.h"
 # include "SelfUpdate.h"
+# include "Ownership.h"
 
 # include <chrono>
 # include <thread>
@@ -52,6 +53,7 @@ int	main(int ac, char* av[])
 	// TestComponent<GCL::Maths::Test>();
 	TestComponent<GCL::Notification::Test>();
 	TestComponent<GCL::Container::Test>();
+	TestComponent<GCL::Ownership::Test>();
 
 	system("pause");
 	return 0;

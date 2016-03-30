@@ -8,6 +8,16 @@ namespace GCL
 	template <typename T>
 	struct Vector : public std::vector<T>
 	{
+		Vector()
+			: std::vector<T>()
+		{}
+		Vector(const std::vector<T> & stdVector)
+			: std::vector<T>(stdVector)
+		{}
+		Vector(const std::vector<T> && stdVector)
+			: std::vector<T>(stdVector)
+		{}
+
 		Vector & operator +=(T && elem)
 		{
 			this->emplace_back(elem);
