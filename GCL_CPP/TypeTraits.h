@@ -3,7 +3,7 @@
 
 namespace GCL
 {
-	namespace Traits
+	namespace TypeTrait
 	{
 		template <typename T>
 		struct	TypeToUniqueId
@@ -28,9 +28,9 @@ namespace GCL
 			static bool Proceed(void) _noexcept
 			{
 				return
-				GCL::Traits::TypeToUniqueId<A>::value == GCL::Traits::TypeToUniqueId<A>::value
-				&& GCL::Traits::TypeToUniqueId<B>::value == GCL::Traits::TypeToUniqueId<B>::value
-				&& GCL::Traits::TypeToUniqueId<A>::value != GCL::Traits::TypeToUniqueId<B>::value
+				GCL::TypeTrait::TypeToUniqueId<A>::value == GCL::TypeTrait::TypeToUniqueId<A>::value
+				&& GCL::TypeTrait::TypeToUniqueId<B>::value == GCL::TypeTrait::TypeToUniqueId<B>::value
+				&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
 				;
 			}
 		};
