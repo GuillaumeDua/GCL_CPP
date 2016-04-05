@@ -11,24 +11,23 @@
 
 namespace GCL
 {
-	namespace Notification
+	namespace Events
 	{
 		template <typename T_EventIDType = std::string>
-		struct Notifiable
+		struct EventHandler
 		{
-			explicit Notifiable() = default;
-			Notifiable(Notifiable && obj)
+			explicit EventHandler() = default;
+			EventHandler(EventHandler && obj)
 				: _events(std::move(obj._events))
 				, _pendingStatus(std::move(obj._pendingStatus))
 			{}
-			virtual ~Notifiable(){}
-			Notifiable & operator=(Notifiable && obj)
+			virtual ~EventHandler(){}
+			EventHandler & operator=(EventHandler && obj)
 			{
 				_events = std::move(obj._events);
 				_pendingStatus = std::move(obj._pendingStatus);
 				return *this;
 			}
-
 
 			using T_EventID = typename T_EventIDType;
 			using EventContainer = typename std::map<typename T_EventID, GCL::Vector<std::function<void()> > >;
@@ -65,7 +64,7 @@ namespace GCL
 
 		struct Test
 		{
-			struct Toto : public Notifiable<>
+			struct Toto : public EventHandler<>
 			{
 				void	DoStuff(void)
 				{

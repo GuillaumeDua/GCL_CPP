@@ -17,11 +17,19 @@ namespace GCL
 		Vector(const std::vector<T> && stdVector)
 			: std::vector<T>(stdVector)
 		{}
+		Vector(const std::initializer_list<T> & initList)
+			: std::vector<T>(initList)
+		{}
 
-		Vector & operator +=(T && elem)
+		Vector & operator+=(T && elem)
 		{
 			this->emplace_back(elem);
 			return *this;
+		}
+		Vector & operator+=(const Vector & vec)
+		{
+			for (auto & elem : vec)
+				this->push_back(elem);
 		}
 		/*Vector & operator +=(const T & elem)
 		{

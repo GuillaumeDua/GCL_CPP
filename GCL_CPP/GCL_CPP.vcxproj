@@ -65,7 +65,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Maths.h" />
-    <ClInclude Include="Notification.h" />
+    <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Ownership.h" />
     <ClInclude Include="SelfUpdate.h" />
     <ClInclude Include="Task.h" />

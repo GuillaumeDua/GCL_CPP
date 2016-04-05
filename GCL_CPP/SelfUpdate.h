@@ -99,7 +99,7 @@ namespace GCL
 				{
 					bool was_cb_called(false);
 					{
-						GCL::Notification::Notifiable<> notifiable;
+						GCL::Notification::EventHandler<> notifiable;
 						{
 							notifiable.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
 						}
@@ -107,7 +107,7 @@ namespace GCL
 							return false;
 					}
 
-					struct Toto : public Notification::Notifiable<>
+					struct Toto : public Notification::EventHandler<>
 					{};
 
 					bool wasElementCorrectlyAdded(false);
