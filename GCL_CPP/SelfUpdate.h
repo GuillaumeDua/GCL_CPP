@@ -7,7 +7,7 @@
 # include <iostream>
 # include <algorithm>
 
-# include "Notification.h"
+# include "EventHandler.h"
 # include "Preprocessor.h"
 
 namespace GCL
@@ -99,15 +99,15 @@ namespace GCL
 				{
 					bool was_cb_called(false);
 					{
-						GCL::Notification::EventHandler<> notifiable;
+						GCL::Events::EventHandler<> eventHandler;
 						{
-							notifiable.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
+							eventHandler.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
 						}
 						if (was_cb_called)
 							return false;
 					}
 
-					struct Toto : public Notification::EventHandler<>
+					struct Toto : public GCL::Events::EventHandler<>
 					{};
 
 					bool wasElementCorrectlyAdded(false);

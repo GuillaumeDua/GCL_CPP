@@ -2,7 +2,7 @@
 
 # include "Task.h"
 # include "Maths.h"
-# include "Notification.h"
+# include "EventHandler.h"
 # include "SelfUpdate.h"
 # include "Ownership.h"
 
@@ -51,7 +51,7 @@ int	main(int ac, char* av[])
 {
 	// TestComponent<GCL::Task::Test>();
 	// TestComponent<GCL::Maths::Test>();
-	TestComponent<GCL::Notification::Test>();
+	TestComponent<GCL::Events::Test>();
 	TestComponent<GCL::Container::Test>();
 	TestComponent<GCL::Ownership::Test>();
 
