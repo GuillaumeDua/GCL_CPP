@@ -5,6 +5,7 @@
 # include "EventHandler.h"
 # include "SelfUpdate.h"
 # include "Ownership.h"
+# include "TypeTraits.h"
 
 # include <chrono>
 # include <thread>
@@ -19,9 +20,11 @@ bool	TestComponent(void)
 		const std::string & symbol_name = typeid(T_ComponentTest).name();
 		std::cout << "[Test] : [" << std::setw(30) << symbol_name << "] : Processing ... " << std::endl;
 
-		std::chrono::high_resolution_clock::time_point tp_start = std::chrono::high_resolution_clock::now();
+		using T_ClockSystem = std::chrono::high_resolution_clock;
+
+		T_ClockSystem::time_point tp_start = T_ClockSystem::now();
 		bool ret = T_ComponentTest::Proceed();
-		const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tp_start).count();
+		const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(T_ClockSystem::now() - tp_start).count();
 
 		std::cout << "[Test] : [" << std::setw(30) << symbol_name << "] : .............. : [" << (ret ? "PASSED" : "FAILED") << "] in " << elasped_usec  << "ms" << std::endl << std::endl;
 
@@ -49,12 +52,15 @@ bool	TestComponent(void)
 
 int	main(int ac, char* av[])
 {
+	TestComponent<GCL::Events::Test>();
+
 	// TestComponent<GCL::Task::Test>();
 	// TestComponent<GCL::Maths::Test>();
-	TestComponent<GCL::Events::Test>();
+
+	/*TestComponent<GCL::Events::Test>();
 	TestComponent<GCL::Container::Test>();
 	TestComponent<GCL::Ownership::Test>();
-
+*/
 	system("pause");
 	return 0;
 }

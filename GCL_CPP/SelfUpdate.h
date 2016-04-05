@@ -29,7 +29,7 @@ namespace GCL
 		}
 	};
 
-	namespace Notification
+	namespace Event
 	{
 		static const std::string DTOR_EVENT_NAME = "_dtor_";
 	}
@@ -56,7 +56,7 @@ namespace GCL
 					std::cerr << "[Warning] : Attempt to register an existing element" << std::endl;
 
 				// Note : elem is **(ret.first)
-				elem.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(OnDestructionCalledStdFunction([this, &elem]()
+				elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(OnDestructionCalledStdFunction([this, &elem]()
 				{
 					this->remove(elem);
 				})));
@@ -101,7 +101,7 @@ namespace GCL
 					{
 						GCL::Events::EventHandler<> eventHandler;
 						{
-							eventHandler.on(Notification::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
+							eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
 						}
 						if (was_cb_called)
 							return false;
