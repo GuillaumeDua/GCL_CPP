@@ -64,12 +64,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Experimental.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Ownership.h" />
     <ClInclude Include="SelfUpdate.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="Thread.h" />
+    <ClInclude Include="TypeTraits.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />

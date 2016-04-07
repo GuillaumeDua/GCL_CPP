@@ -34,7 +34,6 @@ namespace GCL
 			void *      _ptr;
 			const int   _typeUniqueId;
 		};
-
 		struct Test
 		{
 			struct A{}; struct B{};
