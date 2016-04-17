@@ -92,11 +92,11 @@ namespace GCL
 				toto.on("Collision") += [](){ _GCL_DEBUG_INSTRUCTION(std::cout << "Collision events triggered" << std::endl); };
 				toto.on("Collision") += [&toto](){ toto.DoStuff(); };
 				toto.on("Collision") += [&toto]()  { toto.IncrI(); };
-				toto.on("Collision") += [toto]()  mutable { toto.IncrI(); };
+				toto.on("Collision") += [&toto]()  mutable { toto.IncrI(); };
 				// toto.on("Collision") += [toto]()   { toto.IncrI(); };
 
 				CollisionNotificationLogger collisionLogger;
-				toto.on("Collision") += [toto, &collisionLogger]() mutable { collisionLogger.Report(toto._i); };
+				toto.on("Collision") += [&toto, &collisionLogger]() mutable { collisionLogger.Report(toto._i); };
 				toto.on("Collision") += [&toto, &collisionLogger]() { collisionLogger.Report(toto._i); };
 				toto.TriggerEvent("Collision");
 

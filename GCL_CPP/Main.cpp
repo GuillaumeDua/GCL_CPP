@@ -6,6 +6,8 @@
 # include "SelfUpdate.h"
 # include "Ownership.h"
 # include "TypeTraits.h"
+# include "Experimental.h"
+# include "TemplateMetaProgramming.h"
 
 # include <chrono>
 # include <thread>
@@ -52,7 +54,12 @@ bool	TestComponent(void)
 
 int	main(int ac, char* av[])
 {
-	TestComponent<GCL::Events::Test>();
+    TestComponent<GCL::TMP::Test>();
+
+	//TestComponent<GCL::TypeTrait::Test>();
+	//TestComponent<GCL::Experimental::TypeTrait::Test>();
+
+	// TestComponent<GCL::Events::Test>();
 
 	// TestComponent<GCL::Task::Test>();
 	// TestComponent<GCL::Maths::Test>();
