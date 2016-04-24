@@ -30,17 +30,18 @@ namespace GCL
 			}
 
 			using T_EventID = typename T_EventIDType;
-			using EventContainer = typename std::map<typename T_EventID, GCL::Vector<std::function<void()> > >;
+			using T_EventCallback = std::function<void()>;
+			using T_EventContainer = typename std::map<typename T_EventID, GCL::Vector<typename T_EventCallback> >;
 
-			typename EventContainer::mapped_type &	on(const T_EventID & name)
+			typename T_EventContainer::mapped_type &	on(const T_EventID & name)
 			{
 				return _events[name];
 			}
-			void									Notify(const T_EventID & name)
+			void										Notify(const T_EventID & name)
 			{
 				_pendingStatus.push(name);
 			}
-			void									ResolvePendingNotifications(void)
+			void										TriggerPendingEvents(void)
 			{
 				while (!_pendingStatus.empty())
 				{
@@ -48,7 +49,7 @@ namespace GCL
 					_pendingStatus.pop();
 				}
 			}
-			void									TriggerEvent(const T_EventID & name)
+			void										TriggerEvent(const T_EventID & name)
 			{
 				if (_events.find(name) == _events.end())
 					return;
@@ -57,8 +58,8 @@ namespace GCL
 					elem();
 			}
 
-		// protected:
-			EventContainer					_events;
+		protected:
+			T_EventContainer				_events;
 			std::queue<T_EventID>			_pendingStatus;
 		};
 
