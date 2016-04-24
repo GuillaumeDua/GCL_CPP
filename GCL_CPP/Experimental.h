@@ -133,6 +133,39 @@ namespace GCL
 				}
 			};
 		}
+
+		namespace Inheritance
+		{
+			template <class T, class ...Classes>
+			struct Super
+			{
+				struct Type : T, Super<Classes...>::Type
+				{};
+			};
+
+			template <class T>
+			struct Super<T>
+			{
+				using Type = T;
+			};
+
+			struct Test
+			{
+				struct A { A() { std::cout << "A" << std::endl; } };
+				struct B { B() { std::cout << "B" << std::endl; } };
+				struct C { C() { std::cout << "C" << std::endl; } };
+
+				static bool Proceed()
+				{
+					Super<A, B, C>::Type	super;
+
+					return std::is_convertible<Super<A, B, C>::Type, A>::value
+						&& std::is_convertible<Super<A, B, C>::Type, B>::value
+						&& std::is_convertible<Super<A, B, C>::Type, C>::value
+						;
+				}
+			};
+		}
 	}
 }
 
