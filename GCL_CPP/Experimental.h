@@ -133,7 +133,6 @@ namespace GCL
 				}
 			};
 		}
-
 		namespace Inheritance
 		{
 			template <class T, class ...Classes>
@@ -142,12 +141,12 @@ namespace GCL
 				struct Type : T, Super<Classes...>::Type
 				{};
 			};
-
 			template <class T>
 			struct Super<T>
 			{
 				using Type = T;
 			};
+
 
 			struct Test
 			{
@@ -157,12 +156,44 @@ namespace GCL
 
 				static bool Proceed()
 				{
+
 					Super<A, B, C>::Type	super;
 
 					return std::is_convertible<Super<A, B, C>::Type, A>::value
 						&& std::is_convertible<Super<A, B, C>::Type, B>::value
 						&& std::is_convertible<Super<A, B, C>::Type, C>::value
 						;
+				}
+			};
+		}
+
+		// Epic : TypeToId + IdToType
+		namespace Puzzle
+		{
+			struct NullType {};
+
+			template <typename T>
+			struct TypeToID
+			{
+				static const size_t value = 42;
+			};
+			template <size_t ID>
+			struct IDToType
+			{
+				using _Type = NullType;
+			};
+
+			struct Test
+			{
+				static bool Proceed()
+				{
+					struct Toto {};
+
+					const size_t id = TypeToID<Toto>::value;
+
+					return (
+						std::is_same<IDToType<id>::_Type, Toto>::value
+						);
 				}
 			};
 		}

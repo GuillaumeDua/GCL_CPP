@@ -8,6 +8,7 @@
 # include "TypeTraits.h"
 # include "Experimental.h"
 # include "TemplateMetaProgramming.h"
+# include "Color.h"
 
 # include <chrono>
 # include <thread>
@@ -54,10 +55,16 @@ bool	TestComponent(void)
 
 int	main(int ac, char* av[])
 {
-    TestComponent<GCL::TMP::Test>();
+	TestComponent<GCL::Experimental::TypeTrait::Test>();
+	TestComponent<GCL::Experimental::Inheritance::Test>();
+	TestComponent<GCL::Experimental::Puzzle::Test>();
 
-	//TestComponent<GCL::TypeTrait::Test>();
-	//TestComponent<GCL::Experimental::TypeTrait::Test>();
+    // TestComponent<GCL::TMP::Test>();
+
+    //TestComponent<GCL::Color::Test>();
+        
+    //TestComponent<GCL::TypeTrait::Test>();
+	
 
 	// TestComponent<GCL::Events::Test>();
 
