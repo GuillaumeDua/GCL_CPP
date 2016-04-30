@@ -173,12 +173,12 @@ namespace GCL
 			struct NullType {};
 
 			template <typename T>
-			struct TypeToID
+			struct Type2ID
 			{
 				static const size_t value = 42;
 			};
 			template <size_t ID>
-			struct IDToType
+			struct ID2Type
 			{
 				using _Type = NullType;
 			};
@@ -189,10 +189,10 @@ namespace GCL
 				{
 					struct Toto {};
 
-					const size_t id = TypeToID<Toto>::value;
+					const size_t id = Type2ID<Toto>::value;
 
 					return (
-						std::is_same<IDToType<id>::_Type, Toto>::value
+						std::is_same<ID2Type<id>::_Type, Toto>::value
 						);
 				}
 			};
