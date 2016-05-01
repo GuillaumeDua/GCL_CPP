@@ -17,10 +17,10 @@ namespace GCL
 		template<typename... T>
 		std::vector<int> Make_TypeToUniqueIdVector() { return { TypeToUniqueId<T>::value... }; }
 
-		struct Any
+		struct Variant
 		{
 			template <typename T>
-			explicit Any(T & var)
+			explicit Variant(T & var)
 				: _ptr(&var)
 				, _typeUniqueId(TypeToUniqueId<T>::value)
 			{}
@@ -29,7 +29,10 @@ namespace GCL
 			inline T & GetAs(void)
 			{
 				if (TypeToUniqueId<T>::value != _typeUniqueId)
+				{
 					std::cerr << "[Warning] : Bad type requested : [" << _typeUniqueId << "] to [" << TypeToUniqueId<T>::value << ']' << std::endl;
+					throw std::bad_cast;
+				}
 				return *reinterpret_cast<T*>(_ptr);
 			}
 
