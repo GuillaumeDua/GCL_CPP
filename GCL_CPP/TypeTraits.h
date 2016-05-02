@@ -40,6 +40,22 @@ namespace GCL
 			void *      _ptr;
 			const int   _typeUniqueId;
 		};
+
+		template <class T, class Tuple>
+		struct IndexOf;
+
+		template <class T, class... _Types>
+		struct IndexOf<T, std::tuple<T, _Types...> >
+		{
+			static const std::size_t value = 0;
+		};
+
+		template <class T, class U, class... _Types>
+		struct IndexOf<T, std::tuple<U, _Types...> >
+		{
+			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;
+		};
+
 		struct Test
 		{
 			struct A{}; struct B{};
@@ -48,12 +64,16 @@ namespace GCL
 			{
 				std::vector<int> typeIdVector = Make_TypeToUniqueIdVector<int, char, int, char, std::string, A, B>();
 
+				struct B {};
+				using _Types = std::tuple<int, char, B>;
+
 				return
 					GCL::TypeTrait::TypeToUniqueId<A>::value == GCL::TypeTrait::TypeToUniqueId<A>::value
 					&& GCL::TypeTrait::TypeToUniqueId<B>::value == GCL::TypeTrait::TypeToUniqueId<B>::value
 					&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
 					&& typeIdVector.at(0) == typeIdVector.at(2)
 					&& typeIdVector.at(1) == typeIdVector.at(3)
+					&& IndexOf<B, _Types>::value == 2;
 					;
 			}
 		};
