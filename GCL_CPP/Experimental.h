@@ -3,6 +3,10 @@
 
 # include "TypeTraits.h"
 # include <functional>
+# include <cassert>
+# include <tuple>
+# include <initializer_list>
+# include <type_traits>
 
 /*
 	/!\ BEWARE /!\
@@ -172,28 +176,166 @@ namespace GCL
 		{
 			struct NullType {};
 
-			template <typename T>
-			struct Type2ID
+			struct GenerateNextTypeID
 			{
-				static const size_t value = 42;
+				static const size_t	Get()
+				{
+					return Type2ID_inc;
+				}
+				static const size_t GetInc(void)
+				{
+					return ++Type2ID_inc;
+				}
+				static size_t Type2ID_inc;
 			};
+			size_t GenerateNextTypeID::Type2ID_inc = 0;
+
 			template <size_t ID>
 			struct ID2Type
 			{
 				using _Type = NullType;
 			};
 
+			template <size_t & id, typename T>
+			struct TypeAndTypeId
+			{
+				using _Type = T;
+				static size_t & _ID;
+			};
+			template <size_t & id, typename T>
+			size_t & TypeAndTypeId<id, T>::_ID = id;
+
+			template <typename T>
+			struct Type2ID
+			{
+				static /*const */size_t value;
+				static size_t id;
+			};
+			template <typename T>
+			size_t Type2ID<T>::value = GenerateNextTypeID::GetInc();
+			template <typename T>
+			size_t Type2ID<T>::id = TypeAndTypeId<value, T>::_ID;
+
+			template <size_t id>
+			auto	IsType(void)
+			{
+				return TypeAndTypeId<id, T>::id == id;
+			}
+
 			struct Test
 			{
 				static bool Proceed()
 				{
-					struct Toto {};
+					std::cout
+						<< Type2ID<std::string>::id		<< std::endl
+						<< Type2ID<std::string>::value	<< std::endl
+						<< Type2ID<int>::id				<< std::endl
+						<< Type2ID<int>::value			<< std::endl
+						<< Type2ID<char>::id			<< std::endl
+						<< Type2ID<char>::value			<< std::endl
+						;
+					
 
-					const size_t id = Type2ID<Toto>::value;
+					return true;
 
-					return (
-						std::is_same<ID2Type<id>::_Type, Toto>::value
-						);
+					/*struct Toto {};*/
+					//const size_t id = Type2ID<Toto>::value;
+					//return (
+					//	std::is_same<ID2Type<id>::_Type, Toto>::value
+					//	);
+				}
+			};
+		}
+		namespace Puzzle2
+		{
+			struct ListableTypeCounter { static size_t _IDCounter; };
+			size_t ListableTypeCounter::_IDCounter = 0;
+
+			struct TypeByIndexFactory
+			{
+				using _GeneratorFunc = std::function<TypeByIndexFactory*(void)>;
+				static std::vector < _GeneratorFunc >	_listableTypegenerator;
+			};
+			std::vector < TypeByIndexFactory::_GeneratorFunc >	TypeByIndexFactory::_listableTypegenerator;
+
+			template <typename T>
+			struct ListableType : TypeByIndexFactory
+			{
+				ListableType()
+				{
+					_ID;
+					decltype(_listableTypegenerator_insert._enforceCodegeneration) enforceCodeGen = _listableTypegenerator_insert._enforceCodegeneration;
+				}
+
+				static size_t _ID;
+				struct	_ListableTypegenerator_insert
+				{
+					_ListableTypegenerator_insert()
+					{
+						std::cout << "_ListableTypegenerator_insert" << std::endl;
+						assert(_listableTypegenerator.size() == (_ID - 1));
+						_listableTypegenerator.push_back([]() -> TypeByIndexFactory * {
+							return new T;
+						});
+					}
+				public:
+					int _enforceCodegeneration = 0;
+				}		static _listableTypegenerator_insert;
+				
+			};
+			template <typename T>
+			size_t ListableType<T>::_ID = (++ListableTypeCounter::_IDCounter);
+			template <typename T>
+			typename ListableType<T>::_ListableTypegenerator_insert ListableType<T>::_listableTypegenerator_insert;
+			
+			// std::tuple / std::tie / std::tuple_cat / std::make_tuple
+			struct Test
+			{
+				static bool Proceed(void)
+				{
+					struct A : ListableType<A>
+					{};
+
+					std::cout << "Generated type   : " << ListableTypeCounter::_IDCounter << std::endl;
+					std::cout << "Type to generate : " << TypeByIndexFactory::_listableTypegenerator.size() << std::endl;
+
+					return true;
+				}
+			};
+		}
+		namespace Puzzle3
+		{
+			template <typename ...T>
+			struct TypeContainer
+			{
+				using _Types = std::tuple<T...>;
+
+				template <std::size_t N>
+				using TypeAt = typename std::tuple_element<N, _Types>::type;
+				// using TypeAt = std::remove_reference<decltype(std::get<N>(tuple))>::type
+
+				template <typename T_Search>
+				constexpr static const size_t IndexOf(void)
+				{
+					return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
+				}
+			};
+
+			struct Test
+			{
+				static bool Proceed()
+				{
+					struct A {}; struct B {}; struct C {};
+					using _Types = typename TypeContainer
+						<
+						A
+						, B
+						, C
+						>;
+
+					return
+						_Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()
+						;
 				}
 			};
 		}

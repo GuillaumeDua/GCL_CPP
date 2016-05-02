@@ -65,13 +65,14 @@ int	main(int ac, char* av[])
 {
 	TestComponent<GCL::Experimental::TypeTrait::Test>();
 	TestComponent<GCL::Experimental::Inheritance::Test>();
-	TestComponent<GCL::Experimental::Puzzle::Test>();
+	// TestComponent<GCL::Experimental::Puzzle::Test>();
+	TestComponent<GCL::Experimental::Puzzle3::Test>();
 
     // TestComponent<GCL::TMP::Test>();
 
     //TestComponent<GCL::Color::Test>();
         
-    //TestComponent<GCL::TypeTrait::Test>();
+    TestComponent<GCL::TypeTrait::Test>();
 	
 
 	// TestComponent<GCL::Events::Test>();
