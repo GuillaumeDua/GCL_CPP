@@ -2,6 +2,7 @@
 # define GCL_EXPERIMENTAL__
 
 # include "TypeTraits.h"
+# include "TemplateMetaProgramming.h"
 # include <functional>
 # include <cassert>
 # include <tuple>
@@ -14,6 +15,7 @@
 */
 
 using namespace GCL::TypeTrait;
+using namespace GCL::TMP;
 
 namespace GCL
 {
@@ -319,6 +321,20 @@ namespace GCL
 				{
 					return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
 				}
+
+				/*template<template<typename> class V>
+				void	ExecForTypeAt
+				{}*/
+			};
+
+			
+			template <typename T>
+			struct TypenamePrint
+			{
+				static void Call(void)
+				{
+					std::cout << "Type : " << typeid(T).name() << std::endl;
+				}
 			};
 
 			struct Test
@@ -332,6 +348,9 @@ namespace GCL
 						, B
 						, C
 						>;
+
+					Foreach<A, B, C>::Call<TypenamePrint>();
+					Foreach<_Types>::CallAt<TypenamePrint>(0);
 
 					return
 						_Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()

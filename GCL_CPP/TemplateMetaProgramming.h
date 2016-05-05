@@ -7,16 +7,13 @@ namespace GCL
     {
         struct NullType {};
 
-        template <bool condition, typename _THEN, typename _ELSE>
-        struct IF
+		template <bool condition, typename _THEN, typename _ELSE>	struct IF
         {};
-        template <typename _THEN, typename _ELSE>
-        struct IF<true, _THEN, _ELSE>
+		template <typename _THEN, typename _ELSE>					struct IF<true, _THEN, _ELSE>
         {
             using _Type = _THEN;
         };
-        template <typename _THEN, typename _ELSE>
-        struct IF<false, _THEN, _ELSE>
+		template <typename _THEN, typename _ELSE>					struct IF<false, _THEN, _ELSE>
         {
             using _Type = _ELSE;
         };
@@ -31,6 +28,7 @@ namespace GCL
             using _PREV = TMP::IF<(_ID == 0), TMP::NullType, List<_ID - 1> >;
         };
 
+		// [Todo] : Refactoring
         template <typename Type, template <typename> class Visitor, size_t _ItMax, size_t _It = 0, bool Continue = true>
         struct For
         {
@@ -46,6 +44,42 @@ namespace GCL
         {
             static void    iterate() {}
         };
+
+		template <typename ... T>				struct Foreach;
+		template <typename T0, typename ... T>	struct Foreach<T0, T...>
+		{
+			Foreach() = delete;
+			Foreach(const Foreach &) = delete;
+			Foreach(const Foreach &&) = delete;
+
+			template <template <typename> class T_Functor>
+			static void	Call(void)
+			{
+				T_Functor<T0>::Call();
+				Foreach<T...>::Call<T_Functor>();
+			}
+			template <template <typename> class T_Functor, size_t N = 0>
+			static void	CallAt(const size_t pos)
+			{
+				if (N == pos)	T_Functor<T0>::Call();
+				else			Foreach<T...>::CallAt<T_Functor, (N + 1)>(pos);
+			}
+		};
+		template <>								struct Foreach<>
+		{
+			Foreach() = delete;
+			Foreach(const Foreach &) = delete;
+			Foreach(const Foreach &&) = delete;
+
+			template <template <typename> class T_Functor>
+			static void	Call(void)
+			{}
+			template <template <typename> class T_Functor, size_t N = 0>
+			static void	CallAt(const size_t pos)
+			{
+				throw std::out_of_range("template <typename ... T> struct Foreach::CallAt : OOB");
+			}
+		};
 
         struct Test
         {
