@@ -53,7 +53,7 @@ namespace GCL
 		template <class T, class U, class... _Types>
 		struct IndexOf<T, std::tuple<U, _Types...> >
 		{
-			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;
+			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;	// Todo : Check recusion
 		};
 
 		struct Test
