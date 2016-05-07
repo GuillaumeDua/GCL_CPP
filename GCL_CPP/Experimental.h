@@ -307,26 +307,12 @@ namespace GCL
 		}
 		namespace Puzzle3
 		{
-			template <typename ...T>
-			struct TypeContainer
+			template <typename T_Functor>
+			typename T_Functor::result_type	my_func(T_Functor & func)
 			{
-				using _Types = std::tuple<T...>;
-
-				template <std::size_t N>
-				using TypeAt = typename std::tuple_element<N, _Types>::type;
-				// using TypeAt = std::remove_reference<decltype(std::get<N>(tuple))>::type
-
-				template <typename T_Search>
-				constexpr static const size_t IndexOf(void)
-				{
-					return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
-				}
-
-				/*template<template<typename> class V>
-				void	ExecForTypeAt
-				{}*/
-			};
-
+				return func();
+			}
+			
 			
 			template <typename T>
 			struct TypenamePrint
@@ -337,11 +323,22 @@ namespace GCL
 				}
 			};
 
+			struct Super {};
+			template <typename T>
+			struct CtorCaller
+			{
+				using return_type = Super*;
+				static return_type	Call(void)
+				{
+					return reinterpret_cast<return_type>(new T);
+				}
+			};
+
 			struct Test
 			{
 				static bool Proceed()
 				{
-					struct A {}; struct B {}; struct C {};
+					struct A : Super {}; struct B : Super {}; struct C : Super {};
 					using _Types = typename TypeContainer
 						<
 						A
@@ -351,6 +348,11 @@ namespace GCL
 
 					Foreach<A, B, C>::Call<TypenamePrint>();
 					Foreach<_Types>::CallAt<TypenamePrint>(0);
+					Super * super = Foreach<_Types>::CallAt_withReturn<CtorCaller>(0);
+					delete super;
+
+					std::function<int()> functor = []() { return 42; };
+					std::cout << my_func(functor) << std::endl;
 
 					return
 						_Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()

@@ -64,6 +64,12 @@ namespace GCL
 				if (N == pos)	T_Functor<T0>::Call();
 				else			Foreach<T...>::CallAt<T_Functor, (N + 1)>(pos);
 			}
+			template <template <typename> class T_Functor, size_t N = 0>
+			static typename T_Functor<T0>::return_type	CallAt_withReturn(const size_t pos)
+			{
+				if (N == pos)	return T_Functor<T0>::Call();
+				else			return Foreach<T...>::CallAt_withReturn<T_Functor, (N + 1)>(pos);
+			}
 		};
 		template <>								struct Foreach<>
 		{
@@ -77,7 +83,27 @@ namespace GCL
 			template <template <typename> class T_Functor, size_t N = 0>
 			static void	CallAt(const size_t pos)
 			{
-				throw std::out_of_range("template <typename ... T> struct Foreach::CallAt : OOB");
+				throw std::out_of_range("template <typename ... T> struct Foreach::CallAt");
+			}
+			template <template <typename> class T_Functor, size_t N = 0>
+			static typename T_Functor<void>::return_type	CallAt_withReturn(const size_t pos)
+			{
+				throw std::out_of_range("template <typename ... T> struct Foreach::CallAt_withReturn");
+			}
+		};
+
+		template <typename ...T>
+		struct TypeContainer
+		{
+			using _Types = std::tuple<T...>;
+
+			template <std::size_t N>
+			using TypeAt = typename std::tuple_element<N, _Types>::type;
+			// using TypeAt = std::remove_reference<decltype(std::get<N>(tuple))>::type
+			template <typename T_Search>
+			constexpr static const size_t IndexOf(void)
+			{
+				return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
 			}
 		};
 
