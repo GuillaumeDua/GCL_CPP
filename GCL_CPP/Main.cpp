@@ -9,6 +9,7 @@
 # include "Experimental.h"
 # include "TemplateMetaProgramming.h"
 # include "Color.h"
+# include "Serialization.h"
 
 # include <chrono>
 # include <thread>
@@ -63,7 +64,7 @@ bool	TestComponent(void)
 
 int	main(int ac, char* av[])
 {
-	TestComponent<GCL::Experimental::Serialization::Test>();
+	TestComponent<GCL::Serialization::Test>();
 	TestComponent<GCL::Experimental::TypeTrait::Test>();
 	TestComponent<GCL::Experimental::Inheritance::Test>();
 	// TestComponent<GCL::Experimental::Puzzle::Test>();
