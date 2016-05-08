@@ -100,8 +100,9 @@ namespace GCL
 			template <std::size_t N>
 			using TypeAt = typename std::tuple_element<N, _Types>::type;
 			// using TypeAt = std::remove_reference<decltype(std::get<N>(tuple))>::type
+			using Index_type = size_t;
 			template <typename T_Search>
-			constexpr static const size_t IndexOf(void)
+			constexpr static const Index_type IndexOf(void)
 			{
 				return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
 			}
