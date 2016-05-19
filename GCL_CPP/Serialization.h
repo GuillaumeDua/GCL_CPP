@@ -124,8 +124,8 @@ namespace GCL
 				_Serializer::write(ss, r_toto2);
 
 				Serializable * w_titi1 = _Serializer::read(ss);
-				Serializable * w_titi2 = _Serializer::read(ss);
 				Serializable * w_toto1 = _Serializer::read(ss);
+				Serializable * w_titi2 = _Serializer::read(ss);
 				Serializable * w_toto2 = _Serializer::read(ss);
 
 				std::cout << "DEBUG : " << std::endl;
