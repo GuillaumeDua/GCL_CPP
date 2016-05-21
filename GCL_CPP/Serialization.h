@@ -128,10 +128,6 @@ namespace GCL
 				Serializable * w_titi2 = _Serializer::read(ss);
 				Serializable * w_toto2 = _Serializer::read(ss);
 
-				std::cout << "DEBUG : " << std::endl;
-				std::cout << reinterpret_cast<Titi*>(w_titi1) << std::endl;
-				std::cout << reinterpret_cast<Titi*>(w_titi1)->_str << std::endl;
-				std::cout << "/DEBUG : " << std::endl;
 				return (
 					r_titi1._str == reinterpret_cast<Titi*>(w_titi1)->_str
 					&& r_titi2._str == reinterpret_cast<Titi*>(w_titi2)->_str

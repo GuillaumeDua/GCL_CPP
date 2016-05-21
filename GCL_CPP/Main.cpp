@@ -17,75 +17,88 @@
 # include <typeinfo>
 # include <sstream>
 
-template <typename T_ComponentTest>
-bool	TestComponent(void)
+namespace Tool
 {
-	const std::string & symbol_name = typeid(T_ComponentTest).name();
-	std::ostringstream componentTagName;
-	componentTagName
-		<< std::left
-		<< std::setw(45)
-		<< symbol_name
-		;
-
-	try
+	struct Test
 	{
-		std::cout << "[Test] : [" << componentTagName.str() << "] : Processing ... " << std::endl;
+		static uint32_t callCount;
+		template <typename T_ComponentTest>
+		struct TestOneComponent
+		{
+			static bool	Call(void)
+			{
+				++callCount;
+				const std::string & symbol_name = typeid(T_ComponentTest).name();
+				std::ostringstream componentTagName;
+				componentTagName
+					<< std::left
+					<< std::setw(45)
+					<< symbol_name
+					;
 
-		using T_ClockSystem = std::chrono::high_resolution_clock;
+				try
+				{
+					std::cout << "[Test] : [" << componentTagName.str() << "] : Processing ... " << std::endl;
 
-		T_ClockSystem::time_point tp_start = T_ClockSystem::now();
-		bool ret = T_ComponentTest::Proceed();
-		const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(T_ClockSystem::now() - tp_start).count();
+					using T_ClockSystem = std::chrono::high_resolution_clock;
 
-		std::cout << "[Test] : [" << componentTagName.str() << "] : .............. : [" << (ret ? "PASSED" : "FAILED") << "] in " << elasped_usec  << "ms" << std::endl << std::endl;
+					T_ClockSystem::time_point tp_start = T_ClockSystem::now();
+					bool ret = T_ComponentTest::Proceed();
+					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(T_ClockSystem::now() - tp_start).count();
 
-		return ret;
-	}
-	catch (const std::exception & ex)
-	{
-		std::cerr
-			<< "[Error]::[Test] :  [" << componentTagName.str() << "] : ..... FAILED" << std::endl
-			<< "|- std::exception catch : [" << ex.what() << "]" << std::endl
-			<< std::endl
-			;
-		return false;
-	}
-	catch (...)
-	{
-		std::cerr
-			<< "[Error]::[Test] : [" << componentTagName.str() << "] : ..... FAILED" << std::endl
-			<< "|- Unknown type catch" << std::endl
-			<< std::endl
-			;
-		return false;
-	}
+					std::cout << "[Test] : [" << componentTagName.str() << "] : .............. : [" << (ret ? "PASSED" : "FAILED") << "] in " << elasped_usec << "ms" << std::endl << std::endl;
+
+					return ret;
+				}
+				catch (const std::exception & ex)
+				{
+					std::cerr
+						<< "[Error]::[Test] :  [" << componentTagName.str() << "] : ..... FAILED" << std::endl
+						<< "|- std::exception catch : [" << ex.what() << "]" << std::endl
+						<< std::endl
+						;
+					return false;
+				}
+				catch (...)
+				{
+					std::cerr
+						<< "[Error]::[Test] : [" << componentTagName.str() << "] : ..... FAILED" << std::endl
+						<< "|- Unknown type catch" << std::endl
+						<< std::endl
+						;
+					return false;
+				}
+			}
+		};
+		template <typename ...T_ComponentsTest>
+		static void	TestMultipleComponents(void)
+		{
+			GCL::TMP::Foreach<T_ComponentsTest...>::Call<TestOneComponent>();
+			std::cout << std::endl << "[Test] : Success Rate : " << callCount << " / " << sizeof...(T_ComponentsTest) << std::endl;
+		}
+	};
+	uint32_t Test::callCount = 0;
 }
 
 int	main(int ac, char* av[])
 {
-	TestComponent<GCL::Serialization::Test>();
-	TestComponent<GCL::Experimental::TypeTrait::Test>();
-	TestComponent<GCL::Experimental::Inheritance::Test>();
-	// TestComponent<GCL::Experimental::Puzzle::Test>();
-	TestComponent<GCL::Experimental::Puzzle3::Test>();
+	Tool::Test::TestMultipleComponents
+	<
+		GCL::Serialization::Test
+		, GCL::Experimental::TypeTrait::Test
+		, GCL::TMP::Test
+		, GCL::TypeTrait::Test
 
-    // TestComponent<GCL::TMP::Test>();
+		//, GCL::Task::Test
+		//, GCL::Events::Test
+		//, GCL::Container::Test
+		//, GCL::Ownership::Test
 
-    //TestComponent<GCL::Color::Test>();
-        
-    TestComponent<GCL::TypeTrait::Test>();
-	
+		, GCL::Experimental::TypeTrait::Test
+		// GCL::Experimental::Puzzle::Test
+		// , GCL::Color::Test // FIXME
+	>();
 
-	// TestComponent<GCL::Events::Test>();
-
-	// TestComponent<GCL::Task::Test>();
-	// TestComponent<GCL::Maths::Test>();
-
-	/*TestComponent<GCL::Events::Test>();
-	TestComponent<GCL::Container::Test>();
-	TestComponent<GCL::Ownership::Test>();
-*/
 	system("pause");
 	return 0;
 }

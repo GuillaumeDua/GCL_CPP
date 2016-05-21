@@ -3,6 +3,7 @@
 
 # include "TypeTraits.h"
 # include "TemplateMetaProgramming.h"
+# include "IO.h"
 # include <functional>
 # include <cassert>
 # include <tuple>
@@ -115,7 +116,7 @@ namespace GCL
 			{
 				static void	Visit(void)
 				{
-					std::cout << "value=[" << T_TypeList::value << "], UniqueId=[" << T_TypeList::_uniqueId << ']' << std::endl;
+					std::cout << "\t |- value=[" << T_TypeList::value << "], UniqueId=[" << T_TypeList::_uniqueId << ']' << std::endl;
 				}
 			};
 
@@ -135,39 +136,6 @@ namespace GCL
 						GCL::TypeTrait::TypeToUniqueId<A>::value == GCL::TypeTrait::TypeToUniqueId<A>::value
 						&& GCL::TypeTrait::TypeToUniqueId<B>::value == GCL::TypeTrait::TypeToUniqueId<B>::value
 						&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
-						;
-				}
-			};
-		}
-		namespace Inheritance
-		{
-			template <class T, class ...Classes>
-			struct Super
-			{
-				struct Type : T, Super<Classes...>::Type
-				{};
-			};
-			template <class T>
-			struct Super<T>
-			{
-				using Type = T;
-			};
-
-
-			struct Test
-			{
-				struct A { A() { std::cout << "A" << std::endl; } };
-				struct B { B() { std::cout << "B" << std::endl; } };
-				struct C { C() { std::cout << "C" << std::endl; } };
-
-				static bool Proceed()
-				{
-
-					Super<A, B, C>::Type	super;
-
-					return std::is_convertible<Super<A, B, C>::Type, A>::value
-						&& std::is_convertible<Super<A, B, C>::Type, B>::value
-						&& std::is_convertible<Super<A, B, C>::Type, C>::value
 						;
 				}
 			};
@@ -307,13 +275,6 @@ namespace GCL
 		}
 		namespace Puzzle3
 		{
-			template <typename T_Functor>
-			typename T_Functor::result_type	my_func(T_Functor & func)
-			{
-				return func();
-			}
-			
-			
 			template <typename T>
 			struct TypenamePrint
 			{
@@ -323,22 +284,11 @@ namespace GCL
 				}
 			};
 
-			struct Super {};
-			template <typename T>
-			struct CtorCaller
-			{
-				using return_type = Super*;
-				static return_type	Call(void)
-				{
-					return reinterpret_cast<return_type>(new T);
-				}
-			};
-
 			struct Test
 			{
 				static bool Proceed()
 				{
-					struct A : Super {}; struct B : Super {}; struct C : Super {};
+					struct A {}; struct B {}; struct C {};
 					using _Types = typename TypeContainer
 						<
 						A
@@ -346,13 +296,8 @@ namespace GCL
 						, C
 						>;
 
-					Foreach<A, B, C>::Call<TypenamePrint>();
-					Foreach<_Types>::CallAt<TypenamePrint>(0);
-					Super * super = Foreach<_Types>::CallAt_withReturn<CtorCaller>(0);
-					delete super;
-
-					std::function<int()> functor = []() { return 42; };
-					std::cout << my_func(functor) << std::endl;
+					/*Foreach<A, B, C>::Call<TypenamePrint>();
+					Foreach<_Types>::CallAt<TypenamePrint>(0);*/
 
 					return
 						_Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()

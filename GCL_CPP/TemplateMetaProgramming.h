@@ -5,6 +5,18 @@ namespace GCL
 {
     namespace TMP
     {
+		template <class T, class ...Classes>
+		struct Super
+		{
+			struct Type : T, Super<Classes...>::Type
+			{};
+		};
+		template <class T>
+		struct Super<T>
+		{
+			using Type = T;
+		};
+
         struct NullType {};
 
 		template <bool condition, typename _THEN, typename _ELSE>	struct IF
@@ -115,15 +127,33 @@ namespace GCL
             {
                 static void visit()
                 {
-                    std::cout << T::_ID << std::endl;
+					std::cout << T::_ID << ' ';
                 }
             };
 
             static bool    Proceed()
             {
-                std::cout << "Test" << std::endl;
+				std::cout << "\t |- Generated ID list : ";
                 TMP::For<TMP::List<>, Visitor_ListIdPrinter, 10>::iterate();
-                return true;
+				std::cout << std::endl;
+
+				struct A {}; struct B {}; struct C {};
+				using _Types = typename TypeContainer
+					<
+					A
+					, B
+					, C
+					>;
+
+				/*Foreach<A, B, C>::Call<TypenamePrint>();
+				Foreach<_Types>::CallAt<TypenamePrint>(0);*/
+
+				return std::is_convertible<Super<A, B, C>::Type, A>::value
+					&& std::is_convertible<Super<A, B, C>::Type, B>::value
+					&& std::is_convertible<Super<A, B, C>::Type, C>::value
+					&& _Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()
+					;
+
             }
         };
     }
