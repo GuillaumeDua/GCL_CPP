@@ -30,6 +30,7 @@ namespace GCL
 		{
 			for (auto & elem : vec)
 				this->push_back(elem);
+			return *this;
 		}
 		/*Vector & operator +=(const T & elem)
 		{
