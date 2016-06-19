@@ -10,6 +10,7 @@
 # include "TemplateMetaProgramming.h"
 # include "Color.h"
 # include "Serialization.h"
+# include "Pattern.hpp"
 
 # include <chrono>
 # include <thread>
@@ -88,7 +89,7 @@ int	main(int ac, char* av[])
 		, GCL::Experimental::TypeTrait::Test
 		, GCL::TMP::Test
 		, GCL::TypeTrait::Test
-
+		
 		//, GCL::Task::Test
 		//, GCL::Events::Test
 		//, GCL::Container::Test
@@ -97,6 +98,7 @@ int	main(int ac, char* av[])
 		, GCL::Experimental::TypeTrait::Test
 		// GCL::Experimental::Puzzle::Test
 		// , GCL::Color::Test // FIXME
+		, GCL::Experimental::Pattern::Test
 	>();
 
 	system("pause");

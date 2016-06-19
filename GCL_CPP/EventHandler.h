@@ -1,5 +1,5 @@
-#ifndef __GCL_NOTIFICATION__
-# define __GCL_NOTIFICATION__
+#ifndef GCL_EVENT_HANDLER__
+# define GCL_EVENT_HANDLER__
 
 # include "Vector.h"
 # include "Preprocessor.h"
@@ -109,4 +109,4 @@ namespace GCL
 	}
 }
 
-#endif // __GCL_NOTIFICATION__
+#endif // GCL_EVENT_HANDLER__
