@@ -42,16 +42,25 @@ namespace GCL
 				static void	Push(T_Element && rEvent)
 				{
 					T_ThisType & instance = GetInstance();
-					instance._mutex.lock();
-					instance._cache.push(rEvent);
-					instance._mutex.unlock();
-					// notify ?
+					{	// Critical section
+						std::unique_lock<std::mutex> lock(instance._mutex);
+						instance._cache.push(rEvent);
+					}
+					instance._cv.notify_one();
 				}
 				static inline T_ThisType & GetInstance(void)
 				{
 					static T_ThisType instance;
 					return instance;
 				}
+
+				DEBUG_INSTRUCTION
+				(static void inline EmergencyCacheFlush(void)
+				{
+					ControlCenter & instance = GetInstance();
+					std::unique_lock<std::mutex> lock(instance._mutex);
+					instance._cache.swap(T_ElementQueue());
+				})
 
 				void Start(void)
 				{
@@ -65,27 +74,30 @@ namespace GCL
 					struct CaptureAdapter
 					{
 						std::mutex & _mutex;
+						std::condition_variable & _cv;
 						T_ElementQueue &_cache;
 						T_FilterList & _filters;
-					} capture { _mutex, _cache, _filters };
+					} capture { _mutex, _cv, _cache, _filters };
 
 					_thread = std::make_unique<std::thread>([&](CaptureAdapter & capture)
 					{
+						T_ElementQueue::value_type elem;
 						while (this->IsRunning())
 						{
-							if (capture._cache.empty())
-								; // wait notification, condition_variable, etc ...
-							else
+							while (capture._cache.empty())
 							{
-								capture._mutex.lock();
-								T_ElementQueue::value_type elem = std::move(capture._cache.front());
-								capture._cache.pop();
-								capture._mutex.unlock();
-
-								for (auto & filter : capture._filters)
-									filter->Visit(elem);
-								elem();
+								std::unique_lock<std::mutex> lock(capture._mutex);
+								capture._cv.wait(lock);
 							}
+							{	// Critical section
+								std::unique_lock<std::mutex> lock(capture._mutex);
+								elem = std::move(capture._cache.front());
+								capture._cache.pop();
+							}
+
+							for (auto & filter : capture._filters)
+								filter->Visit(elem);
+							elem();
 						}
 					}, capture);
 				}
@@ -119,6 +131,7 @@ namespace GCL
 			private:
 				std::unique_ptr<std::thread>	_thread;
 				std::mutex						_mutex;
+				std::condition_variable			_cv;
 				volatile bool					_running = false;
 
 				ControlCenter() = default;
@@ -139,16 +152,34 @@ namespace GCL
 				{
 					using ControlCenterType = ControlCenter<Test::Event>;
 
-					
-					static const long long qty = std::chrono::microseconds::period::den;
-					for (long long i = 0; i < qty; ++i)
-						ControlCenterType::Push(Event{});
+					{	// Test 1 : consuming in 1 second
+						static const long long qty = std::chrono::microseconds::period::den;
+						std::cout << "\t |- Generating " << qty << " elements ..." << std::endl;
+						for (long long i = 0; i < qty; ++i)
+							ControlCenterType::Push(Event{});
 
-					std::cout << "\t |- Racing ..." << std::endl;
-					ControlCenterType::GetInstance().Start();
-					std::this_thread::sleep_for(std::chrono::seconds(1));
-					ControlCenterType::GetInstance().Stop();
-					std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " in 1 second" << std::endl;
+						std::cout << "\t |- Racing ..." << std::endl;
+						ControlCenterType::GetInstance().Start();
+						std::this_thread::sleep_for(std::chrono::seconds(1));
+						ControlCenterType::GetInstance().Stop();
+						std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " in 1 second" << std::endl;
+					}
+
+					ControlCenterType::EmergencyCacheFlush();
+
+					{	// Test 2 : Produce take more time than consuming
+						std::cout << "\t |- Racing ..." << std::endl;
+						ControlCenterType::GetInstance().Start();
+						static const long long qty = std::chrono::milliseconds::period::den;
+						for (long long i = 0; i < qty; ++i)
+						{
+							std::this_thread::sleep_for(std::chrono::milliseconds(1));
+							ControlCenterType::Push(Event{});
+						}
+						ControlCenterType::GetInstance().Stop();
+						std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " / " << qty << std::endl;
+					}
+
 					return true;
 				}
 			};
