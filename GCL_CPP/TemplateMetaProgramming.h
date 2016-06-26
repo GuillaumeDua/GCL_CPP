@@ -64,6 +64,12 @@ namespace GCL
 			Foreach(const Foreach &) = delete;
 			Foreach(const Foreach &&) = delete;
 
+			template <template <typename> class T_Constraint>
+			struct Require
+			{
+				T_Constraint<T0> _check;
+				typename Foreach<T...>::template Require<T_Constraint> _next;
+			};
 			template <template <typename> class T_Functor>
 			static void	Call(void)
 			{
@@ -89,6 +95,9 @@ namespace GCL
 			Foreach(const Foreach &) = delete;
 			Foreach(const Foreach &&) = delete;
 
+			template <template <typename> class T_Constraint>
+			struct Require
+			{};
 			template <template <typename> class T_Functor>
 			static void	Call(void)
 			{}
@@ -131,13 +140,34 @@ namespace GCL
                 }
             };
 
+			struct A
+			{
+				struct _MandatoryNested {};
+			};
+			struct B
+			{
+				struct _MandatoryNested {};
+			};
+			struct C
+			{
+				struct _MandatoryNested {};
+			};
+			
+			template <typename T>
+			struct T_Constraint
+			{
+				using _MandatoryNested = typename T::_MandatoryNested;
+			};
+
             static bool    Proceed()
             {
+				// static require constraint
+				(void)TMP::Foreach<A, B, C>::template Require<T_Constraint>();
+
 				std::cout << "\t |- Generated ID list : ";
                 TMP::For<TMP::List<>, Visitor_ListIdPrinter, 10>::iterate();
 				std::cout << std::endl;
 
-				struct A {}; struct B {}; struct C {};
 				using _Types = typename TypeContainer
 					<
 					A
