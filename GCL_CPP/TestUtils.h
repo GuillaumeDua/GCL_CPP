@@ -14,6 +14,25 @@
 
 namespace GCL
 {
+	namespace Functionnal
+	{
+		struct OnDestroyExecute : public std::function<void()>
+		{
+			explicit OnDestroyExecute(std::function<void()> && func)
+			{
+				func.swap(*this);
+			}
+			OnDestroyExecute(const OnDestroyExecute & w)
+			{
+				const_cast<OnDestroyExecute &>(w).swap(*this);
+			}
+			~OnDestroyExecute()
+			{
+				if (*this)
+					(*this)();
+			}
+		};
+	}
 	namespace Experimental
 	{
 		namespace TestUtils
@@ -60,76 +79,103 @@ namespace GCL
 						std::lock_guard<std::mutex> lock(_obs_mutex);
 						_observers.push_back(obs);
 					}
+					template <bool default_active_value = false>
 					static T_Container::mapped_type			Get(const T_Container::key_type & key)
 					{
 						std::lock_guard<std::mutex>	lock(_container_mutex);
 						T_Container::iterator it = _container.find(key);
 						if (it == _container.end())
 						{
-							auto insert_ret = _container.emplace(value_type(key, false));
+							auto insert_ret = _container.emplace(value_type(key, default_active_value));
 							assert(insert_ret.second);
-							OnPropertyChanged(*(insert_ret.first));	// costly
+							OnPropertyChanged(*(insert_ret.first));	// Can be costly
 						}
 						return _container.at(key);
 					}
 
 					static inline void						Activate(const size_t distance)
 					{
-						std::lock_guard<std::mutex>	lock(_container_mutex);
-						T_Container::iterator it = _container.begin();
-						std::advance(it, distance);
-						it->second = true;
-						std::cout << "[+]::[INFO] : Activating hookpoint at : " << it->first << std::endl;
+						SetMappedValue(distance, true);
 					}
 					static inline void						Activate(const key_type key)
+					{
+						SetMappedValue(key, true);
+					}
+					static inline void						Desactivate(const size_t distance)
+					{
+						SetMappedValue(distance, false);
+					}
+					static inline void						Desactivate(const key_type key)
+					{
+						SetMappedValue(key, false);
+					}
+
+				protected:
+					static inline void						SetMappedValue(const size_t index, T_Container::mapped_type new_value)
+					{
+						std::lock_guard<std::mutex>	lock(_container_mutex);
+						T_Container::iterator it = _container.begin();
+						std::advance(it, index);
+						it->second = new_value;
+					}
+					static inline void						SetMappedValue(const key_type & key, T_Container::mapped_type new_value)
 					{
 						std::lock_guard<std::mutex>	lock(_container_mutex);
 						T_Container::iterator it = _container.find(key);
 						assert(it != _container.end());
-						it->second = true;
+						it->second = new_value;
 					}
 				};
 
-#define CONDITIONAL_SCOPE_INLINE(expr)		static const GCL::Experimental::TestUtils::Inline::RT_Exception_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
-											GCL::Experimental::TestUtils::Inline::RT_Exception_controler::mapped_type hook_active = RT_Exception_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Get(key);	\
+#define CONDITIONAL_SCOPE_INLINE(expr)	{																																																			\
+											static const GCL::Experimental::TestUtils::Inline::RT_Exception_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
+											GCL::Experimental::TestUtils::Inline::RT_Exception_controler::mapped_type hook_active = RT_Exception_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Get<>(key);	\
 											if (hook_active)																																														\
 											{																																																		\
 												expr																																																\
-											}
+											}																																																		\
+										}
+
+#define CONDITIONAL_SCOPE_INLINE_CALL_ONE(expr)		{																																																				\
+														static const GCL::Experimental::TestUtils::Inline::RT_Exception_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
+														GCL::Experimental::TestUtils::Inline::RT_Exception_controler::mapped_type hook_active = RT_Exception_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Get<true>(key);	\
+														if (hook_active)																																															\
+														{																																																			\
+															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Desactivate(key); });															\
+															expr																																																	\
+														}																																																			\
+													}
 
 				struct Test
 				{
-					struct LogObserver : RT_Exception_controler::Observer
-					{
-						void	NotifyPropertyChanged(RT_Exception_controler::value_type & elem) override
-						{
-							std::cout << "[+]::[TEST] : New entry at : " << elem.first << std::endl;
-							elem.second = true;	// activate the element
-							std::cout << "[+]::[TEST] : New entry activated" << std::endl;
-						}
-					};
+					//struct LogObserver : RT_Exception_controler::Observer
+					//{
+					//	void	NotifyPropertyChanged(RT_Exception_controler::value_type & elem) override
+					//	{
+					//		std::cout << "[+]::[TEST] : New entry at : " << elem.first << std::endl;
+					//		elem.second = true;	// activate the element
+					//	}
+					//};
 
 					static bool Proceed(void)
 					{
-						std::shared_ptr<RT_Exception_controler::Observer> logObs = std::make_shared<LogObserver>();
+						/*std::shared_ptr<RT_Exception_controler::Observer> logObs = std::make_shared<LogObserver>();*/
+						// RT_Exception_controler::AddObserver(logObs);
+						RT_Exception_controler::IsActive() = true;
 
-						RT_Exception_controler::AddObserver(logObs);
-
-						/*RT_Exception_controler::IsActive() = true;*/
-
-						for (size_t i = 0; i < 2; ++i)
+						for (size_t i = 0; i < 5; ++i)
 						{
 							try
 							{
-								CONDITIONAL_SCOPE_INLINE(throw std::runtime_error("std::runtime_error"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("first throw"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("second throw"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("third throw"););
 								std::cout << "[+]::[TEST] : " << i << " : No throw" << std::endl;
 							}
 							catch (const std::exception & ex)
 							{
 								std::cout << "[+]::[TEST] : " << i << " : Exception catch : " << ex.what() << std::endl;
 							}
-
-							// RT_Exception_controler::Activate(0);					// simulate activation at index 0
 						}
 						return true;
 					}
@@ -138,6 +184,5 @@ namespace GCL
 		}
 	}
 }
-
 
 #endif // GCL_TEST_UTILS__
