@@ -56,6 +56,8 @@ namespace GCL
 			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;	// Todo : Check recusion
 		};
 
+		// Substitute to C++17 feature : constraint/require
+		// Allow sfinae static type checking in C++TMP
 		namespace sfinae
 		{
 		    template<typename> struct Gen { typedef void type; };
