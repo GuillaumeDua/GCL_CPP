@@ -13,6 +13,7 @@ namespace GCL
 {
 	namespace Thread
 	{
+		// Warning : Create a bottle-neck on ressources acquisition
 		template <typename ElementType, typename ElementCreationPolicy>
 		struct	UniqueRsc
 		{
