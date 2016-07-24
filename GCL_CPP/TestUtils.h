@@ -39,7 +39,7 @@ namespace GCL
 		{
 			namespace Inline
 			{
-				struct RT_Exception_controler final
+				struct RT_scope_controler final
 				{
 					using key_type = std::string;
 					using mapped_type = bool;
@@ -51,8 +51,9 @@ namespace GCL
 					};
 					using T_ObserversList = std::list<std::shared_ptr<Observer>>;
 
-				private:
 					using T_Container = std::unordered_map<key_type, mapped_type>;
+
+				private:
 					static T_Container		_container;
 					static std::mutex		_container_mutex;
 					static T_ObserversList	_observers;
@@ -128,8 +129,8 @@ namespace GCL
 				};
 
 #define CONDITIONAL_SCOPE_INLINE(expr)	{																																																			\
-											static const GCL::Experimental::TestUtils::Inline::RT_Exception_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
-											GCL::Experimental::TestUtils::Inline::RT_Exception_controler::mapped_type hook_active = RT_Exception_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Get<>(key);	\
+											static const GCL::Experimental::TestUtils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
+											GCL::Experimental::TestUtils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_scope_controler::Get<>(key);	\
 											if (hook_active)																																														\
 											{																																																		\
 												expr																																																\
@@ -137,20 +138,20 @@ namespace GCL
 										}
 
 #define CONDITIONAL_SCOPE_INLINE_CALL_ONE(expr)		{																																																				\
-														static const GCL::Experimental::TestUtils::Inline::RT_Exception_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
-														GCL::Experimental::TestUtils::Inline::RT_Exception_controler::mapped_type hook_active = RT_Exception_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Get<true>(key);	\
+														static const GCL::Experimental::TestUtils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
+														GCL::Experimental::TestUtils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_scope_controler::Get<true>(key);	\
 														if (hook_active)																																															\
 														{																																																			\
-															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::TestUtils::Inline::RT_Exception_controler::Desactivate(key); });															\
+															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::TestUtils::Inline::RT_scope_controler::Desactivate(key); });															\
 															expr																																																	\
 														}																																																			\
 													}
 
 				struct Test
 				{
-					//struct LogObserver : RT_Exception_controler::Observer
+					//struct LogObserver : RT_scope_controler::Observer
 					//{
-					//	void	NotifyPropertyChanged(RT_Exception_controler::value_type & elem) override
+					//	void	NotifyPropertyChanged(RT_scope_controler::value_type & elem) override
 					//	{
 					//		std::cout << "[+]::[TEST] : New entry at : " << elem.first << std::endl;
 					//		elem.second = true;	// activate the element
@@ -159,9 +160,9 @@ namespace GCL
 
 					static bool Proceed(void)
 					{
-						/*std::shared_ptr<RT_Exception_controler::Observer> logObs = std::make_shared<LogObserver>();*/
-						// RT_Exception_controler::AddObserver(logObs);
-						RT_Exception_controler::IsActive() = true;
+						/*std::shared_ptr<RT_scope_controler::Observer> logObs = std::make_shared<LogObserver>();*/
+						// RT_scope_controler::AddObserver(logObs);
+						RT_scope_controler::IsActive() = true;
 
 						for (size_t i = 0; i < 5; ++i)
 						{

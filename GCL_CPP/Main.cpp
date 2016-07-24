@@ -11,6 +11,25 @@
 # include "Color.h"
 # include "Serialization.h"
 # include "Pattern.hpp"
+# include "TestUtils.h"
+
+//
+// Link symbols :
+//
+namespace GCL
+{
+	namespace Experimental
+	{
+		namespace TestUtils
+		{
+			std::mutex									Inline::RT_scope_controler::_container_mutex;
+			std::mutex									Inline::RT_scope_controler::_obs_mutex;
+			volatile bool								Inline::RT_scope_controler::_isActive;
+			Inline::RT_scope_controler::T_Container		Inline::RT_scope_controler::_container;
+			Inline::RT_scope_controler::T_ObserversList	Inline::RT_scope_controler::_observers;
+		}
+	}
+}
 
 # include <chrono>
 # include <thread>
@@ -99,6 +118,7 @@ int	main(int ac, char* av[])
 		// GCL::Experimental::Puzzle::Test
 		// , GCL::Color::Test // FIXME
 		, GCL::Experimental::Pattern::Test
+		, GCL::Experimental::TestUtils::Inline::Test
 	>();
 
 	system("pause");
