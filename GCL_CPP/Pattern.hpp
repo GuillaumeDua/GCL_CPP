@@ -84,20 +84,23 @@ namespace GCL
 						T_ElementQueue::value_type elem;
 						while (this->IsRunning())
 						{
-							while (capture._cache.empty())
+							if (capture._cache.empty())
 							{
 								std::unique_lock<std::mutex> lock(capture._mutex);
 								capture._cv.wait(lock);
 							}
-							{	// Critical section
-								std::unique_lock<std::mutex> lock(capture._mutex);
-								elem = std::move(capture._cache.front());
-								capture._cache.pop();
-							}
+							if (!capture._cache.empty()) // ensure the last elemn is processed even after stop were notified
+							{
+								{	// Critical section
+									std::unique_lock<std::mutex> lock(capture._mutex);
+									elem = std::move(capture._cache.front());
+									capture._cache.pop();
+								}
 
-							for (auto & filter : capture._filters)
-								filter->Visit(elem);
-							elem();
+								for (auto & filter : capture._filters)
+									filter->Visit(elem);
+								elem();
+							}
 						}
 					}, capture);
 				}
@@ -105,7 +108,10 @@ namespace GCL
 				{
 					_running = false;
 					if (_thread != nullptr)
+					{
+						GetInstance()._cv.notify_all();
 						_thread->join();
+					}
 					_thread.reset();
 				}
 				inline bool	IsRunning(void) const
@@ -152,6 +158,16 @@ namespace GCL
 				{
 					using ControlCenterType = ControlCenter<Test::Event>;
 
+					{	// Test 0 : nothing to consum
+						std::cout << "\t |- Racing ..." << std::endl;
+						ControlCenterType::GetInstance().Start();
+						std::this_thread::sleep_for(std::chrono::seconds(1));
+						ControlCenterType::GetInstance().Stop();
+						std::cout << "\t |- Elements remaining: " << ControlCenterType::GetInstance().Pending() << " in 1 second" << std::endl;
+						if (ControlCenterType::GetInstance().Pending() != 0)
+							return false;
+					}
+
 					{	// Test 1 : consuming in 1 second
 						static const long long qty = std::chrono::microseconds::period::den;
 						std::cout << "\t |- Generating " << qty << " elements ..." << std::endl;
@@ -178,6 +194,8 @@ namespace GCL
 						}
 						ControlCenterType::GetInstance().Stop();
 						std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " / " << qty << std::endl;
+						if (ControlCenterType::GetInstance().Pending() != 0)
+							return false;
 					}
 
 					return true;
