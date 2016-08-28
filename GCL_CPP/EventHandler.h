@@ -1,7 +1,7 @@
 #ifndef GCL_EVENT_HANDLER__
 # define GCL_EVENT_HANDLER__
 
-# include "Vector.h"
+# include "Container.h"
 # include "Preprocessor.h"
 
 # include <map>
@@ -11,8 +11,10 @@
 
 namespace GCL
 {
-	namespace Events
+	namespace events
 	{
+		// todo : rename as Handler
+		//        avoid repetition in naming
 		template <typename T_EventIDType = std::string>
 		struct EventHandler
 		{
@@ -31,7 +33,7 @@ namespace GCL
 
 			using T_EventID = typename T_EventIDType;
 			using T_EventCallback = std::function<void()>;
-			using T_EventContainer = typename std::map<typename T_EventID, GCL::Vector<typename T_EventCallback> >;
+			using T_EventContainer = typename std::map<typename T_EventID, GCL::container::non_concurrent::Vector<typename T_EventCallback> >;
 
 			typename T_EventContainer::mapped_type &	on(const T_EventID & name)
 			{

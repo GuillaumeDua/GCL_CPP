@@ -2,7 +2,6 @@
 # define GCL_PATTERN_
 
 # include <iostream>
-# include <queue>
 # include <thread>
 # include <future>
 # include <chrono>
@@ -52,8 +51,8 @@ namespace GCL
 				RELEASE_INSTRUCTION
 				(static_assert(std::is_constructible<T_ElementType>::value == false, "Optimization error : T_ElementType cannot be constructible");)
 
-				using T_ThisType = ControlCenter<T_ElementType>;
-				using T_Element			= std::unique_ptr<T_ElementType>;
+				using T_ThisType		= ControlCenter<T_ElementType>;
+				using T_Element			= typename std::unique_ptr<T_ElementType>;
 				using T_FilterChain		= Module::FilterChain<T_Element>;
 				using T_ElementQueue	= typename std::queue<T_Element>;
 				static_assert(std::is_same<typename T_FilterChain::_ToVisitElement, typename T_ElementQueue::value_type>::value, "Type mismatch");
@@ -125,7 +124,6 @@ namespace GCL
 								}
 
 								capture._filterChain.Process(elem);
-
 								(*elem)();
 							}
 						}
