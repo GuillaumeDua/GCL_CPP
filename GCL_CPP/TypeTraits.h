@@ -58,6 +58,7 @@ namespace GCL
 
 		// Substitute to C++17 feature : constraint/require
 		// Allow sfinae static type checking in C++TMP
+#pragma region Waiting_for_Cpp17_constraint_require_reflexion
 		namespace sfinae
 		{
 		    template<typename> struct Gen { typedef void type; };
@@ -118,6 +119,7 @@ namespace GCL
 		        }                                                           \
 		    }                                                               \
 		}
+#pragma endregion Waiting_for_Cpp17_constraint_require_reflexion
 
 		struct Test
 		{
