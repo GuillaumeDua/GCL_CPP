@@ -57,7 +57,31 @@ namespace GCL
 			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;	// Todo : Check recusion
 		};
 
+		template <typename ... Types>
+		struct TypePack
+		{
+			using _Types = std::tuple<Types...>;
 
+			template <typename T>
+			static constexpr size_t indexOf(void)
+			{
+				return indexOf_impl<T, 0, Types...>();
+			}
+
+			// Add any other function here
+
+		private:
+			template <typename T_Needle, size_t It, typename T_It, typename ... T_HayStack>
+			static constexpr size_t indexOf_impl(void)
+			{
+				return (std::is_same<T_Needle, T_It>::value ? It : indexOf_impl<T_Needle, It + 1, T_HayStack...>());
+			}
+			template <typename T_Needle, size_t It>
+			static constexpr size_t indexOf_impl(void)
+			{
+				throw std::out_of_range("TypeInfo::indexOf_impl : Not found");
+			}
+		};
 
 		struct Test
 		{
