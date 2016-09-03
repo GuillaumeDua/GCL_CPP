@@ -20,10 +20,10 @@ namespace GCL
 		template<typename... T>
 		std::vector<int> Make_TypeToUniqueIdVector() { return { TypeToUniqueId<T>::value... }; }
 
-		struct Variant
+		struct Any // Variant [?]
 		{
 			template <typename T>
-			explicit Variant(T & var)
+			explicit Any(T & var)
 				: _ptr(&var)
 				, _typeUniqueId(TypeToUniqueId<T>::value)
 			{}
