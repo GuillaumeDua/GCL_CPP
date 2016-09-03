@@ -2,6 +2,11 @@
 # define GCL_TRAITS__
 
 # include "TypeTrait_SFINAE.hpp"
+# include <vector>
+# include <unordered_map>
+# include <functional>
+# include <iostream>
+# include <string>
 
 namespace GCL
 {
@@ -126,6 +131,45 @@ namespace GCL
 			};
 		};
 
+		static bool Test_interfaceIs(void)
+		{
+			struct Interface { virtual const std::string name() = 0; };
+			struct Toto : Interface { const std::string name() { return "Toto"; } };
+			struct Titi : Interface { const std::string name() { return "Titi"; } };
+			struct Tata : Interface { const std::string name() { return "Tata"; } };
+			struct Tutu : Interface { const std::string name() { return "Tutu"; } };
+			struct NotInPack {};
+
+			try
+			{
+				TypePack<Toto, Titi, Tata, Tutu>::indexOf<Tata>();
+				TypePack<Toto, Titi, Tata, Tutu>::indexOf<NotInPack>();	// throw std::out_of_range
+				return false;
+			}
+			catch (const std::out_of_range &)
+			{}
+
+			try
+			{
+				InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::Indexer index;
+
+				for (auto & elem : index)
+					std::cout << "\t- [" << elem.first << "] => [" << elem.second()->name() << ']' << std::endl;
+				if (index.size() != InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::index.size())
+					throw std::exception("Sizes mismatch");
+				return true;
+			}
+			catch (const std::exception & ex)
+			{
+				std::cerr << "Exception catched : " << ex.what() << std::endl;
+			}
+			catch (...)
+			{
+				std::cerr << "Unknown stuff catched" << std::endl;
+			}
+			return false;
+		}
+
 		struct Test
 		{
 			struct A{}; struct B{};
@@ -143,7 +187,8 @@ namespace GCL
 					&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
 					&& typeIdVector.at(0) == typeIdVector.at(2)
 					&& typeIdVector.at(1) == typeIdVector.at(3)
-					&& IndexOf<B, _Types>::value == 2;
+					&& IndexOf<B, _Types>::value == 2
+					&& Test_interfaceIs()
 					;
 			}
 		};
