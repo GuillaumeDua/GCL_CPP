@@ -83,6 +83,49 @@ namespace GCL
 			}
 		};
 
+		template <typename T_Interface>
+		struct InterfaceIs
+		{
+			using _Interface = T_Interface;
+			using basic_container_type = typename std::unordered_map<size_t, std::function<_Interface*(void)>>;
+
+			template <class T>
+			struct CtorCaller
+			{
+				static const typename basic_container_type::mapped_type value;
+			};
+
+			template <typename ... Types>
+			struct OfTypes
+			{
+				// TODO : static_assert(std::is_base_of<_Interface, T>::value && std::is_constructible<T>::value)
+
+				template <typename T>
+				struct _Elem : basic_container_type::value_type
+				{
+					_Elem()
+						: basic_container_type::value_type{ TypePack<Types...>::template indexOf<T>(), std::ref(CtorCaller<T>::value) }
+					{}
+				};
+
+				struct Indexer
+					: public std::unordered_map<size_t, std::function<T_Interface*(void)>>
+				{
+					explicit Indexer()
+						: basic_container_type{ _Elem<Types>()... }
+					{}
+
+					template <typename T>
+					inline size_t at() const
+					{
+						return basic_container_type::at(TypeInfo<Types...>::template indexOf<T>());
+					}
+				};
+
+				static const std::unordered_map<size_t, std::function<T_Interface*(void)>> index;
+			};
+		};
+
 		struct Test
 		{
 			struct A{}; struct B{};
