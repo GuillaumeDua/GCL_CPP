@@ -5,7 +5,7 @@
 # include <stdexcept>
 # include <cassert>
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER	// synthaxic sugar used by GCC and CLANG
 # define and	&&
 # define and_eq &=
 # define bitand &
