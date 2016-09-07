@@ -1,6 +1,8 @@
 #ifndef GCL_TMP_H_
 # define GCL_TMP_H_
 
+# include "TypeTraits.h"
+
 namespace GCL
 {
     namespace TMP
@@ -113,22 +115,6 @@ namespace GCL
 			}
 		};
 
-		template <typename ...T>
-		struct TypeContainer
-		{
-			using _Types = std::tuple<T...>;
-
-			template <std::size_t N>
-			using TypeAt = typename std::tuple_element<N, _Types>::type;
-			// using TypeAt = std::remove_reference<decltype(std::get<N>(tuple))>::type
-			using Index_type = size_t;
-			template <typename T_Search>
-			constexpr static const Index_type IndexOf(void)
-			{
-				return GCL::TypeTrait::IndexOf< T_Search, _Types>::value;
-			}
-		};
-
         struct Test
         {
             template <typename T>
@@ -168,22 +154,13 @@ namespace GCL
                 TMP::For<TMP::List<>, Visitor_ListIdPrinter, 10>::iterate();
 				std::cout << std::endl;
 
-				using _Types = typename TypeContainer
-					<
-					A
-					, B
-					, C
-					>;
-
 				/*Foreach<A, B, C>::Call<TypenamePrint>();
 				Foreach<_Types>::CallAt<TypenamePrint>(0);*/
 
 				return std::is_convertible<Super<A, B, C>::Type, A>::value
 					&& std::is_convertible<Super<A, B, C>::Type, B>::value
 					&& std::is_convertible<Super<A, B, C>::Type, C>::value
-					&& _Types::IndexOf<B>() == _Types::IndexOf<_Types::TypeAt<1>>()
 					;
-
             }
         };
     }
