@@ -49,40 +49,30 @@ namespace GCL
 			const int   _typeUniqueId;
 		};
 
-		template <class T, class Tuple>
-		struct IndexOf;
-		template <class T, class... _Types>
-		struct IndexOf<T, std::tuple<T, _Types...> >
-		{
-			static const std::size_t value = 0;
-		};
-		template <class T, class U, class... _Types>
-		struct IndexOf<T, std::tuple<U, _Types...> >
-		{
-			static const std::size_t value = 1 + IndexOf<T, std::tuple<_Types...> >::value;	// Todo : Check recusion
-		};
-
 		template <typename ... Types>
 		struct TypePack
 		{
 			using _Types = std::tuple<Types...>;
 
 			template <typename T>
-			static constexpr size_t indexOf(void)
+			static constexpr inline size_t indexOf(void)
 			{
 				return indexOf_impl<T, 0, Types...>();
 			}
+
+			template <size_t N>
+			using TypeAt = typename std::tuple_element<N, std::tuple<_Types>>::type;
 
 			// Add any other function here
 
 		private:
 			template <typename T_Needle, size_t It, typename T_It, typename ... T_HayStack>
-			static constexpr size_t indexOf_impl(void)
+			static constexpr inline size_t indexOf_impl(void)
 			{
 				return (std::is_same<T_Needle, T_It>::value ? It : indexOf_impl<T_Needle, It + 1, T_HayStack...>());
 			}
 			template <typename T_Needle, size_t It>
-			static constexpr size_t indexOf_impl(void)
+			static constexpr inline size_t indexOf_impl(void)
 			{
 				throw std::out_of_range("TypeInfo::indexOf_impl : Not found");
 			}
@@ -92,7 +82,8 @@ namespace GCL
 		struct InterfaceIs
 		{
 			using _Interface = T_Interface;
-			using basic_container_type = typename std::unordered_map<size_t, std::function<_Interface*(void)>>;
+			using index_type = size_t;
+			using basic_container_type = typename std::unordered_map<index_type, std::function<_Interface*(void)>>;
 
 			template <class T>
 			struct CtorCaller
@@ -105,6 +96,8 @@ namespace GCL
 			{
 				// TODO : static_assert(std::is_base_of<_Interface, T>::value && std::is_constructible<T>::value)
 
+				using T_TypePack = TypePack<Types...>;
+
 				template <typename T>
 				struct _Elem : basic_container_type::value_type
 				{
@@ -114,20 +107,24 @@ namespace GCL
 				};
 
 				struct Indexer
-					: public std::unordered_map<size_t, std::function<T_Interface*(void)>>
+					: public std::unordered_map<index_type, std::function<T_Interface*(void)>> // [TODO] : replace std::function by a struct with many tools in [?]
 				{
 					explicit Indexer()
 						: basic_container_type{ _Elem<Types>()... }
 					{}
 
 					template <typename T>
-					inline size_t at() const
+					static inline constexpr index_type indexOf(void)
 					{
-						return basic_container_type::at(TypeInfo<Types...>::template indexOf<T>());
+						return TypePack<Types...>::template indexOf<T>();
 					}
-				};
-
-				static const std::unordered_map<size_t, std::function<T_Interface*(void)>> index;
+					template <typename T>
+					inline typename basic_container_type::mapped_type at(void) const
+					{
+						return basic_container_type::at(indexOf<T>());
+					}
+				} /*static index*/; // [TODO]::[FixMe] : How to duplicate pack expansion [?]
+				static const basic_container_type index;
 			};
 		};
 
@@ -187,7 +184,7 @@ namespace GCL
 					&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
 					&& typeIdVector.at(0) == typeIdVector.at(2)
 					&& typeIdVector.at(1) == typeIdVector.at(3)
-					&& IndexOf<B, _Types>::value == 2
+					//&& GCL::TypeTrait::IndexOf<B, _Types>::value == 2
 					&& Test_interfaceIs()
 					;
 			}

@@ -1,11 +1,11 @@
 // #define _GCL_DEBUG
 
+# include "TypeTraits.h"
 # include "Task.h"
 # include "Maths.h"
 # include "EventHandler.h"
 # include "SelfUpdate.h"
 # include "Ownership.h"
-# include "TypeTraits.h"
 # include "Experimental.h"
 # include "TemplateMetaProgramming.h"
 # include "Color.h"
@@ -28,6 +28,17 @@ namespace GCL
 			Inline::RT_scope_controler::T_Container		Inline::RT_scope_controler::_container;
 			Inline::RT_scope_controler::T_ObserversList	Inline::RT_scope_controler::_observers;
 		}
+	}
+	namespace TypeTrait
+	{
+		template <typename T_Interface>
+		template <class T>
+		const typename InterfaceIs<T_Interface>::basic_container_type::mapped_type
+			InterfaceIs<T_Interface>::CtorCaller<T>::value = { []() -> T_Interface* { return new T(); } };
+
+		template <typename T_Interface>
+		template <typename ... Types>
+		const std::unordered_map<size_t, std::function<T_Interface*(void)>> InterfaceIs<T_Interface>::OfTypes<Types...>::index = { _Elem<Types>()... };
 	}
 }
 
