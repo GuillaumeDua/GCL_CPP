@@ -2,7 +2,7 @@
 # define GCL_CPP_IO__
 
 # include <iostream>
-# include <cassert>
+# include "Preprocessor.h"
 
 namespace GCL
 {
@@ -16,25 +16,25 @@ namespace GCL
 				static void	write(std::ostream & os, const T & var)
 				{
 					os.write(reinterpret_cast<const char *>(&var), sizeof(T));
-					assert(os);
+					_GCL_ASSERT(os);
 				}
 				template <typename T>
 				static void	read(std::istream & is, T & var)
 				{
 					is.read(reinterpret_cast<char *>(&var), sizeof(T));
-					assert(is);
+					_GCL_ASSERT(is);
 				}
 				template <typename T>
 				static void	write(std::ostream & os, const T * var)
 				{
 					os.write(reinterpret_cast<const char *>(var), sizeof(T));
-					assert(os);
+					_GCL_ASSERT(os);
 				}
 				template <typename T>
 				static void	read(std::istream & is, T * var)
 				{
 					is.read(reinterpret_cast<char *>(var), sizeof(T));
-					assert(is);
+					_GCL_ASSERT(is);
 				}
 
 				template <>
@@ -42,19 +42,19 @@ namespace GCL
 				{
 					std::string::size_type size;
 					is.read(reinterpret_cast<char *>(&size), sizeof(std::string::size_type));
-					assert(is);
+					_GCL_ASSERT(is);
 					var.resize(size, '\0');
 					is.read(&var[0], size);
-					assert(is);
+					_GCL_ASSERT(is);
 				}
 				template <>
 				static void write<std::string>(std::ostream & os, const std::string & var)
 				{
 					std::string::size_type size = var.length();
 					os.write(reinterpret_cast<char *>(&size), sizeof(std::string::size_type));
-					assert(os);
+					_GCL_ASSERT(os);
 					os.write(&var[0], var.length());
-					assert(os);
+					_GCL_ASSERT(os);
 				}
 			};
 		}
