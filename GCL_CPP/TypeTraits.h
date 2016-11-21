@@ -61,7 +61,7 @@ namespace GCL
 			}
 
 			template <size_t N>
-			using TypeAt = typename std::tuple_element<N, std::tuple<_Types>>::type;
+			using TypeAt = typename std::tuple_element<N, _Types>::type;
 
 			// Add any other function here
 
