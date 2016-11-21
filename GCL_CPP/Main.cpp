@@ -12,6 +12,7 @@
 # include "Serialization.h"
 # include "Pattern.hpp"
 # include "TestUtils.h"
+# include "RuntimeControler.h"
 
 //
 // Link symbols :
