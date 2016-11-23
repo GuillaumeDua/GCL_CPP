@@ -1,6 +1,7 @@
 #ifndef GCL_TRAITS__
 # define GCL_TRAITS__
 
+#include "Preprocessor.h"
 # include "TypeTrait_SFINAE.hpp"
 # include <vector>
 # include <unordered_map>
@@ -38,7 +39,7 @@ namespace GCL
 			{
 				if (TypeToUniqueId<T>::value != _typeUniqueId)
 				{
-					std::cerr << "[Warning] : Bad type requested : [" << _typeUniqueId << "] to [" << TypeToUniqueId<T>::value << ']' << std::endl;
+					DEBUG_INSTRUCTION(std::cerr << "[Warning] : Bad type requested : [" << _typeUniqueId << "] to [" << TypeToUniqueId<T>::value << ']' << std::endl);
 					throw std::bad_cast;
 				}
 				return *reinterpret_cast<T*>(_ptr);
@@ -83,31 +84,37 @@ namespace GCL
 		{
 			using _Interface = T_Interface;
 			using index_type = size_t;
-			using basic_container_type = typename std::unordered_map<index_type, std::function<_Interface*(void)>>;
 
-			template <class T>
-			struct CtorCaller
+			struct TypeHelper
 			{
-				static const typename basic_container_type::mapped_type value;
+				using CB_DefaultCtorCallerType = std::function<_Interface*(void)>;
+
+				template <class T>
+				struct DefaultCtorCaller
+				{
+					static_assert(std::is_default_constructible<T>::value, "GCL::TypeTrait::InterfaceIs<I>::DefaultCtorCaller<T>");
+					static const CB_DefaultCtorCallerType value;
+				};
+				const CB_DefaultCtorCallerType & defaultConstructeurCallerOp;
 			};
+			using basic_container_type = typename std::unordered_map<index_type, TypeHelper>;
 
 			template <typename ... Types>
 			struct OfTypes
 			{
-				// TODO : static_assert(std::is_base_of<_Interface, T>::value && std::is_constructible<T>::value)
-
 				using T_TypePack = TypePack<Types...>;
 
 				template <typename T>
 				struct _Elem : basic_container_type::value_type
 				{
+					static_assert(std::is_base_of<_Interface, T>::value, "GCL::TypeTrait::InterfaceIs<I>::OfTypes<...T>::_Elem<T>");
 					_Elem()
-						: basic_container_type::value_type{ TypePack<Types...>::template indexOf<T>(), std::ref(CtorCaller<T>::value) }
+						: basic_container_type::value_type{ TypePack<Types...>::template indexOf<T>(), { std::ref(TypeHelper::DefaultCtorCaller<T>::value) } }
 					{}
 				};
 
 				struct Indexer
-					: public std::unordered_map<index_type, std::function<T_Interface*(void)>> // [TODO] : replace std::function by a struct with many tools in [?]
+					: public std::unordered_map<index_type, typename basic_container_type::mapped_type>
 				{
 					explicit Indexer()
 						: basic_container_type{ _Elem<Types>()... }
@@ -151,7 +158,7 @@ namespace GCL
 				InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::Indexer index;
 
 				for (auto & elem : index)
-					std::cout << "\t- [" << elem.first << "] => [" << elem.second()->name() << ']' << std::endl;
+					;// std::cout << "\t- [" << elem.first << "] => [" << elem.second()->name() << ']' << std::endl;
 				if (index.size() != InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::index.size())
 					throw std::exception("Sizes mismatch");
 				return true;

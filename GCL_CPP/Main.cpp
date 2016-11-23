@@ -12,7 +12,6 @@
 # include "Serialization.h"
 # include "Pattern.hpp"
 # include "TestUtils.h"
-# include "RuntimeControler.h"
 
 //
 // Link symbols :
@@ -34,12 +33,12 @@ namespace GCL
 	{
 		template <typename T_Interface>
 		template <class T>
-		const typename InterfaceIs<T_Interface>::basic_container_type::mapped_type
-			InterfaceIs<T_Interface>::CtorCaller<T>::value = { []() -> T_Interface* { return new T(); } };
+		const typename InterfaceIs<T_Interface>::TypeHelper::CB_DefaultCtorCallerType
+			InterfaceIs<T_Interface>::TypeHelper::DefaultCtorCaller<T>::value = { []() -> T_Interface* { return new T(); } };
 
 		template <typename T_Interface>
 		template <typename ... Types>
-		const std::unordered_map<size_t, std::function<T_Interface*(void)>> InterfaceIs<T_Interface>::OfTypes<Types...>::index = { _Elem<Types>()... };
+		const std::unordered_map<size_t, typename InterfaceIs<T_Interface>::TypeHelper> InterfaceIs<T_Interface>::OfTypes<Types...>::index = { _Elem<Types>()... };
 	}
 }
 

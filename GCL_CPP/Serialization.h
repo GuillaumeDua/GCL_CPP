@@ -55,7 +55,7 @@ namespace GCL
 			{
 				_index_type typeId;
 				T_IOPolicy::read(is, typeId);
-				auto & constructor = T_TypeManager::index.at(typeId);
+				auto & constructor = T_TypeManager::index.at(typeId).defaultConstructeurCallerOp;
 				T_SerializableInterface * obj = constructor();
 				is >> *obj;
 				return obj;
