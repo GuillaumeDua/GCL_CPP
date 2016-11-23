@@ -34,7 +34,10 @@
 #else
 # define _GCL_DEBUG_INSTRUCTION(instruction)
 # define _GCL_RELEASE_INSTRUCTION(instruction)	instruction
-# define _GCL_ASSERT(instruction)				{ if (not instruction) throw std::runtime_error("_GCL_ASSERT"); }
+# define _GCL_ASSERT(instruction)				{	if (not instruction) throw std::runtime_error(						\
+													"_GCL_ASSERT : " __FILE__ " : " + std::to_string(__LINE__) + "\n"	\
+													);																	\
+												}
 #endif
 
 #endif // __GCL__PREPROCESSOR__
