@@ -23,8 +23,8 @@ namespace GCL
 				template <typename T>
 				static void	read(std::istream & is, T & var)
 				{
-					is.read(reinterpret_cast<char *>(&var), sizeof(T));
 					_GCL_ASSERT(is);
+					is.read(reinterpret_cast<char *>(&var), sizeof(T));
 				}
 				template <typename T>
 				static void	write(std::ostream & os, const T * var)
@@ -35,19 +35,19 @@ namespace GCL
 				template <typename T>
 				static void	read(std::istream & is, T * var)
 				{
-					is.read(reinterpret_cast<char *>(var), sizeof(T));
 					_GCL_ASSERT(is);
+					is.read(reinterpret_cast<char *>(var), sizeof(T));
 				}
 
 				template <>
 				static void read<std::string>(std::istream & is, std::string & var)
 				{
 					std::string::size_type size;
+					_GCL_ASSERT(is);
 					is.read(reinterpret_cast<char *>(&size), sizeof(std::string::size_type));
-					_GCL_ASSERT(is);
 					var.resize(size, '\0');
-					is.read(&var[0], size);
 					_GCL_ASSERT(is);
+					is.read(&var[0], size);
 				}
 				template <>
 				static void write<std::string>(std::ostream & os, const std::string & var)
@@ -70,8 +70,8 @@ namespace GCL
 				template <typename T>
 				static void	read(std::istream & is, T & var)
 				{
-					is >> var;
 					_GCL_ASSERT(is);
+					is >> var;
 				}
 				template <typename T>
 				static void	write(std::ostream & os, const T * var)
