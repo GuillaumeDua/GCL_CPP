@@ -119,6 +119,7 @@ int	main(int ac, char* av[])
 		, GCL::Experimental::TypeTrait::Test
 		, GCL::TMP::Test
 		, GCL::TypeTrait::Test
+		, GCL::Introspection::Test
 		
 		//, GCL::Task::Test
 		//, GCL::Events::Test

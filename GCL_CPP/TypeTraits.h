@@ -1,8 +1,9 @@
 #ifndef GCL_TRAITS__
 # define GCL_TRAITS__
 
-#include "Preprocessor.h"
-# include "TypeTrait_SFINAE.hpp"
+# include "Introspection.hpp" // append to current file
+
+# include "Preprocessor.h"
 # include <vector>
 # include <unordered_map>
 # include <functional>
