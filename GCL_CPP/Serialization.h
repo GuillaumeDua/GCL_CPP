@@ -4,10 +4,13 @@
 # include "TypeTraits.h"
 # include "IO.h"
 # include "TemplateMetaProgramming.h"
+# include "Introspection.hpp"
 
 # include <sstream>
 # include <map>
 # include <queue>
+
+GCL_Introspection__GenHasNested(NotSerializable);
 
 namespace GCL
 {
@@ -30,11 +33,30 @@ namespace GCL
 				struct Writer
 				{
 					template <typename T>
+					struct WriterImpl
+					{
+						static const bool isSerializable = !GCL::Introspection::has_NotSerializable_nested<T>::value;
+
+						template <bool _isSerializable = isSerializable>
+						static void	write_impl(std::ostream & os, const T & var);
+						template <>
+						static void	write_impl<true>(std::ostream & os, const T & var)
+						{
+							T_IO_POlicy::write(os, _TypesPack::template indexOf<T>());
+							os << var;
+						}
+						template <>
+						static void	write_impl<false>(std::ostream & os, const T & var)
+						{
+							static_assert(false, "This type has \"NeverSerialize\"");
+						}
+					};
+
+					template <typename T>
 					static void	write(std::ostream & os, const T & var)
 					{
 						static_assert(std::is_base_of<_InterfaceType, T>::value, "GCL::Serialization::InterfaceIs<I>::Writer::write<T> : T is not child of I");
-						T_IO_POlicy::write(os, _TypesPack::template indexOf<T>());
-						os << var;
+						WriterImpl<T>::write_impl<>(os, var);
 					}
 
 					explicit	Writer(std::ostream & oStream)
