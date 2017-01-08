@@ -110,7 +110,7 @@ namespace GCL
 				{
 					static_assert(std::is_base_of<_Interface, T>::value, "GCL::TypeTrait::InterfaceIs<I>::OfTypes<...T>::_Elem<T>");
 					_Elem()
-						: basic_container_type::value_type{ TypePack<Types...>::template indexOf<T>(), { std::ref(TypeHelper::DefaultCtorCaller<T>::value) } }
+						: basic_container_type::value_type{ T_TypePack::template indexOf<T>(), { std::ref(TypeHelper::DefaultCtorCaller<T>::value) } }
 					{}
 				};
 
@@ -124,7 +124,7 @@ namespace GCL
 					template <typename T>
 					static inline constexpr index_type indexOf(void)
 					{
-						return TypePack<Types...>::template indexOf<T>();
+						return T_TypePack::template indexOf<T>();
 					}
 					template <typename T>
 					inline typename basic_container_type::mapped_type at(void) const
@@ -132,6 +132,9 @@ namespace GCL
 						return basic_container_type::at(indexOf<T>());
 					}
 				} /*static index*/; // [TODO]::[FixMe] : How to duplicate pack expansion [?]
+				/*template <typename T_Interface>
+				template <typename ... Types>
+				typename InterfaceIs<T_Interface>::OfTypes<Types...>::Indexer InterfaceIs<T_Interface>::OfTypes<Types...>::index;*/
 				static const basic_container_type index;
 			};
 		};
