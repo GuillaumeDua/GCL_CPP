@@ -9,6 +9,7 @@
 # include <sstream>
 # include <map>
 # include <queue>
+# include <memory>
 
 GCL_Introspection__GenHasNested(NotSerializable);
 
@@ -32,33 +33,6 @@ namespace GCL
 				template <typename T_IO_POlicy = GCL::IO::Policy::Binary>
 				struct Writer
 				{
-					template <typename T>
-					struct WriterImpl
-					{
-						static const bool isSerializable = !GCL::Introspection::has_NotSerializable_nested<T>::value;
-
-						template <bool _isSerializable = isSerializable>
-						static void	write_impl(std::ostream & os, const T & var);
-						template <>
-						static void	write_impl<true>(std::ostream & os, const T & var)
-						{
-							T_IO_POlicy::write(os, _TypesPack::template indexOf<T>());
-							os << var;
-						}
-						template <>
-						static void	write_impl<false>(std::ostream & os, const T & var)
-						{
-							static_assert(false, "This type has \"NeverSerialize\"");
-						}
-					};
-
-					template <typename T>
-					static void	write(std::ostream & os, const T & var)
-					{
-						static_assert(std::is_base_of<_InterfaceType, T>::value, "GCL::Serialization::InterfaceIs<I>::Writer::write<T> : T is not child of I");
-						WriterImpl<T>::write_impl<>(os, var);
-					}
-
 					explicit	Writer(std::ostream & oStream)
 						: _oStream(oStream)
 					{}
@@ -68,8 +42,34 @@ namespace GCL
 						write(_oStream, element);
 						return *this;
 					}
+					template <typename T>
+					static constexpr void	write(std::ostream & os, const T & var)
+					{
+						static_assert(std::is_base_of<_InterfaceType, T>::value, "GCL::Serialization::InterfaceIs<I>::Writer::write<T> : T is not child of I");
+						WriterImpl<T>::write_impl<>(os, var);
+					}
 
 				private:
+					template <typename T>
+					struct WriterImpl
+					{
+						static constexpr bool isSerializable = !GCL::Introspection::has_NotSerializable_nested<T>::value;
+
+						template <bool _isSerializable = isSerializable>
+						static constexpr inline void	write_impl(std::ostream & os, const T & var);
+						template <>
+						static constexpr inline void	write_impl<true>(std::ostream & os, const T & var)
+						{
+							T_IO_POlicy::write(os, _TypesPack::template indexOf<T>());
+							os << var; // WTF this is constexpr ?
+						}
+						template <>
+						static constexpr inline void	write_impl<false>(std::ostream & os, const T & var)
+						{
+							static_assert(false, "This type has \"NeverSerialize\"");
+						}
+					};
+
 					std::ostream & _oStream;
 				};
 				template <typename T_IO_POlicy = GCL::IO::Policy::Binary>
@@ -94,31 +94,32 @@ namespace GCL
 						_GCL_ASSERT(_TypesPack::template indexOf<T>() == typeIndex);
 						is >> var;
 					}
-					static _InterfaceType *	read(std::istream & is)
+					static std::unique_ptr<_InterfaceType> read(std::istream & is)
 					{
+						_GCL_ASSERT(is);
 						size_t typeIndex;
 
 						T_IO_POlicy::read(is, typeIndex);
 						if (is.eof()) return 0x0;
 
 						auto & constructor = T_TypeManager::index.at(typeIndex).defaultConstructeurCallerOp;
-						_InterfaceType * elem = constructor();
+						std::unique_ptr<_InterfaceType> elem(constructor());
 						is >> *elem;
 						return elem;
 					}
 
-					Reader &				operator >> (_InterfaceType *& element)
+					Reader &				operator >> (std::unique_ptr<_InterfaceType> & element)
 					{
 						_GCL_ASSERT(_iStream);
 						element = read(_iStream);
 						return *this;
 					}
-					Reader &				operator >> (std::queue<_InterfaceType*> & elemQueue)
+					Reader &				operator >> (std::queue<std::unique_ptr<_InterfaceType>> & elemQueue)
 					{
 						_GCL_ASSERT(_iStream);
-						_InterfaceType * elem{ 0x0 };
+						std::unique_ptr<_InterfaceType> elem = nullptr;
 						while (*this >> elem)
-							elemQueue.push(elem);
+							elemQueue.emplace(std::move(elem));
 						return *this;
 					}
 
@@ -191,7 +192,7 @@ namespace GCL
 
 					Reader			reader(ss);
 
-					std::queue<TestInterface*> elements;
+					std::queue<std::unique_ptr<TestInterface>> elements;
 					reader
 						>> elements
 						;
@@ -199,7 +200,6 @@ namespace GCL
 					while (not elements.empty())
 					{
 						elements.front()->DoStuff();
-						delete elements.front();
 						elements.pop();
 					}
 				}
