@@ -54,6 +54,8 @@ namespace GCL
 		template <typename ... Types>
 		struct TypePack
 		{
+			TypePack() = delete;
+
 			using _Types = std::tuple<Types...>;
 
 			template <typename T>
