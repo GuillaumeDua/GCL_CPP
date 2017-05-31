@@ -65,21 +65,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Container.h" />
+    <ClInclude Include="Monitoring.h" />
     <ClInclude Include="Pattern.hpp" />
     <ClInclude Include="Experimental.h" />
     <ClInclude Include="IO.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Ownership.h" />
+    <ClInclude Include="RuntimeControler.h" />
     <ClInclude Include="SelfUpdate.h" />
     <ClInclude Include="Serialization.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TemplateMetaProgramming.h" />
+    <ClInclude Include="TestUtils.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TypeTraits.h" />
+    <ClInclude Include="Introspection.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Serialization.cpp" />
+    <ClCompile Include="TypeTraits.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
