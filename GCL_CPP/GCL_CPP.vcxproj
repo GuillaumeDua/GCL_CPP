@@ -66,6 +66,7 @@
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="filesystem.hpp" />
     <ClInclude Include="Monitoring.h" />
     <ClInclude Include="Pattern.hpp" />
     <ClInclude Include="Experimental.h" />

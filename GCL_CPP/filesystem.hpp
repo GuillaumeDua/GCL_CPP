@@ -78,7 +78,7 @@ namespace gcl
 			std::string value;
 			bool is_valid = false;
 		};
-
+		// todo : extension : *.png
 		struct directory
 		{
 			enum walk_logic
