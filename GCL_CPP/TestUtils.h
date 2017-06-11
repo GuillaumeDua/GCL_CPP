@@ -12,30 +12,13 @@
 #include <thread>
 #include <mutex>
 
+#include "../GCL_CPP/functionnal.hpp"
+
 namespace GCL
 {
-	namespace Functionnal
-	{
-		struct OnDestroyExecute : public std::function<void()>
-		{
-			explicit OnDestroyExecute(std::function<void()> && func)
-			{
-				func.swap(*this);
-			}
-			OnDestroyExecute(const OnDestroyExecute & w)
-			{
-				const_cast<OnDestroyExecute &>(w).swap(*this);
-			}
-			~OnDestroyExecute()
-			{
-				if (*this)
-					(*this)();
-			}
-		};
-	}
 	namespace Experimental
 	{
-		namespace TestUtils
+		namespace test_utils
 		{
 			namespace Inline
 			{
@@ -129,20 +112,20 @@ namespace GCL
 				};
 
 #define CONDITIONAL_SCOPE_INLINE(expr)	{																																																			\
-											static const GCL::Experimental::TestUtils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
-											GCL::Experimental::TestUtils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_scope_controler::Get<>(key);	\
+											static const GCL::Experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
+											GCL::Experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::test_utils::Inline::RT_scope_controler::Get<>(key);	\
 											if (hook_active)																																														\
 											{																																																		\
 												expr																																																\
 											}																																																		\
 										}
 
-#define CONDITIONAL_SCOPE_INLINE_CALL_ONE(expr)		{																																																				\
-														static const GCL::Experimental::TestUtils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
-														GCL::Experimental::TestUtils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::TestUtils::Inline::RT_scope_controler::Get<true>(key);	\
+#define CONDITIONAL_SCOPE_INLINE_CALL_ONCE(expr)		{																																																				\
+														static const GCL::Experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
+														GCL::Experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::test_utils::Inline::RT_scope_controler::Get<true>(key);	\
 														if (hook_active)																																															\
 														{																																																			\
-															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::TestUtils::Inline::RT_scope_controler::Desactivate(key); });															\
+															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
 															expr																																																	\
 														}																																																			\
 													}
@@ -158,6 +141,7 @@ namespace GCL
 					//	}
 					//};
 
+					// todo : improve that test with value-check
 					static bool Proceed(void)
 					{
 						/*std::shared_ptr<RT_scope_controler::Observer> logObs = std::make_shared<LogObserver>();*/
@@ -168,9 +152,9 @@ namespace GCL
 						{
 							try
 							{
-								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("first throw"););
-								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("second throw"););
-								CONDITIONAL_SCOPE_INLINE_CALL_ONE(throw std::runtime_error("third throw"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONCE(throw std::runtime_error("first throw"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONCE(throw std::runtime_error("second throw"););
+								CONDITIONAL_SCOPE_INLINE_CALL_ONCE(throw std::runtime_error("third throw"););
 								std::cout << "[+]::[TEST] : " << i << " : No throw" << std::endl;
 							}
 							catch (const std::exception & ex)

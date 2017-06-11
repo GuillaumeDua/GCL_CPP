@@ -20,7 +20,7 @@ namespace GCL
 {
 	namespace Experimental
 	{
-		namespace TestUtils
+		namespace test_utils
 		{
 			std::mutex									Inline::RT_scope_controler::_container_mutex;
 			std::mutex									Inline::RT_scope_controler::_obs_mutex;
@@ -50,6 +50,7 @@ namespace GCL
 
 namespace Tool
 {
+	// todo : replace by new test component
 	struct Test
 	{
 		static uint32_t callCount;
@@ -130,7 +131,7 @@ int	main(int ac, char* av[])
 		// GCL::Experimental::Puzzle::Test
 		// , GCL::Color::Test // FIXME
 		, GCL::Experimental::Pattern::Test
-		, GCL::Experimental::TestUtils::Inline::Test
+		, GCL::Experimental::test_utils::Inline::Test
 	>();
 
 	system("pause");
