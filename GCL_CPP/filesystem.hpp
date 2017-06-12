@@ -12,6 +12,7 @@
 
 namespace gcl
 {
+	// todo : unix/linux impl
 	namespace filesystem
 	{
 		namespace exception
