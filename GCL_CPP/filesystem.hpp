@@ -79,7 +79,7 @@ namespace gcl
 			std::string value;
 			bool is_valid = false;
 		};
-		// todo : extension : *.png
+		// todo : extension : *.png -> use regex [?]
 		struct directory
 		{
 			enum walk_logic
