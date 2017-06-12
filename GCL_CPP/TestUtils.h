@@ -12,11 +12,11 @@
 #include <thread>
 #include <mutex>
 
-#include "../GCL_CPP/functionnal.hpp"
+#include <gcl_cpp/functionnal.hpp>
 
-namespace GCL
+namespace gcl
 {
-	namespace Experimental
+	namespace experimental
 	{
 		namespace test_utils
 		{
@@ -112,8 +112,8 @@ namespace GCL
 				};
 
 #define CONDITIONAL_SCOPE_INLINE(expr)	{																																																			\
-											static const GCL::Experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
-											GCL::Experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::test_utils::Inline::RT_scope_controler::Get<>(key);	\
+											static const gcl::experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);													\
+											gcl::experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && gcl::experimental::test_utils::Inline::RT_scope_controler::Get<>(key);	\
 											if (hook_active)																																														\
 											{																																																		\
 												expr																																																\
@@ -121,11 +121,11 @@ namespace GCL
 										}
 
 #define CONDITIONAL_SCOPE_INLINE_CALL_ONCE(expr)		{																																																				\
-														static const GCL::Experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
-														GCL::Experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && GCL::Experimental::test_utils::Inline::RT_scope_controler::Get<true>(key);	\
+														static const gcl::experimental::test_utils::Inline::RT_scope_controler::key_type key = std::string(__FILE__ " line ") + std::to_string(__LINE__);														\
+														gcl::experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && gcl::experimental::test_utils::Inline::RT_scope_controler::Get<true>(key);	\
 														if (hook_active)																																															\
 														{																																																			\
-															GCL::Functionnal::OnDestroyExecute onDestroyExecute([](){ GCL::Experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
+															gcl::functionnal::on_destroy_call onDestroyExecute([](){ gcl::experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
 															expr																																																	\
 														}																																																			\
 													}
@@ -159,7 +159,7 @@ namespace GCL
 							}
 							catch (const std::exception & ex)
 							{
-								std::cout << "[+]::[TEST] : " << i << " : Exception catch : " << ex.what() << std::endl;
+								std::cout << "[+]::[TEST] : " << i << " : exception catch : " << ex.what() << std::endl;
 							}
 						}
 						return true;

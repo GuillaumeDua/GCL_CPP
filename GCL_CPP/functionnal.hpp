@@ -3,21 +3,21 @@
 
 # include <functional>
 
-namespace GCL
+namespace gcl
 {
-	namespace Functionnal
+	namespace functionnal
 	{
-		struct OnDestroyExecute : public std::function<void()>
+		struct on_destroy_call : public std::function<void()>
 		{
-			explicit OnDestroyExecute(std::function<void()> && func)
+			explicit on_destroy_call(std::function<void()> && func)
 			{
 				func.swap(*this);
 			}
-			OnDestroyExecute(const OnDestroyExecute & w)
+			on_destroy_call(const on_destroy_call & w)
 			{
-				const_cast<OnDestroyExecute &>(w).swap(*this);
+				const_cast<on_destroy_call &>(w).swap(*this);
 			}
-			~OnDestroyExecute()
+			~on_destroy_call()
 			{
 				if (*this)
 					(*this)();

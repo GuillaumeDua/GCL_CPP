@@ -1,8 +1,8 @@
-#include "Serialization.h"
+#include <gcl_cpp/serialisation.hpp>
 
-namespace GCL
+namespace gcl
 {
-	namespace Serialization
+	namespace serialization
 	{
 		/*template
 		<

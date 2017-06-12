@@ -44,6 +44,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -56,6 +57,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories);$(ProjectDir)\..</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -66,28 +68,30 @@
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="exception.hpp" />
     <ClInclude Include="filesystem.hpp" />
+    <ClInclude Include="functionnal.hpp" />
     <ClInclude Include="Monitoring.h" />
-    <ClInclude Include="Pattern.hpp" />
+    <ClInclude Include="pattern.hpp" />
     <ClInclude Include="Experimental.h" />
     <ClInclude Include="IO.h" />
-    <ClInclude Include="Maths.h" />
+    <ClInclude Include="maths.h" />
     <ClInclude Include="EventHandler.h" />
-    <ClInclude Include="Ownership.h" />
-    <ClInclude Include="RuntimeControler.h" />
+    <ClInclude Include="ownership.hpp" />
+    <ClInclude Include="preprocessor.hpp" />
     <ClInclude Include="SelfUpdate.h" />
-    <ClInclude Include="Serialization.h" />
-    <ClInclude Include="Task.h" />
-    <ClInclude Include="TemplateMetaProgramming.h" />
+    <ClInclude Include="serialisation.hpp" />
+    <ClInclude Include="task.hpp" />
+    <ClInclude Include="template_meta_programming.hpp" />
     <ClInclude Include="TestUtils.h" />
-    <ClInclude Include="Thread.h" />
-    <ClInclude Include="TypeTraits.h" />
-    <ClInclude Include="Introspection.hpp" />
+    <ClInclude Include="thread.hpp" />
+    <ClInclude Include="type_traits.hpp" />
+    <ClInclude Include="static_introspection.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Serialization.cpp" />
-    <ClCompile Include="TypeTraits.cpp" />
+    <ClCompile Include="serialisation.cpp" />
+    <ClCompile Include="type_traits.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

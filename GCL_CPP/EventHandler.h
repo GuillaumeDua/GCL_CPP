@@ -1,15 +1,17 @@
 #ifndef GCL_EVENT_HANDLER__
 # define GCL_EVENT_HANDLER__
 
-# include "Container.h"
-# include "Preprocessor.h"
+# include <gcl_cpp/Container.h>
+# include <gcl_cpp/preprocessor.hpp>
 
 # include <map>
 # include <queue>
 # include <functional>
 # include <iostream>
 
-namespace GCL
+// TODO : replace by new gcl::event
+
+namespace gcl
 {
 	namespace events
 	{
@@ -33,7 +35,7 @@ namespace GCL
 
 			using T_EventID = typename T_EventIDType;
 			using T_EventCallback = std::function<void()>;
-			using T_EventContainer = typename std::map<typename T_EventID, GCL::container::non_concurrent::Vector<typename T_EventCallback> >;
+			using T_EventContainer = typename std::map<typename T_EventID, gcl::container::non_concurrent::Vector<typename T_EventCallback> >;
 
 			typename T_EventContainer::mapped_type &	on(const T_EventID & name)
 			{
@@ -71,7 +73,7 @@ namespace GCL
 			{
 				void	DoStuff(void)
 				{
-					_GCL_DEBUG_INSTRUCTION(std::cout << "Toto::DoStuff" << std::endl);
+					GCL_DEBUG_INSTRUCTION(std::cout << "Toto::DoStuff" << std::endl);
 				}
 				void	IncrI(void)
 				{
@@ -85,14 +87,14 @@ namespace GCL
 			{
 				void	Report(const int i)
 				{
-					_GCL_DEBUG_INSTRUCTION(std::cout << "[0x" << this << "] : CollisionNotificationLogger::Report : " << i << std::endl);
+					GCL_DEBUG_INSTRUCTION(std::cout << "[0x" << this << "] : CollisionNotificationLogger::Report : " << i << std::endl);
 				}
 			};
 
 			static bool	Proceed()
 			{
 				Toto toto;
-				toto.on("Collision") += [](){ _GCL_DEBUG_INSTRUCTION(std::cout << "Collision events triggered" << std::endl); };
+				toto.on("Collision") += [](){ GCL_DEBUG_INSTRUCTION(std::cout << "Collision events triggered" << std::endl); };
 				toto.on("Collision") += [&toto](){ toto.DoStuff(); };
 				toto.on("Collision") += [&toto]()  { toto.IncrI(); };
 				toto.on("Collision") += [&toto]()  mutable { toto.IncrI(); };

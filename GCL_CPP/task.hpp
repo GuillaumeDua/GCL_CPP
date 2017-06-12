@@ -10,34 +10,34 @@
 # include <queue>
 # include <iomanip>
 
-# include "Thread.h"
-# include "Preprocessor.h"
+# include <gcl_cpp/thread.hpp>
+# include <gcl_cpp/preprocessor.hpp>
 
-namespace GCL
+namespace gcl
 {
-	namespace Task
+	namespace task
 	{
-		template <typename ElementType>
-		struct	Queue
+		template <typename T_element_type>
+		struct	queue
 		{
-			explicit Queue() = default;
-			Queue(const Queue &) = delete;
-			Queue(const Queue &&) = delete;
-			Queue & operator=(const Queue &) = delete;
-			~Queue() = default;
+			explicit queue() = default;
+			queue(const queue &) = delete;
+			queue(const queue &&) = delete;
+			queue & operator=(const queue &) = delete;
+			~queue() = default;
 
-			using _ElementType = ElementType;
+			using element_type = T_element_type;
 
-			void						Push(ElementType * elem)
+			void						push(T_element_type * elem)
 			{
 				std::lock_guard<std::mutex>	guardLock(_mutex);
 				_content.push(elem);
 				_conditionVariable.notify_one();	// [Todo] : Test
 				//_conditionVariable.notify_all();
 			}
-			ElementType *				Pop(void)
+			T_element_type *			pop(void)
 			{
-				ElementType * elem;
+				T_element_type * elem;
 				std::lock_guard<std::mutex>	guardLock(_mutex);
 				if (this->_content.size() == 0)
 					return 0x0;
@@ -45,17 +45,17 @@ namespace GCL
 				this->_content.pop();
 				return elem;
 			}
-			const size_t				Size(void)
+			const size_t				size(void)
 			{
 				std::lock_guard<std::mutex>	guardLock(_mutex);
 				return this->_content.size();
 			}
-			void						WaitFor(void)
+			void						wait_for(void)
 			{
 				std::unique_lock<std::mutex>	uniqueLock(_mutex);
 				_conditionVariable.wait(uniqueLock);
 			}
-			void						StopAllPendingWait()
+			void						stop_pending_waits()
 			{
 				_conditionVariable.notify_all();
 			}
@@ -63,106 +63,111 @@ namespace GCL
 		protected:
 			std::mutex					_mutex;
 			std::condition_variable		_conditionVariable;
-			std::queue<ElementType*>	_content;
+			std::queue<T_element_type*>	_content;
 		};
 
-		template <typename QueueType>
-		struct	Producer
+		template <typename T_queue>
+		struct	producer
 		{
-			Producer(QueueType & queue)
+			using queue_type = T_queue;
+
+			producer(queue_type & queue)
 				: _queue(queue)
 			{}
-
 
 		protected:
-			QueueType	&	_queue;
+			queue_type	&	_queue;
 		};
 
-		template <typename QueueType, class HandleElementPolicy>
-		struct	Consumer
+		template <typename T_queue, class T_HandleElementPolicy>
+		struct	consumer
 		{
-			static_assert(std::is_same
-				<
-				typename QueueType::_ElementType,
-				typename HandleElementPolicy::_ElementType
-				>::value,
-				"[Error]::[GCL::Consumer] : Mismatch elements type"
-				);
+			using queue_type = T_queue;
 
-			explicit Consumer(QueueType & queue)
+			static_assert
+			(
+				std::is_same
+				<
+					typename T_queue::element_type,
+					typename T_HandleElementPolicy::element_type
+				>::value,
+				"[Error]::[gcl::consumer] : Mismatch elements type"
+			);
+
+			explicit consumer(T_queue & queue)
 				: _queue(queue)
-				, _isRunning(false)
-				, _stopRequieredIfLazy(false)
+				, is_running(false)
+				, stop_requiered_if_lazy(false)
 			{}
-			Consumer() = delete;
-			Consumer(const Consumer &) = delete;
-			Consumer(const Consumer &&) = delete;
-			Consumer & operator=(const Consumer &) = delete;
-			~Consumer() = default;
+			consumer() = delete;
+			consumer(const consumer &) = delete;
+			consumer(const consumer &&) = delete;
+			consumer & operator=(const consumer &) = delete;
+			~consumer() = default;
 
 			const bool	IsRunning(void) const
 			{
-				return this->_isRunning;
+				return this->is_running;
 			}
 			const bool	IsStopRequieredIfLazy(void) const
 			{
-				return this->_stopRequieredIfLazy;
+				return this->stop_requiered_if_lazy;
 			}
 			void		Work(void)
 			{
-				GCL::Thread::scout.Print("[+] : Consumer : Work starting");
-				QueueType::_ElementType * element;
-				_isRunning = true;
-				_stopRequieredIfLazy = false;
+				gcl::thread::scout.Print("[+] : consumer : Work starting");
+				queue_type::element_type * element;
+				is_running = true;
+				stop_requiered_if_lazy = false;
 
-				while (_isRunning)
+				while (is_running)
 				{
-					if ((element = this->_queue.Pop()) != 0x0)
-						HandleElementPolicy::HandleElement(element);
-					else if (_stopRequieredIfLazy)
+					if ((element = this->_queue.pop()) != 0x0)
+						T_HandleElementPolicy::HandleElement(element);
+					else if (stop_requiered_if_lazy)
 						break;
 					else
-						this->_queue.WaitFor();
+						this->_queue.wait_for();
 				}
-				_isRunning = false;
+				is_running = false;
 			}
 			inline void	Stop(void)
 			{
-				this->_isRunning = false;
+				this->is_running = false;
 			}
 			inline void	RequiereStopIfLazy(void)
 			{
-				this->_stopRequieredIfLazy = true;
+				this->stop_requiered_if_lazy = true;
 			}
 
 		protected:
-			volatile bool	_isRunning;
-			volatile bool	_stopRequieredIfLazy;
-			QueueType	&	_queue;
+			volatile bool	is_running;
+			volatile bool	stop_requiered_if_lazy;
+			queue_type	&	_queue;
 		};
 
 
-		struct Test
+		struct Test // todo : use gcl::test
 		{
-			template <typename ElementType>
+			template <typename T_element_type>
 			struct	FakeHandleElementPolicy
 			{
-				using _ElementType = ElementType;
+				using element_type = T_element_type;
 
-				static bool	HandleElement(ElementType * element)
+				static bool	HandleElement(T_element_type * element)
 				{
 					bool returnValue(element != 0x0);
-					THREAD_SAFE_STDCOUT("[-] : Consumer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
+					THREAD_SAFE_STDCOUT("[-] : consumer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
 					delete element;
 					std::this_thread::sleep_for(std::chrono::milliseconds(300));
 					return returnValue;
 				}
 			};
 
-			template <typename QueueType, typename ConsumerType, size_t Qty>
+			template <typename T_queue, typename ConsumerType, size_t Qty>
 			struct	ConsumerPool
 			{
-				explicit ConsumerPool(QueueType & queue)
+				explicit ConsumerPool(T_queue & queue)
 				{
 					for (size_t i = 0; i < Qty; ++i)
 						this->_content.push_back(new ConsumerType(queue));
@@ -205,41 +210,41 @@ namespace GCL
 				std::vector<std::future<void> >	_asyncFutures;
 			};
 
-			template <typename ElementType>
+			template <typename T_element_type>
 			struct FakeUniqueRscCreationPolicy
 			{
-				using _ElementType = ElementType;
+				using element_type = T_element_type;
 
-				static ElementType * GetNewInstance(void)
+				static T_element_type * GetNewInstance(void)
 				{
-					return new ElementType();
+					return new T_element_type();
 				}
 			};
 
 			static bool Proceed(void)
 			{
-				using ElementType = int;
-				using QueueType = GCL::Task::Queue < ElementType > ;
-				using HandleElementPolicy = FakeHandleElementPolicy < ElementType > ;
-				using ConsumerType = GCL::Task::Consumer < QueueType, HandleElementPolicy > ;
+				using T_element_type = int;
+				using T_queue = gcl::task::queue < T_element_type > ;
+				using T_HandleElementPolicy = FakeHandleElementPolicy < T_element_type > ;
+				using ConsumerType = gcl::task::consumer < T_queue, T_HandleElementPolicy > ;
 
-				// [Producer]
-				/*QueueType	queue;
-				auto		producingAsync = std::async(std::launch::async, [&queue](QueueType & queue) mutable
+				// [producer]
+				/*T_queue	queue;
+				auto		producingAsync = std::async(std::launch::async, [&queue](T_queue & queue) mutable
 				{
-				ElementType * element;
+				T_element_type * element;
 				for (size_t i = 0; i < 100; ++i)
 				{
-				element = new ElementType(i);
-				THREAD_SAFE_STDCOUT("[+] : Producer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
-				queue.Push(element);
+				element = new T_element_type(i);
+				THREAD_SAFE_STDCOUT("[+] : producer : " << std::setw(4) << std::this_thread::get_id() << " : [0x" << element << "] => [" << *element << "]");
+				queue.push(element);
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
 				}, std::ref(queue));
 				*/
 				// [1 consumer]
-				//GCL::Consumer<QueueType, HandleElementPolicy> consumer(queue);
-				//auto		consumerAsync = std::async(std::launch::async, [&consumer](GCL::Consumer<QueueType, HandleElementPolicy> & consumer) mutable
+				//gcl::consumer<T_queue, T_HandleElementPolicy> consumer(queue);
+				//auto		consumerAsync = std::async(std::launch::async, [&consumer](gcl::consumer<T_queue, T_HandleElementPolicy> & consumer) mutable
 				//{
 				//	consumer.Work();
 				//}, std::ref(consumer));
@@ -248,18 +253,18 @@ namespace GCL
 				//consumerAsync.get();
 
 				// [n(2) consumers]
-				//ConsumerPool<QueueType, ConsumerType, 2> consumers(queue);
+				//ConsumerPool<T_queue, ConsumerType, 2> consumers(queue);
 				//consumers.LauchASync();
 				//producingAsync.get();
 				//consumers.Apply(std::function<void(ConsumerType &)>([&](ConsumerType & consumer) mutable -> void
 				//{
 				//	consumer.RequiereStopIfLazy();
 				//}));
-				//queue.StopAllPendingWait();
+				//queue.stop_pending_waits();
 				//consumers.GetSync();
 
 				// [Unique Rcs] (very trash test)
-				GCL::Thread::UniqueRsc<ElementType, FakeUniqueRscCreationPolicy<ElementType> >	uniqueRsc;
+				gcl::thread::unique_rsc<T_element_type, FakeUniqueRscCreationPolicy<T_element_type> >	uniqueRsc;
 				std::vector<std::future<void>>	_vec;
 				for (size_t i = 0; i < 10; ++i)
 					_vec.emplace_back(std::async(std::launch::async, [&uniqueRsc](void) -> void
@@ -267,7 +272,7 @@ namespace GCL
 					for (size_t i = 0; i < 5; ++i)
 					{
 						const int * unique_rcs_ptr = &(uniqueRsc.Get());
-						_GCL_DEBUG_INSTRUCTION(THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << unique_rcs_ptr << ']'));
+						GCL_DEBUG_INSTRUCTION(THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << unique_rcs_ptr << ']'));
 						std::this_thread::sleep_for(std::chrono::seconds(1));
 					}
 				}));

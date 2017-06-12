@@ -9,36 +9,39 @@
 # include <unordered_map>
 # include <sstream>
 
-namespace GCL
+namespace gcl
 {
-	namespace Thread
+	namespace thread
 	{
 		// Warning : Create a bottle-neck on ressources acquisition
-		template <typename ElementType, typename ElementCreationPolicy>
-		struct	UniqueRsc
+		// todo : allocator instead/plus T_element_creation_policy ?
+		template <typename T_element_type, typename T_element_creation_policy>
+		struct	unique_rsc
 		{
-			using _ElementType = ElementType;
-			using _ElementCreationFunc = std::function < ElementType*(void) > ;
+			using element_type = std::remove_pointer_t<T_element_type>; // std::decay
+			using element_creator_fun_t = std::function<element_type*(void)>;
 
-			static_assert(std::is_same
+			static_assert
+			(
+				std::is_same
 				<
-				typename _ElementType,
-				typename ElementCreationPolicy::_ElementType
+					typename element_type,
+					typename T_element_creation_policy::element_type
 				>::value,
-				"[Error]::[GCL::Thread::UniqueRsc] : Mismatch elements type"
-				);
+				"[Error]::[gcl::thread::unique_rsc] : Mismatch elements type"
+			);
 
-			template <typename Elem> ElementType &				Emplace(std::initializer_list<Elem> & initializer_list)
+			template <typename Elem> element_type &				Emplace(std::initializer_list<Elem> & initializer_list)
 			{
 				const std::thread::id id = std::this_thread::get_id();
 				std::lock_guard<std::mutex>	lock(_mutex);
 
 				if (this->_content.find(id) != this->_content.end())
 					throw std::runtime_error("[Error] : Ressource already exists");
-				this->_content[id] = ElementCreationPolicy::GetNewInstance(initializer_list);
+				this->_content[id] = T_element_creation_policy::GetNewInstance(initializer_list);
 				return *(this->_content[id]);
 			}
-			ElementType &										Emplace(_ElementCreationFunc & createFunc)
+			element_type &										Emplace(element_creator_fun_t & createFunc)
 			{
 				std::lock_guard<std::mutex>	lock(_mutex);
 
@@ -48,20 +51,20 @@ namespace GCL
 				this->_content[id] = createFunc();
 				return *(this->_content[id]);
 			}
-			ElementType &										Get(void)
+			element_type &										Get(void)
 			{
 				const std::thread::id id = std::this_thread::get_id();
 				std::lock_guard<std::mutex>	lock(_mutex);
 
 				if (this->_content.find(id) == this->_content.end())
-					this->_content[id] = ElementCreationPolicy::GetNewInstance();
+					this->_content[id] = T_element_creation_policy::GetNewInstance();
 				return *(this->_content[id]);
 			}
-			const ElementType &									Get(void) const
+			const element_type &									Get(void) const
 			{
 				std::lock_guard<std::mutex>	lock(_mutex);
 				if (this->_content.find(std::this_thread::get_id()) == this->_content.end())
-					throw std::runtime_error("[Error] : GCL::Thread::UniqueRsc : Rsc does not exists, and cannot create it (const qualifier)");
+					throw std::runtime_error("[Error] : gcl::thread::unique_rsc : Rsc does not exists, and cannot create it (const qualifier)");
 				return this->_content[std::this_thread::get_id()];
 			}
 			void												Clean(void)
@@ -72,8 +75,8 @@ namespace GCL
 			}
 
 		protected:
-			std::unordered_map<std::thread::id, ElementType*>	_content;
-			std::mutex											_mutex;
+			std::unordered_map<std::thread::id, element_type*>	_content;
+			std::mutex												_mutex;
 		};
 
 		struct	SafeStdCout
@@ -119,7 +122,7 @@ namespace GCL
 # define THREAD_SAFE_STDCOUT(args) {				\
 	std::ostringstream __ossTmpMsg;					\
 	__ossTmpMsg << args;							\
-	GCL::Thread::scout.Print(__ossTmpMsg.str());	\
+	gcl::thread::scout.Print(__ossTmpMsg.str());	\
 							}
 	}
 }

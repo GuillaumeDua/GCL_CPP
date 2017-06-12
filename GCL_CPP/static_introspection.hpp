@@ -1,13 +1,13 @@
 #ifndef GCL_INTROSPECTION
 # define GCL_INTROSPECTION
 
-# include "Preprocessor.h"
+# include <gcl_cpp/preprocessor.hpp>
 
 // [Todo] : Introspection or Reflexion [?]
 // [Todo] : Use ParamTester insteand of std::void_t to make synthax clearer [?]
 
 #define GCL_Introspection__GenHasNested(nested)									\
-namespace GCL { namespace Introspection {										\
+namespace gcl { namespace Introspection {										\
 template< class, class = std::void_t<> >										\
 struct has_##nested##_nested : std::false_type { };								\
 template< class T >																\
@@ -15,7 +15,7 @@ struct has_##nested##_nested<T, std::void_t<typename T::##nested>> : std::true_t
 }}
 
 #define GCL_Introspection__GenHasMemberFunction(name)							\
-namespace GCL { namespace Introspection {										\
+namespace gcl { namespace Introspection {										\
 template< class, class = std::void_t<> >										\
 struct has_##name##_memberFunction : std::false_type { };						\
 template< class T >																\
@@ -32,41 +32,41 @@ DEBUG_INSTRUCTION
 	GCL_Introspection__GenHasMemberFunction(doStuff);
 	);
 
-namespace GCL
+namespace gcl
 {
 	namespace Introspection
 	{
 		struct Test
 		{
-			static bool Proceed(void)
+			struct Toto { enum		Flag1 {}; void doStuff() {} };
+			struct Titi { struct	Flag2 {}; };
+			struct Tata { enum		Flag3 {}; };
+
+			static constexpr bool Proceed(void)
 			{
 				RELEASE_INSTRUCTION(return true;);
 				DEBUG_INSTRUCTION
 				(
-					struct Toto { enum		Flag1 {}; void doStuff() {} };
-					struct Titi { struct	Flag2 {}; };
-					struct Tata { enum		Flag3 {}; };
-
 					return
 					(
 						//=> Nested :
 						// Flag1
-							GCL::Introspection::has_Flag1_nested<Toto>::value
-						&& !GCL::Introspection::has_Flag2_nested<Toto>::value
-						&& !GCL::Introspection::has_Flag3_nested<Toto>::value
+							gcl::Introspection::has_Flag1_nested<Toto>::value
+						&& !gcl::Introspection::has_Flag2_nested<Toto>::value
+						&& !gcl::Introspection::has_Flag3_nested<Toto>::value
 						// Flag2
-						&& !GCL::Introspection::has_Flag1_nested<Titi>::value
-						&&	GCL::Introspection::has_Flag2_nested<Titi>::value
-						&& !GCL::Introspection::has_Flag3_nested<Titi>::value
+						&& !gcl::Introspection::has_Flag1_nested<Titi>::value
+						&&	gcl::Introspection::has_Flag2_nested<Titi>::value
+						&& !gcl::Introspection::has_Flag3_nested<Titi>::value
 						// Flag3
-						&& !GCL::Introspection::has_Flag1_nested<Tata>::value
-						&& !GCL::Introspection::has_Flag2_nested<Tata>::value
-						&&	GCL::Introspection::has_Flag3_nested<Tata>::value
+						&& !gcl::Introspection::has_Flag1_nested<Tata>::value
+						&& !gcl::Introspection::has_Flag2_nested<Tata>::value
+						&&	gcl::Introspection::has_Flag3_nested<Tata>::value
 						//=> MemberFunction :
 						// doStuff
-						&&	GCL::Introspection::has_doStuff_memberFunction<Toto>::value
-						&& !GCL::Introspection::has_doStuff_memberFunction<Titi>::value
-						&& !GCL::Introspection::has_doStuff_memberFunction<Tata>::value
+						&&	gcl::Introspection::has_doStuff_memberFunction<Toto>::value
+						&& !gcl::Introspection::has_doStuff_memberFunction<Titi>::value
+						&& !gcl::Introspection::has_doStuff_memberFunction<Tata>::value
 					);	// NB : This boolean is constexpr
 					)
 			}
@@ -78,10 +78,10 @@ namespace GCL
 //	Previous version :
 //
 
-namespace GCL
+namespace gcl
 {
 	namespace OLD {
-		namespace TypeTrait
+		namespace type_trait
 		{
 			// Allow sfinae static type introspection in C++TMP
 #pragma region Waiting_for_Cpp17_constraint_require_reflexion
@@ -93,9 +93,9 @@ namespace GCL
 	}
 }
 #define gen_has_nested_type(name)                               \
-namespace GCL {                                                 \
+namespace gcl {                                                 \
 	namespace OLD {												\
-    namespace TypeTrait {                                       \
+    namespace type_trait {                                       \
     namespace sfinae											\
     {                                                           \
         template<typename T, typename SFINAE = void>            \
@@ -119,9 +119,9 @@ namespace GCL {                                                 \
     }}}                                                         \
 }
 #define gen_has_member_function(name)                           \
-namespace GCL {													\
+namespace gcl {													\
 	namespace OLD {												\
-    namespace TypeTrait {										\
+    namespace type_trait {										\
     namespace sfinae											\
     {                                                           \
         template<typename T, typename SFINAE = void>            \

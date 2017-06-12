@@ -2,11 +2,13 @@
 # define GCL_CPP_IO__
 
 # include <iostream>
-# include "Preprocessor.h"
+# include <gcl_cpp/preprocessor.hpp>
 
 # include <sstream> // For test purpose only
 
-namespace GCL
+// TODO : merge with gcl::io::fd_proxy
+
+namespace gcl
 {
 	namespace IO
 	{
@@ -18,24 +20,24 @@ namespace GCL
 				static void	write(std::ostream & os, const T & var)
 				{
 					os.write(reinterpret_cast<const char *>(&var), sizeof(T));
-					_GCL_ASSERT(os);
+					GCL_ASSERT(os);
 				}
 				template <typename T>
 				static void	read(std::istream & is, T & var)
 				{
-					_GCL_ASSERT(is);
+					GCL_ASSERT(is);
 					is.read(reinterpret_cast<char *>(&var), sizeof(T));
 				}
 				template <typename T>
 				static void	write(std::ostream & os, const T * var)
 				{
 					os.write(reinterpret_cast<const char *>(var), sizeof(T));
-					_GCL_ASSERT(os);
+					GCL_ASSERT(os);
 				}
 				template <typename T>
 				static void	read(std::istream & is, T * var)
 				{
-					_GCL_ASSERT(is);
+					GCL_ASSERT(is);
 					is.read(reinterpret_cast<char *>(var), sizeof(T));
 				}
 
@@ -43,10 +45,10 @@ namespace GCL
 				static void read<std::string>(std::istream & is, std::string & var)
 				{
 					std::string::size_type size;
-					_GCL_ASSERT(is);
+					GCL_ASSERT(is);
 					is.read(reinterpret_cast<char *>(&size), sizeof(std::string::size_type));
 					var.resize(size, '\0');
-					_GCL_ASSERT(is);
+					GCL_ASSERT(is);
 					is.read(&var[0], size);
 				}
 				template <>
@@ -54,9 +56,9 @@ namespace GCL
 				{
 					std::string::size_type size = var.length();
 					os.write(reinterpret_cast<char *>(&size), sizeof(std::string::size_type));
-					_GCL_ASSERT(os);
+					GCL_ASSERT(os);
 					os.write(&var[0], var.length());
-					_GCL_ASSERT(os);
+					GCL_ASSERT(os);
 				}
 			};
 			struct Stream
@@ -65,12 +67,12 @@ namespace GCL
 				static void	write(std::ostream & os, const T & var)
 				{
 					os << var;
-					_GCL_ASSERT(os);
+					GCL_ASSERT(os);
 				}
 				template <typename T>
 				static void	read(std::istream & is, T & var)
 				{
-					_GCL_ASSERT(is);
+					GCL_ASSERT(is);
 					is >> var;
 				}
 				template <typename T>

@@ -1,9 +1,9 @@
 #ifndef GCL_EXPERIMENTAL__
 # define GCL_EXPERIMENTAL__
 
-# include "TypeTraits.h"
-# include "TemplateMetaProgramming.h"
-# include "IO.h"
+# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/IO.h>
 # include <functional>
 # include <cassert>
 # include <tuple>
@@ -12,29 +12,29 @@
 
 /*
 	/!\ BEWARE /!\
-	This is experimental, uncomplete features, that may become GCL components in the futur.
+	This is experimental, uncomplete features, that may become gcl components in the futur.
 	(And thus move to other files, and appropriate namespaces).
 */
 
-using namespace GCL::TypeTrait;
-using namespace GCL::TMP;
+using namespace gcl::type_trait;
+using namespace gcl::TMP;
 
-namespace GCL
+namespace gcl
 {
-	namespace Experimental
+	namespace experimental
 	{
 		namespace NestedTypeWrapper
 		{
 			template <typename T_VarOriginType>
 			struct NonStaticMember
 			{
-				static void Call(void * ptr, std::function<void(T_VarOriginType&)> fun)
+				static void call(void * ptr, std::function<void(T_VarOriginType&)> fun)
 				{
 					fun(reinterpret_cast<T_VarOriginType&>(*ptr));
 				}
 			};
 		}
-		namespace TypeTrait
+		namespace type_trait
 		{
 			struct NullType{};
 
@@ -134,9 +134,9 @@ namespace GCL
 					TypeIdList<0>::Visit<TestTypeListVisitor_Dump>::Do();
 
 					return
-						GCL::TypeTrait::TypeToUniqueId<A>::value == GCL::TypeTrait::TypeToUniqueId<A>::value
-						&& GCL::TypeTrait::TypeToUniqueId<B>::value == GCL::TypeTrait::TypeToUniqueId<B>::value
-						&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
+						gcl::type_trait::TypeToUniqueId<A>::value == gcl::type_trait::TypeToUniqueId<A>::value
+						&& gcl::type_trait::TypeToUniqueId<B>::value == gcl::type_trait::TypeToUniqueId<B>::value
+						&& gcl::type_trait::TypeToUniqueId<A>::value != gcl::type_trait::TypeToUniqueId<B>::value
 						;
 				}
 			};

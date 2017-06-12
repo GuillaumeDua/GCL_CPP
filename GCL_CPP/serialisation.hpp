@@ -1,10 +1,10 @@
 #ifndef GCL_SERIALIZATION__
 # define GCL_SERIALIZATION__
 
-# include "TypeTraits.h"
-# include "IO.h"
-# include "TemplateMetaProgramming.h"
-# include "Introspection.hpp"
+# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/IO.h>
+# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/static_introspection.hpp>
 
 # include <sstream>
 # include <map>
@@ -13,31 +13,31 @@
 
 GCL_Introspection__GenHasNested(NotSerializable);
 
-namespace GCL
+namespace gcl
 {
-	namespace Serialization
+	namespace serialization
 	{
 		template <class T_Interface>
-		struct InterfaceIs
+		struct interface_is
 		{
 			using _InterfaceType = T_Interface;
 
 			template <typename ...Types>
-			struct OfTypes
+			struct of_types
 			{
-				// TODO : (void)GCL::TMP::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
+				// TODO : (void)gcl::TMP::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
 
-				using _TypesPack = typename GCL::TypeTrait::TypePack<Types...>;
-				using _ThisType = typename OfTypes<Types...>;
+				using type_pack_t = typename gcl::type_trait::TypePack<Types...>;
+				using type_t = typename of_types<Types...>;
 
-				template <typename T_IO_POlicy = GCL::IO::Policy::Binary>
-				struct Writer
+				template <typename T_IO_POlicy = gcl::IO::Policy::Binary>
+				struct writer
 				{
-					explicit	Writer(std::ostream & oStream)
+					explicit	writer(std::ostream & oStream)
 						: _oStream(oStream)
 					{}
 					template <typename T>
-					Writer &	operator<<(const T & element)
+					writer &	operator<<(const T & element)
 					{
 						write(_oStream, element);
 						return *this;
@@ -45,22 +45,22 @@ namespace GCL
 					template <typename T>
 					static constexpr void	write(std::ostream & os, const T & var)
 					{
-						static_assert(std::is_base_of<_InterfaceType, T>::value, "GCL::Serialization::InterfaceIs<I>::Writer::write<T> : T is not child of I");
-						WriterImpl<T>::write_impl<>(os, var);
+						static_assert(std::is_base_of<_InterfaceType, T>::value, "gcl::serialization::interface_is<I>::writer::write<T> : T is not child of I");
+						writer_impl<T>::write_impl<>(os, var);
 					}
 
 				private:
 					template <typename T>
-					struct WriterImpl
+					struct writer_impl
 					{
-						static constexpr bool isSerializable = !GCL::Introspection::has_NotSerializable_nested<T>::value;
+						static constexpr bool isSerializable = !gcl::Introspection::has_NotSerializable_nested<T>::value;
 
 						template <bool _isSerializable = isSerializable>
 						static constexpr inline void	write_impl(std::ostream & os, const T & var);
 						template <>
 						static constexpr inline void	write_impl<true>(std::ostream & os, const T & var)
 						{
-							T_IO_POlicy::write(os, _TypesPack::template indexOf<T>());
+							T_IO_POlicy::write(os, type_pack_t::template indexOf<T>());
 							os << var; // WTF this is constexpr ?
 						}
 						template <>
@@ -72,12 +72,12 @@ namespace GCL
 
 					std::ostream & _oStream;
 				};
-				template <typename T_IO_POlicy = GCL::IO::Policy::Binary>
-				struct Reader
+				template <typename T_IO_POlicy = gcl::IO::Policy::Binary>
+				struct reader
 				{
-					using T_TypeManager = typename TypeTrait::InterfaceIs<_InterfaceType>::template OfTypes<Types...>;
+					using type_manager_t = typename type_trait::interface_is<_InterfaceType>::template of_types<Types...>;
 
-					explicit				Reader(std::istream & istream)
+					explicit				reader(std::istream & istream)
 						: _iStream(istream)
 					{}
 
@@ -91,32 +91,32 @@ namespace GCL
 					{
 						size_t typeIndex;
 						is >> typeIndex;
-						_GCL_ASSERT(_TypesPack::template indexOf<T>() == typeIndex);
+						GCL_ASSERT(type_pack_t::template indexOf<T>() == typeIndex);
 						is >> var;
 					}
 					static std::unique_ptr<_InterfaceType> read(std::istream & is)
 					{
-						_GCL_ASSERT(is);
+						GCL_ASSERT(is);
 						size_t typeIndex;
 
 						T_IO_POlicy::read(is, typeIndex);
 						if (is.eof()) return 0x0;
 
-						auto & constructor = T_TypeManager::index.at(typeIndex).defaultConstructeurCallerOp;
+						auto & constructor = type_manager_t::index.at(typeIndex).defaultConstructeurCallerOp;
 						std::unique_ptr<_InterfaceType> elem(constructor());
 						is >> *elem;
 						return elem;
 					}
 
-					Reader &				operator >> (std::unique_ptr<_InterfaceType> & element)
+					reader &				operator >> (std::unique_ptr<_InterfaceType> & element)
 					{
-						_GCL_ASSERT(_iStream);
+						GCL_ASSERT(_iStream);
 						element = read(_iStream);
 						return *this;
 					}
-					Reader &				operator >> (std::queue<std::unique_ptr<_InterfaceType>> & elemQueue)
+					reader &				operator >> (std::queue<std::unique_ptr<_InterfaceType>> & elemQueue)
 					{
-						_GCL_ASSERT(_iStream);
+						GCL_ASSERT(_iStream);
 						std::unique_ptr<_InterfaceType> elem = nullptr;
 						while (*this >> elem)
 							elemQueue.emplace(std::move(elem));
@@ -140,8 +140,8 @@ namespace GCL
 			type _value;																					\
 																											\
 			void	DoStuff(void) const override { std::cout << ""#name##"" " -> value=[" << _value << ']' << std::endl;}\
-			std::ostream & operator<<(std::ostream & os) const  override	{ GCL::IO::Policy::Binary::write(os, _value); return os; }	\
-			std::istream & operator>>(std::istream & is)		override	{ GCL::IO::Policy::Binary::read (is, _value); return is; }	\
+			std::ostream & operator<<(std::ostream & os) const  override	{ gcl::IO::Policy::Binary::write(os, _value); return os; }	\
+			std::istream & operator>>(std::istream & is)		override	{ gcl::IO::Policy::Binary::read (is, _value); return is; }	\
 	};
 
 		struct TestInterface
@@ -172,12 +172,12 @@ namespace GCL
 		{
 			static bool Proceed(void)
 			{
-				using Writer = Serialization::InterfaceIs<TestInterface>::OfTypes<Toto, Titi, Tata, Tutu>::Writer<>;
+				using writer = serialization::interface_is<TestInterface>::of_types<Toto, Titi, Tata, Tutu>::writer<>;
 
 				std::stringstream ss;
 
-				Writer writer(ss);
-				writer
+				writer my_writer(ss);
+				my_writer
 					<< Toto{ 42 }
 					<< Titi{ "Hello, world" }
 					<< Tata{ 130390 }
@@ -185,12 +185,12 @@ namespace GCL
 				;
 				std::cout << "Serialized : [" << ss.str() << ']' << std::endl;
 
-				using Reader = Serialization::InterfaceIs<TestInterface>::OfTypes<Toto, Titi, Tata, Tutu>::Reader<>;
+				using reader = serialization::interface_is<TestInterface>::of_types<Toto, Titi, Tata, Tutu>::reader<>;
 
 				try
 				{
 
-					Reader			reader(ss);
+					reader			reader(ss);
 
 					std::queue<std::unique_ptr<TestInterface>> elements;
 					reader
@@ -215,7 +215,7 @@ namespace GCL
 
 	namespace OLD
 	{
-		namespace Serialization
+		namespace serialization
 		{
 			struct Interface
 			{
@@ -245,8 +245,8 @@ namespace GCL
 				struct Serializer
 			{
 				using T_IOPolicy = IO_Policy;
-				using T_TypeManager = typename GCL::TypeTrait::InterfaceIs<T_SerializableInterface>::template OfTypes<T_SerializableTypes...>;
-				using _index_type = typename GCL::TypeTrait::InterfaceIs<T_SerializableInterface>::index_type;
+				using T_TypeManager = typename gcl::type_trait::interface_is<T_SerializableInterface>::template of_types<T_SerializableTypes...>;
+				using _index_type = typename gcl::type_trait::interface_is<T_SerializableInterface>::index_type;
 
 				// static typename T_TypeManager::Indexer _typeIndex;
 
@@ -270,7 +270,7 @@ namespace GCL
 
 			struct Test
 			{
-				struct Toto : Serialization::Interface
+				struct Toto : serialization::Interface
 				{
 					int _i;
 					~Toto() override {}
@@ -285,7 +285,7 @@ namespace GCL
 						return os;
 					}
 				};
-				struct Titi : Serialization::Interface
+				struct Titi : serialization::Interface
 				{
 					std::string _str;
 					~Titi() override {}
@@ -306,7 +306,7 @@ namespace GCL
 					// IO Policy
 					IO::Policy::Binary
 					// Serializable interface
-					, Serialization::Interface
+					, serialization::Interface
 					// Serializable types
 					, Toto
 					, Titi
@@ -325,10 +325,10 @@ namespace GCL
 					_Serializer::write(ss, r_titi2);
 					_Serializer::write(ss, r_toto2);
 
-					Serialization::Interface * w_titi1 = _Serializer::read(ss);
-					Serialization::Interface * w_toto1 = _Serializer::read(ss);
-					Serialization::Interface * w_titi2 = _Serializer::read(ss);
-					Serialization::Interface * w_toto2 = _Serializer::read(ss);
+					serialization::Interface * w_titi1 = _Serializer::read(ss);
+					serialization::Interface * w_toto1 = _Serializer::read(ss);
+					serialization::Interface * w_titi2 = _Serializer::read(ss);
+					serialization::Interface * w_toto2 = _Serializer::read(ss);
 
 					return (
 						r_titi1._str == reinterpret_cast<Titi*>(w_titi1)->_str

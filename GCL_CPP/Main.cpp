@@ -1,24 +1,23 @@
 // #define _GCL_DEBUG
 
-# include "TypeTraits.h"
-# include "Task.h"
-# include "Maths.h"
-# include "EventHandler.h"
-# include "SelfUpdate.h"
-# include "Ownership.h"
-# include "Experimental.h"
-# include "TemplateMetaProgramming.h"
-# include "Color.h"
-# include "Serialization.h"
-# include "Pattern.hpp"
-# include "TestUtils.h"
+# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/task.hpp>
+# include <gcl_cpp/maths.h>
+# include <gcl_cpp/EventHandler.h>
+# include <gcl_cpp/SelfUpdate.h>
+# include <gcl_cpp/ownership.hpp>
+# include <gcl_cpp/Experimental.h>
+# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/serialisation.hpp>
+# include <gcl_cpp/pattern.hpp>
+# include <gcl_cpp/TestUtils.h>
 
 //
 // Link symbols :
 //
-namespace GCL
+namespace gcl
 {
-	namespace Experimental
+	namespace experimental
 	{
 		namespace test_utils
 		{
@@ -29,16 +28,16 @@ namespace GCL
 			Inline::RT_scope_controler::T_ObserversList	Inline::RT_scope_controler::_observers;
 		}
 	}
-	namespace TypeTrait
+	namespace type_trait
 	{
 		template <typename T_Interface>
 		template <class T>
-		const typename InterfaceIs<T_Interface>::TypeHelper::CB_DefaultCtorCallerType
-			InterfaceIs<T_Interface>::TypeHelper::DefaultCtorCaller<T>::value = { []() -> T_Interface* { return new T(); } };
+		const typename interface_is<T_Interface>::TypeHelper::CB_DefaultCtorCallerType
+			interface_is<T_Interface>::TypeHelper::DefaultCtorCaller<T>::value = { []() -> T_Interface* { return new T(); } };
 
 		template <typename T_Interface>
 		template <typename ... Types>
-		const std::unordered_map<size_t, typename InterfaceIs<T_Interface>::TypeHelper> InterfaceIs<T_Interface>::OfTypes<Types...>::index = { _Elem<Types>()... };
+		const std::unordered_map<size_t, typename interface_is<T_Interface>::TypeHelper> interface_is<T_Interface>::of_types<Types...>::index = { _Elem<Types>()... };
 	}
 }
 
@@ -57,7 +56,7 @@ namespace Tool
 		template <typename T_ComponentTest>
 		struct TestOneComponent
 		{
-			static bool	Call(void)
+			static bool	call(void)
 			{
 				++callCount;
 				const std::string & symbol_name = typeid(T_ComponentTest).name();
@@ -105,7 +104,7 @@ namespace Tool
 		template <typename ...T_ComponentsTest>
 		static void	TestMultipleComponents(void)
 		{
-			GCL::TMP::Foreach<T_ComponentsTest...>::Call<TestOneComponent>();
+			gcl::TMP::for_each<T_ComponentsTest...>::call<TestOneComponent>();
 			std::cout << std::endl << "[Test] : Success Rate : " << callCount << " / " << sizeof...(T_ComponentsTest) << std::endl;
 		}
 	};
@@ -116,22 +115,22 @@ int	main(int ac, char* av[])
 {
 	Tool::Test::TestMultipleComponents
 	<
-		GCL::Serialization::Test
-		, GCL::Experimental::TypeTrait::Test
-		, GCL::TMP::Test
-		, GCL::TypeTrait::Test
-		, GCL::Introspection::Test
+		gcl::serialization::Test
+		, gcl::experimental::type_trait::Test
+		, gcl::TMP::Test
+		, gcl::type_trait::Test
+		, gcl::Introspection::Test
 		
-		//, GCL::Task::Test
-		//, GCL::Events::Test
-		//, GCL::Container::Test
-		//, GCL::Ownership::Test
+		//, gcl::task::Test
+		//, gcl::Events::Test
+		//, gcl::Container::Test
+		//, gcl::ownership::Test
 
-		, GCL::Experimental::TypeTrait::Test
-		// GCL::Experimental::Puzzle::Test
-		// , GCL::Color::Test // FIXME
-		, GCL::Experimental::Pattern::Test
-		, GCL::Experimental::test_utils::Inline::Test
+		, gcl::experimental::type_trait::Test
+		// gcl::experimental::Puzzle::Test
+		// , gcl::Color::Test // FIXME
+		, gcl::experimental::pattern::Test
+		, gcl::experimental::test_utils::Inline::Test
 	>();
 
 	system("pause");

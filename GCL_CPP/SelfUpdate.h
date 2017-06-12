@@ -7,28 +7,12 @@
 # include <iostream>
 # include <algorithm>
 
-# include "EventHandler.h"
-# include "Preprocessor.h"
+# include <gcl_cpp/EventHandler.h>
+# include <gcl_cpp/Preprocessor.hpp>
+# include <gcl_cpp/functionnal.hpp>
 
-namespace GCL
+namespace gcl
 {
-	struct OnDestructionCalledStdFunction : public std::function<void()>
-	{
-		explicit OnDestructionCalledStdFunction(std::function<void()> && func)
-		{
-			func.swap(*this);
-		}
-		OnDestructionCalledStdFunction(const OnDestructionCalledStdFunction & w)
-		{
-			const_cast<OnDestructionCalledStdFunction &>(w).swap(*this);
-		}
-		~OnDestructionCalledStdFunction()
-		{
-			if (*this)
-				(*this)();
-		}
-	};
-
 	namespace Event
 	{
 		static const std::string DTOR_EVENT_NAME = "_dtor_";
@@ -56,7 +40,7 @@ namespace GCL
 					std::cerr << "[Warning] : Attempt to register an existing element" << std::endl;
 
 				// Note : elem is **(ret.first)
-				elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(OnDestructionCalledStdFunction([this, &elem]()
+				elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::on_destroy_call([this, &elem]()
 				{
 					this->remove(elem);
 				})));
@@ -99,15 +83,15 @@ namespace GCL
 				{
 					bool was_cb_called(false);
 					{
-						GCL::events::EventHandler<> eventHandler;
+						gcl::events::EventHandler<> eventHandler;
 						{
-							eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(GCL::OnDestructionCalledStdFunction([&was_cb_called](){ was_cb_called = true; })));
+							eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::on_destroy_call([&was_cb_called](){ was_cb_called = true; })));
 						}
 						if (was_cb_called)
 							return false;
 					}
 
-					struct Toto : public GCL::events::EventHandler<>
+					struct Toto : public gcl::events::EventHandler<>
 					{};
 
 					bool wasElementCorrectlyAdded(false);
@@ -125,7 +109,7 @@ namespace GCL
 				}
 				catch (const std::exception & ex)
 				{
-					std::cerr << "[Error] : STD Exception catch : [" << ex.what() << ']' << std::endl;
+					std::cerr << "[Error] : STD exception catch : [" << ex.what() << ']' << std::endl;
 				}
 				catch (...)
 				{

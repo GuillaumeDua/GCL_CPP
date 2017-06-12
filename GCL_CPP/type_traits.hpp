@@ -1,18 +1,18 @@
 #ifndef GCL_TRAITS__
 # define GCL_TRAITS__
 
-# include "Introspection.hpp" // append to current file
+# include <gcl_cpp/static_introspection.hpp> // append to current file
+# include <gcl_cpp/preprocessor.hpp>
 
-# include "Preprocessor.h"
 # include <vector>
 # include <unordered_map>
 # include <functional>
 # include <iostream>
 # include <string>
 
-namespace GCL
+namespace gcl
 {
-	namespace TypeTrait
+	namespace type_trait
 	{
 		// Warning : Values change per program instance
 		template <typename T>
@@ -67,7 +67,7 @@ namespace GCL
 			template <size_t N>
 			using TypeAt = typename std::tuple_element<N, _Types>::type;
 
-			// Add any other function here
+			// add any other function here
 
 		private:
 			template <typename T_Needle, size_t It, typename T_It, typename ... T_HayStack>
@@ -83,7 +83,7 @@ namespace GCL
 		};
 
 		template <typename T_Interface>
-		struct InterfaceIs
+		struct interface_is
 		{
 			using _Interface = T_Interface;
 			using index_type = size_t;
@@ -95,7 +95,7 @@ namespace GCL
 				template <class T>
 				struct DefaultCtorCaller
 				{
-					static_assert(std::is_default_constructible<T>::value, "GCL::TypeTrait::InterfaceIs<I>::DefaultCtorCaller<T>");
+					static_assert(std::is_default_constructible<T>::value, "gcl::type_trait::interface_is<I>::DefaultCtorCaller<T>");
 					static const CB_DefaultCtorCallerType value;
 				};
 				const CB_DefaultCtorCallerType & defaultConstructeurCallerOp;
@@ -103,14 +103,14 @@ namespace GCL
 			using basic_container_type = typename std::unordered_map<index_type, TypeHelper>;
 
 			template <typename ... Types>
-			struct OfTypes
+			struct of_types
 			{
 				using T_TypePack = TypePack<Types...>;
 
 				template <typename T>
 				struct _Elem : basic_container_type::value_type
 				{
-					static_assert(std::is_base_of<_Interface, T>::value, "GCL::TypeTrait::InterfaceIs<I>::OfTypes<...T>::_Elem<T>");
+					static_assert(std::is_base_of<_Interface, T>::value, "gcl::type_trait::interface_is<I>::of_types<...T>::_Elem<T>");
 					_Elem()
 						: basic_container_type::value_type{ T_TypePack::template indexOf<T>(), { std::ref(TypeHelper::DefaultCtorCaller<T>::value) } }
 					{}
@@ -136,7 +136,7 @@ namespace GCL
 				} /*static index*/; // [TODO]::[FixMe] : How to duplicate pack expansion [?]
 				/*template <typename T_Interface>
 				template <typename ... Types>
-				typename InterfaceIs<T_Interface>::OfTypes<Types...>::Indexer InterfaceIs<T_Interface>::OfTypes<Types...>::index;*/
+				typename interface_is<T_Interface>::of_types<Types...>::Indexer interface_is<T_Interface>::of_types<Types...>::index;*/
 				static const basic_container_type index;
 			};
 		};
@@ -161,17 +161,17 @@ namespace GCL
 
 			try
 			{
-				InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::Indexer index;
+				interface_is<Interface>::of_types<Toto, Titi, Tata, Tutu>::Indexer index;
 
 				for (auto & elem : index)
 					;// std::cout << "\t- [" << elem.first << "] => [" << elem.second()->name() << ']' << std::endl;
-				if (index.size() != InterfaceIs<Interface>::OfTypes<Toto, Titi, Tata, Tutu>::index.size())
+				if (index.size() != interface_is<Interface>::of_types<Toto, Titi, Tata, Tutu>::index.size())
 					throw std::exception("Sizes mismatch");
 				return true;
 			}
 			catch (const std::exception & ex)
 			{
-				std::cerr << "Exception catched : " << ex.what() << std::endl;
+				std::cerr << "exception catched : " << ex.what() << std::endl;
 			}
 			catch (...)
 			{
@@ -192,12 +192,12 @@ namespace GCL
 				using _Types = std::tuple<int, char, B>;
 
 				return
-					GCL::TypeTrait::TypeToUniqueId<A>::value == GCL::TypeTrait::TypeToUniqueId<A>::value
-					&& GCL::TypeTrait::TypeToUniqueId<B>::value == GCL::TypeTrait::TypeToUniqueId<B>::value
-					&& GCL::TypeTrait::TypeToUniqueId<A>::value != GCL::TypeTrait::TypeToUniqueId<B>::value
+					gcl::type_trait::TypeToUniqueId<A>::value == gcl::type_trait::TypeToUniqueId<A>::value
+					&& gcl::type_trait::TypeToUniqueId<B>::value == gcl::type_trait::TypeToUniqueId<B>::value
+					&& gcl::type_trait::TypeToUniqueId<A>::value != gcl::type_trait::TypeToUniqueId<B>::value
 					&& typeIdVector.at(0) == typeIdVector.at(2)
 					&& typeIdVector.at(1) == typeIdVector.at(3)
-					//&& GCL::TypeTrait::IndexOf<B, _Types>::value == 2
+					//&& gcl::type_trait::IndexOf<B, _Types>::value == 2
 					&& Test_interfaceIs()
 					;
 			}
