@@ -3,8 +3,6 @@
 # include <gcl_cpp/type_traits.hpp>
 # include <gcl_cpp/task.hpp>
 # include <gcl_cpp/maths.h>
-# include <gcl_cpp/EventHandler.h>
-# include <gcl_cpp/SelfUpdate.h>
 # include <gcl_cpp/ownership.hpp>
 # include <gcl_cpp/Experimental.h>
 # include <gcl_cpp/template_meta_programming.hpp>

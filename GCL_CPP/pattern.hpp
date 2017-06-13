@@ -9,11 +9,11 @@
 # include <type_traits>
 # include <utility>
 
-namespace GCL
+namespace gcl
 {
-	namespace Experimental
+	namespace experimental
 	{
-		namespace Pattern
+		namespace pattern
 		{
 			namespace Module // Filter
 			{
@@ -46,30 +46,30 @@ namespace GCL
 			}
 			// Todo : Runnable class with status : Starting, Started, Running, Stoping, Stopped
 			template <typename T_ElementType>
-			struct ControlCenter final
+			struct control_center final
 			{
 				RELEASE_INSTRUCTION
 				(static_assert(std::is_constructible<T_ElementType>::value == false, "Optimization error : T_ElementType cannot be constructible");)
 
-				using T_ThisType		= ControlCenter<T_ElementType>;
+				using T_ThisType		= control_center<T_ElementType>;
 				using T_Element			= typename std::unique_ptr<T_ElementType>;
 				using T_FilterChain		= Module::FilterChain<T_Element>;
 				using T_ElementQueue	= typename std::queue<T_Element>;
 				static_assert(std::is_same<typename T_FilterChain::_ToVisitElement, typename T_ElementQueue::value_type>::value, "Type mismatch");
 
-				ControlCenter() = default;
+				control_center() = default;
 
 				static inline		T_ThisType & GetInstance(void)
 				{
 					static T_ThisType instance;
 					return instance;
 				}
-				static void			Push(T_Element && rEvent)
+				static void			push(T_Element && rEvent)
 				{
 					T_ThisType & instance = GetInstance();
-					instance._Push(std::move(rEvent)); // fixme
+					instance._push(std::move(rEvent)); // fixme
 				}
-				void				_Push(T_Element && rEvent)
+				void				_push(T_Element && rEvent)
 				{
 					{	// Critical section
 						std::unique_lock<std::mutex> lock(_mutex);
@@ -94,7 +94,7 @@ namespace GCL
 				{
 					_running = true;
 					if (_thread != nullptr)
-						throw std::runtime_error("Event::ControlCenter::Start : Already started");
+						throw std::runtime_error("Event::control_center::Start : Already started");
 					_thread.reset();
 
 					struct CaptureAdapter
@@ -159,8 +159,8 @@ namespace GCL
 				std::condition_variable			_cv;
 				volatile bool					_running = false;
 
-				ControlCenter(const ControlCenter &)	= default;
-				ControlCenter(ControlCenter &&)			= delete;
+				control_center(const control_center &)	= default;
+				control_center(control_center &&)			= delete;
 			};
 
 			struct Test
@@ -175,7 +175,7 @@ namespace GCL
 
 				static bool	Proceed(void)
 				{
-					using ControlCenterType = ControlCenter<Test::Event>;
+					using ControlCenterType = control_center<Test::Event>;
 
 					{	// Test 0 : nothing to consum
 						std::cout << "\t |- Racing ..." << std::endl;
@@ -191,7 +191,7 @@ namespace GCL
 						static const long long qty = std::chrono::microseconds::period::den;
 						std::cout << "\t |- Generating " << qty << " elements ..." << std::endl;
 						for (long long i = 0; i < qty; ++i)
-							ControlCenterType::Push(std::move(std::make_unique<Event>()));
+							ControlCenterType::push(std::move(std::make_unique<Event>()));
 
 						std::cout << "\t |- Racing ..." << std::endl;
 						ControlCenterType::GetInstance().Start();
@@ -209,7 +209,7 @@ namespace GCL
 						for (long long i = 0; i < qty; ++i)
 						{
 							std::this_thread::sleep_for(std::chrono::milliseconds(1));
-							ControlCenterType::Push(std::move(std::make_unique<Event>()));
+							ControlCenterType::push(std::move(std::make_unique<Event>()));
 						}
 						ControlCenterType::GetInstance().Stop();
 						std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " / " << qty << std::endl;

@@ -146,7 +146,6 @@ namespace gcl
 			queue_type	&	_queue;
 		};
 
-
 		struct Test // todo : use gcl::test
 		{
 			template <typename T_element_type>
@@ -283,9 +282,5 @@ namespace gcl
 		};
 	}
 }
-
-
-
-
 
 #endif // __GCL_PRODUCER_CONSUMER__

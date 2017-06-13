@@ -14,6 +14,9 @@ namespace gcl
 		: std::exception(msg.c_str())
 		{}
 	};
+
+	// todo : custom exception stack/pack ?
+	// -> channeling exception stack
 };
 
 #endif // GCL_EXCEPTION_HPP__

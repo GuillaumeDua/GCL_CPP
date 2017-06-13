@@ -7,7 +7,7 @@
 
 // todo :  operator "" overload, to get a nodejs npm color synthax-like
 
-namespace GCL
+namespace gcl
 {
     namespace Color
     {
@@ -106,7 +106,7 @@ namespace GCL
                 return true;
             }
         };
-    } // GCL::Color
-} // GCL
+    } // gcl::Color
+} // gcl
 
 #endif // GCL_COLOR_H_

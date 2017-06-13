@@ -34,6 +34,7 @@ namespace Log
 		// , ...
 	};
 
+	// todo : refactor using stream binding
 	struct Channel
 	{
 		Channel() = default;
