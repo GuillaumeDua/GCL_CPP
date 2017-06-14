@@ -13,27 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\old">
+      <UniqueIdentifier>{5d8deb99-6098-4ea6-87f1-896a3c2488bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\test">
+      <UniqueIdentifier>{5136dd19-18f3-4ad2-836d-270a792f5f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\test\container">
+      <UniqueIdentifier>{bde8b559-7858-4427-a7d6-558b29271b84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\container">
+      <UniqueIdentifier>{86cccbfd-547c-4606-8c0c-cc36858b9aa1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SelfUpdate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EventHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Experimental.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TestUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Monitoring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Container.h">
@@ -52,9 +52,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="task.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pattern.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="exception.hpp">
@@ -76,6 +73,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="template_meta_programming.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="old\EventHandler.h">
+      <Filter>Header Files\old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Monitoring.h">
+      <Filter>Header Files\old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\SelfUpdate.h">
+      <Filter>Header Files\old</Filter>
+    </ClInclude>
+    <ClInclude Include="pattern.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="type_info.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\event.hpp">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="test\gcl.hpp">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="test\type_info.hpp">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="test\container\polymorphic_vector.hpp">
+      <Filter>Header Files\test\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\polymorphic_vector.hpp">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="log.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

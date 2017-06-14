@@ -66,12 +66,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Color.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="container\polymorphic_vector.hpp" />
+    <ClInclude Include="event.hpp" />
     <ClInclude Include="exception.hpp" />
     <ClInclude Include="filesystem.hpp" />
     <ClInclude Include="functionnal.hpp" />
-    <ClInclude Include="Log.h" />
+    <ClInclude Include="log.hpp" />
     <ClInclude Include="old\EventHandler.h" />
     <ClInclude Include="old\Monitoring.h" />
     <ClInclude Include="old\SelfUpdate.h" />
@@ -84,8 +86,14 @@
     <ClInclude Include="serialisation.hpp" />
     <ClInclude Include="task.hpp" />
     <ClInclude Include="template_meta_programming.hpp" />
+    <ClInclude Include="test.hpp" />
     <ClInclude Include="TestUtils.h" />
+    <ClInclude Include="test\container\polymorphic_vector.hpp" />
+    <ClInclude Include="test\event.hpp" />
+    <ClInclude Include="test\gcl.hpp" />
+    <ClInclude Include="test\type_info.hpp" />
     <ClInclude Include="thread.hpp" />
+    <ClInclude Include="type_info.hpp" />
     <ClInclude Include="type_traits.hpp" />
     <ClInclude Include="static_introspection.hpp" />
   </ItemGroup>

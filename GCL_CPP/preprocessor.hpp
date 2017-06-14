@@ -15,6 +15,11 @@
 # define xor_eq	^=
 #endif
 
+#define GCL_PREPROCESSOR__NOT_INSTANTIABLE(type) \
+	type() = delete;				\
+	type(const type &) = delete;	\
+	type(type &&) = delete; 
+
 #ifdef _DEBUG
 # define DEBUG_INSTRUCTION(instruction)		instruction
 # define RELEASE_INSTRUCTION(instruction)
