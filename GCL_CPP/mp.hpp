@@ -5,7 +5,7 @@
 
 namespace gcl
 {
-    namespace TMP
+    namespace mp
     {
 		template <class T, class ... T_Classes>
 		struct super
@@ -38,8 +38,8 @@ namespace gcl
 
             using type_t = list<id>;
             using next = list<id + 1>;
-            using previous = TMP::IF<(id == 0), out_of_range, list<id - 1> >;
-			constexpr static const bool is_head = TMP::IF<(id == 0), true, false>;
+            using previous = mp::IF<(id == 0), out_of_range, list<id - 1> >;
+			constexpr static const bool is_head = mp::IF<(id == 0), true, false>;
         };
 
 		template <template <typename> class T_trait>
@@ -55,7 +55,7 @@ namespace gcl
 			template <typename T>
 			static constexpr void on()
 			{
-				static_assert(T_Constraint<T>::value, "gcl::TMP::apply_constraint : constraint not matched");
+				static_assert(T_Constraint<T>::value, "gcl::mp::apply_constraint : constraint not matched");
 			}
 		};
 
@@ -148,7 +148,7 @@ namespace gcl
             static bool    Proceed()
             {
 				// static require constraint
-				(void)TMP::for_each<A, B, C>::template require<T_Constraint>();
+				(void)mp::for_each<A, B, C>::template require<T_Constraint>();
 
 				/*for_each<A, B, C>::Call<TypenamePrint>();
 				for_each<_Types>::CallAt<TypenamePrint>(0);*/
