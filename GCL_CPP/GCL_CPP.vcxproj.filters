@@ -72,9 +72,6 @@
     <ClInclude Include="static_introspection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="template_meta_programming.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="old\EventHandler.h">
       <Filter>Header Files\old</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
       <Filter>Header Files\container</Filter>
     </ClInclude>
     <ClInclude Include="log.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

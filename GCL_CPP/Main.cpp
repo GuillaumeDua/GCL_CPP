@@ -5,7 +5,7 @@
 # include <gcl_cpp/maths.h>
 # include <gcl_cpp/ownership.hpp>
 # include <gcl_cpp/Experimental.h>
-# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/serialisation.hpp>
 # include <gcl_cpp/pattern.hpp>
 # include <gcl_cpp/TestUtils.h>
@@ -102,34 +102,44 @@ namespace Tool
 		template <typename ...T_ComponentsTest>
 		static void	TestMultipleComponents(void)
 		{
-			gcl::TMP::for_each<T_ComponentsTest...>::call<TestOneComponent>();
+			gcl::mp::for_each<T_ComponentsTest...>::call<TestOneComponent>();
 			std::cout << std::endl << "[Test] : Success Rate : " << callCount << " / " << sizeof...(T_ComponentsTest) << std::endl;
 		}
 	};
 	uint32_t Test::callCount = 0;
 }
 
+# include <gcl_cpp/test.hpp>
+// test includes
+# include <gcl_cpp/test/event.hpp>
+
 int	main(int ac, char* av[])
 {
-	Tool::Test::TestMultipleComponents
-	<
-		gcl::serialization::Test
-		, gcl::experimental::type_trait::Test
-		, gcl::TMP::Test
-		, gcl::type_trait::Test
-		, gcl::Introspection::Test
-		
-		//, gcl::task::Test
-		//, gcl::Events::Test
-		//, gcl::Container::Test
-		//, gcl::ownership::Test
+	//Tool::Test::TestMultipleComponents
+	//<
+	//	gcl::serialization::Test
+	//	, gcl::experimental::type_trait::Test
+	//	, gcl::mp::Test
+	//	, gcl::type_trait::Test
+	//	, gcl::Introspection::Test
+	//	
+	//	//, gcl::task::Test
+	//	//, gcl::Events::Test
+	//	//, gcl::Container::Test
+	//	//, gcl::ownership::Test
 
-		, gcl::experimental::type_trait::Test
-		// gcl::experimental::Puzzle::Test
-		// , gcl::Color::Test // FIXME
-		, gcl::experimental::pattern::Test
-		, gcl::experimental::test_utils::Inline::Test
-	>();
+	//	, gcl::experimental::type_trait::Test
+	//	// gcl::experimental::Puzzle::Test
+	//	// , gcl::Color::Test // FIXME
+	//	, gcl::experimental::pattern::Test
+	//	, gcl::experimental::test_utils::Inline::Test
+	//>();
+
+	struct toto {};
+	gcl::test::component<toto>::test();
+	gcl::test::component<gcl::test::event>::test(); // todo : call count on variadic
+
+	// todo : is_constexpr trait
 
 	system("pause");
 	return 0;

@@ -10,9 +10,11 @@
 #include <iomanip>
 #include <sstream>
 #include <functional>
+#include <chrono>
 
 // todo : static SFINAE tests
 // type_trait : test_component<name>::pass / test_component<name>::fail as constexpr booleans value
+// => constexpr testing
 
 namespace gcl
 {
@@ -79,7 +81,7 @@ namespace gcl
 			}
 		};
 
-		namespace indent_style
+		namespace logger
 		{
 			static const size_t default_name_w = 50;
 			static const size_t default_margin_w = 3;
@@ -88,12 +90,14 @@ namespace gcl
 			template <std::size_t preindent_w>
 			struct log_t
 			{
+				static std::string last_label;
+
 				GCL_PREPROCESSOR__NOT_INSTANTIABLE(log_t);
 
 				using next_t = log_t<preindent_w + 1>;
 				using prev_t = log_t<preindent_w == 0 ? 0 : preindent_w - 1>;
 
-				template <typename T>
+				template <typename T, char fill_char_v = ' '>
 				static void print(const std::string & value = "", const std::string & info = "")
 				{
 					static const std::size_t preindent_width_v = default_margin_w * preindent_w;
@@ -107,19 +111,20 @@ namespace gcl
 						assert(it != std::string::npos);
 						label = label.substr(it + 2);
 					}
-					label = (label.length() > msg_width_v ? label.substr(0, msg_width_v - 3) + "..." : label);
+					label = (label.length() > msg_width_v ? label.substr(0, msg_width_v - 4) + "..." : label) + " ";
 
-					static std::string last_label;
 					if (label != last_label)
 						std::cout
 						<< std::left
 						<< std::setw(preindent_width_v) << "" << (preindent_w == 0 ? "[+]" : " |-") << ' '
-						<< std::setw(msg_width_v) << label << "   "
+						<< std::setfill(fill_char_v) << std::setw(msg_width_v) << label
+						<< std::setfill(' ') << "   "
 						;
 					else
 						std::cout
 						<< std::setw(preindent_width_v) << "" << " `-" << ' '
-						<< std::setfill('.') << std::setw(msg_width_v) << "" << "   " << std::setfill(' ')
+						<< std::setfill(fill_char_v) << std::setw(msg_width_v) << "" << "   "
+						<< std::setfill(' ')
 						;
 					last_label = label;
 
@@ -136,6 +141,8 @@ namespace gcl
 					}
 				}
 			};
+			template <std::size_t preindent_w>
+			std::string log_t<preindent_w>::last_label;
 		}
 
 		namespace type_traits
@@ -151,18 +158,26 @@ namespace gcl
 			struct has_proceed<T, std::void_t<decltype(T::proceed)>> : std::true_type {};
 		}
 
+		static std::pair<std::size_t, std::size_t> winrate_counter{ 0, 0 }; // todo : private, gcl::test as struct
+
 		template <class component_t, std::size_t deepth = 0>
 		struct component
 		{
 			GCL_PREPROCESSOR__NOT_INSTANTIABLE(component);
 
 			using type = typename component<component_t, deepth>;
-			using log_t = typename indent_style::log_t<deepth>;
+			using log_t = typename logger::log_t<deepth>;
 
 			static void test()
 			{
+				if (deepth == 0)
+					winrate_counter = {0, 0};
+
 				if_has_pack_then_it();
 				if_has_proceed_then_execute();
+
+				if (deepth == 0)
+					log_t::print<component_t, '='>("[ " + std::to_string(winrate_counter.first) + " / " + std::to_string(winrate_counter.second) + " ]");
 			}
 
 		// protected: // disable until VS2015 frienship issue is fix
@@ -198,10 +213,17 @@ namespace gcl
 			template <bool has_proceed = type_traits::has_proceed<component_t>::value>
 			static void if_has_proceed_then_execute()
 			{
+				++winrate_counter.second;
 				try
 				{
+					using clock_t = std::chrono::system_clock;
+
+					clock_t::time_point tp_start = clock_t::now();
 					auto output = do_proceed(component_t::proceed);
-					log_t::print<component_t>("[PASSED]", output);
+					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(clock_t::now() - tp_start).count();
+
+					log_t::print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " ms", output);
+					++winrate_counter.first;
 				}
 				catch (const fail_exception & ex)
 				{
@@ -219,7 +241,7 @@ namespace gcl
 			template <>
 			static void if_has_proceed_then_execute<false>()
 			{
-				log_t::print<component_t>("[SKIP]", "no test implemented");
+				log_t::print<component_t, '.'>("[SKIP]", "no test implemented");
 			}
 
 		protected:
