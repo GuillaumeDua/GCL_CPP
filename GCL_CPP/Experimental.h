@@ -2,7 +2,7 @@
 # define GCL_EXPERIMENTAL__
 
 # include <gcl_cpp/type_traits.hpp>
-# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/IO.h>
 # include <functional>
 # include <cassert>
@@ -17,7 +17,7 @@
 */
 
 using namespace gcl::type_trait;
-using namespace gcl::TMP;
+using namespace gcl::mp;
 
 namespace gcl
 {

@@ -85,7 +85,7 @@
     <ClInclude Include="preprocessor.hpp" />
     <ClInclude Include="serialisation.hpp" />
     <ClInclude Include="task.hpp" />
-    <ClInclude Include="template_meta_programming.hpp" />
+    <ClInclude Include="mp.hpp" />
     <ClInclude Include="test.hpp" />
     <ClInclude Include="TestUtils.h" />
     <ClInclude Include="test\container\polymorphic_vector.hpp" />

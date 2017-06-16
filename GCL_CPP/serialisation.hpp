@@ -3,7 +3,7 @@
 
 # include <gcl_cpp/type_traits.hpp>
 # include <gcl_cpp/IO.h>
-# include <gcl_cpp/template_meta_programming.hpp>
+# include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/static_introspection.hpp>
 
 # include <sstream>
@@ -25,7 +25,7 @@ namespace gcl
 			template <typename ...Types>
 			struct of_types
 			{
-				// TODO : (void)gcl::TMP::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
+				// TODO : (void)gcl::mp::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
 
 				using type_pack_t = typename gcl::type_trait::TypePack<Types...>;
 				using type_t = typename of_types<Types...>;
