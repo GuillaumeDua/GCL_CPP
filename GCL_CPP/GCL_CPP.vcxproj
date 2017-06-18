@@ -91,6 +91,7 @@
     <ClInclude Include="test\container\polymorphic_vector.hpp" />
     <ClInclude Include="test\event.hpp" />
     <ClInclude Include="test\gcl.hpp" />
+    <ClInclude Include="test\test.hpp" />
     <ClInclude Include="test\type_info.hpp" />
     <ClInclude Include="thread.hpp" />
     <ClInclude Include="type_info.hpp" />

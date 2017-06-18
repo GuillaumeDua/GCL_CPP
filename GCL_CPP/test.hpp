@@ -11,6 +11,8 @@
 #include <sstream>
 #include <functional>
 #include <chrono>
+#include <vector>
+#include <algorithm>
 
 // todo : static SFINAE tests
 // type_trait : test_component<name>::pass / test_component<name>::fail as constexpr booleans value
@@ -34,46 +36,89 @@ namespace gcl
 		{
 			GCL_PREPROCESSOR__NOT_INSTANTIABLE(check);
 
-			template <typename T>
-			static inline void expect(const T & to_test, const std::string & user_msg)
+			template <typename Fun>
+			static inline void expect(const Fun & to_test, const std::string & user_msg = "")
 			{
 				if (!to_test())
-					throw fail_exception(user_msg);
+					throw fail_exception("gcl::test::check::expect failed" + (user_msg.empty() ? "" : " : " + user_msg));
 			}
 			template <>
 			static inline void expect<bool>(const bool & test_result, const std::string & user_msg)
 			{
 				if (!test_result)
-					throw fail_exception(user_msg);
+					throw fail_exception("gcl::test::check::expect failed" + (user_msg.empty() ? "" : " : " + user_msg));
 			}
 
-			template <typename T>
-			static inline void expect(const std::string & file, const std::size_t line, const std::string & func, const T & to_test, const std::string & user_msg = "")
+			template <typename value_t, typename U>
+			static inline void expect_value(const value_t & value, const U & expected_value, const std::string & user_msg = "")
 			{
-				expect(to_test, get_where(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+				if (value != expected_value)
+					throw fail_exception("gcl::test::check::expect_value failed" + (user_msg.empty() ? "" : " : " + user_msg));
 			}
 
-#define GCL_TEST__EXPECT(...) gcl::test::check::expect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+			template <typename value_t>
+			using value_range_t = std::pair<value_t, value_t>;
 
-			/*template <typename T, typename Fun>
-			static inline void expect_value(const T & value, const T & val_before, Fun what, const T & val_after, const std::string & user_msg = "")
+			template <typename value_t, typename expected_value_t>
+			static inline void expect_value_in_range(const value_t & value, const value_range_t<expected_value_t> & expected_values_range, const std::string & user_msg = "")
 			{
-				try
-				{
-					if (value != val_before)
-						throw fail_exception();
-					what();
-					if (value != val_after)
-						throw fail_exception();
-				}
-				catch ()
-				{
-					throw;
-				}
-			}*/
+				assert(expected_values_range.first < expected_values_range.second);
+
+				if (value < expected_values_range.first || value > expected_values_range.second)
+					throw fail_exception("gcl::test::check::expect_value_in_range failed" + (user_msg.empty() ? "" : " : " + user_msg));
+			}
+
+			template <typename value_t, typename expected_value_t, typename Fun>
+			static inline void expect_values(const value_t & value, const expected_value_t & expected_value_before, Fun what, const expected_value_t & expected_value_after, const std::string & user_msg = "")
+			{
+				if (value != expected_value_before)
+					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+				what();
+				if (value != expected_value_after)
+					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+			}
+
+#pragma region macro_invokable
+#define GCL_TEST_WHERE_VARS const std::string & file, const std::size_t line, const std::string & func // __FILE__, __LINE__, __func__
+
+			template <typename value_t>
+			static inline void expect(GCL_TEST_WHERE_VARS, const value_t & to_test, const std::string & user_msg = "")
+			{
+				expect(to_test, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+			}
+
+			template <typename value_t, typename expected_value_t>
+			static inline void expect_value(GCL_TEST_WHERE_VARS, const value_t & value, const expected_value_t & expected_value, const std::string & user_msg = "")
+			{
+				expect_value(value, expected_value, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+			}
+
+			template <typename value_t, typename expected_value_t>
+			static inline void expect_value_in_range(GCL_TEST_WHERE_VARS, const value_t & value, const value_range_t<expected_value_t> & expected_values_range, const std::string & user_msg = "")
+			{
+				expect_value_in_range(value, expected_values_range, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+			}
+
+			template <typename value_t, typename expected_value_t, typename Fun>
+			static inline void expect_values(GCL_TEST_WHERE_VARS, const value_t & value, const expected_value_t & val_before, Fun what, const expected_value_t & val_after, const std::string & user_msg = "")
+			{
+				if (value != val_before)
+					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+				what();
+				if (value != val_after)
+					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+			}
+#pragma endregion
+
+#define GCL_TEST__EXPECT(...)					gcl::test::check::expect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUE(...)				gcl::test::check::expect_value(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUE_IN_RANGE(...)	gcl::test::check::expect_value_in_range(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUES(...)			gcl::test::check::expect_values(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+
+			// todo : expect value range
 
 		private:
-			static inline std::string get_where(const std::string & file, const std::size_t line, const std::string & func)
+			static inline std::string make_where_msg(GCL_TEST_WHERE_VARS)
 			{
 				auto filepos = file.find_last_of("\\/");
 				std::string filename{ filepos == std::string::npos ? file : file.substr(filepos + 1) };

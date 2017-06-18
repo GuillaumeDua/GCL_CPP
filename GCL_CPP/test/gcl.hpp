@@ -2,6 +2,7 @@
 # define GCL_TEST_GCL_HPP__
 
 #include <gcl_cpp/test/event.hpp>
+#include <gcl_cpp/test/test.hpp>
 #include <gcl_cpp/test/container/polymorphic_vector.hpp> // todo
 #include <gcl_cpp/test/type_info.hpp> // todo
 
@@ -13,9 +14,8 @@ namespace gcl
 	{
 		static void proceed()
 		{
-			struct toto {};
-			gcl::test::component<toto>::test();
-			gcl::test::component<gcl::test::event>::test();
+			::gcl::test::component<::gcl::test::test>::test();
+			::gcl::test::component<::gcl::test::event>::test();
 		}
 	}
 }
