@@ -158,7 +158,8 @@ namespace gcl
 			struct has_proceed<T, std::void_t<decltype(T::proceed)>> : std::true_type {};
 		}
 
-		static std::pair<std::size_t, std::size_t> winrate_counter{ 0, 0 }; // todo : private, gcl::test as struct
+		static std::pair<std::size_t, std::size_t> winrate_counter{ 0, 0 }; // todo : private
+		static std::pair<std::size_t, std::size_t> implrate_counter{ 0, 0 }; // todo : private
 
 		template <class component_t, std::size_t deepth = 0>
 		struct component
@@ -170,6 +171,8 @@ namespace gcl
 
 			static void test()
 			{
+				implrate_counter.second++;
+
 				if (deepth == 0)
 					winrate_counter = {0, 0};
 
@@ -177,7 +180,13 @@ namespace gcl
 				if_has_proceed_then_execute();
 
 				if (deepth == 0)
-					log_t::print<component_t, '='>("[ " + std::to_string(winrate_counter.first) + " / " + std::to_string(winrate_counter.second) + " ]");
+				{
+					log_t::print<component_t, '='>
+						(
+							"[ " + std::to_string(winrate_counter.first) + " / " + std::to_string(winrate_counter.second) + " ]" +
+							"\t(" + std::to_string(implrate_counter.first) + " not implemented yet)"
+						);
+				}
 			}
 
 		// protected: // disable until VS2015 frienship issue is fix
@@ -241,6 +250,7 @@ namespace gcl
 			template <>
 			static void if_has_proceed_then_execute<false>()
 			{
+				++implrate_counter.first;
 				log_t::print<component_t, '.'>("[SKIP]", "no test implemented");
 			}
 
