@@ -102,7 +102,6 @@ namespace gcl
 					dispatcher.subscribe<A_event>(handler1);
 					//dispatcher.subscribe<A_event>(handler2);
 
-					//std::cout << "dispatching A_event :" << std::endl;
 					dispatcher.dispatch(A_event{ 42 });
 					/*std::cout << "dispatching B_event :" << std::endl;
 					dispatcher.dispatch(B_event{ "Hello, world" });

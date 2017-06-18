@@ -315,6 +315,23 @@ namespace gcl
 				return std::string{};
 			}
 		};
+
+		template <class ... components_t>
+		struct components;
+		template <typename component_t, class ... components_t>
+		struct components<component_t, components_t...>
+		{
+			static void test()
+			{
+				component<component_t>::test();
+				components<components_t...>::test();
+			}
+		};
+		template <>
+		struct components<>
+		{
+			static void test() {}
+		};
 	}
 }
 

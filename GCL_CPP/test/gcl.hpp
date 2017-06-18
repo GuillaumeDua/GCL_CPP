@@ -14,8 +14,13 @@ namespace gcl
 	{
 		static void proceed()
 		{
-			::gcl::test::component<::gcl::test::test>::test();
-			::gcl::test::component<::gcl::test::event>::test();
+			// ::gcl::test::component<::gcl::test::test>::test();
+			// ::gcl::test::component<::gcl::test::event>::test();
+			::gcl::test::components
+			<
+				::gcl::test::test,
+				::gcl::test::event
+			>::test();
 		}
 	}
 }

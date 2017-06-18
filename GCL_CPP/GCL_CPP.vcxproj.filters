@@ -117,6 +117,9 @@
     <ClInclude Include="mp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="test\test.hpp">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
