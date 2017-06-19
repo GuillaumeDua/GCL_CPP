@@ -1,3 +1,5 @@
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
+
 #include <gcl_cpp/event.hpp>
 #include <gcl_cpp/test.hpp>
 

@@ -1,5 +1,4 @@
-#ifndef GCL_TEST_TEST_HPP__
-# define GCL_TEST_TEST_HPP__
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
 # include <gcl_cpp/test.hpp>
 # include <tuple>
@@ -27,5 +26,3 @@ namespace gcl
 		};
 	}
 }
-
-#endif // GCL_TEST_TEST_HPP__

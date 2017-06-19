@@ -1,5 +1,4 @@
-#ifndef GCL_CONTAINER_TEST_POLYMORPHIC_VECTOR_HPP__
-# define GCL_CONTAINER_TEST_POLYMORPHIC_VECTOR_HPP__
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
 # include "../../container/polymorphic_vector.hpp"
 # include <cassert>
@@ -78,6 +77,3 @@ namespace gcl
 		};
 	}
 }
-
-
-#endif // GCL_CONTAINER_TEST_POLYMORPHIC_VECTOR_HPP__

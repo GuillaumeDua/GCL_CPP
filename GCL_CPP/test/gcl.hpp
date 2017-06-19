@@ -1,5 +1,4 @@
-#ifndef GCL_TEST_GCL_HPP__
-# define GCL_TEST_GCL_HPP__
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
 #include <gcl_cpp/test/event.hpp>
 #include <gcl_cpp/test/test.hpp>
@@ -24,5 +23,3 @@ namespace gcl
 		}
 	}
 }
-
-#endif // GCL_TEST_GCL_HPP__

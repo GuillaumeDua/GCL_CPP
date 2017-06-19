@@ -1,5 +1,4 @@
-#ifndef GCL_TEST_UTILS__
-# define GCL_TEST_UTILS__
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
 #include <iostream>
 #include <vector>
@@ -169,5 +168,3 @@ namespace gcl
 		}
 	}
 }
-
-#endif // GCL_TEST_UTILS__

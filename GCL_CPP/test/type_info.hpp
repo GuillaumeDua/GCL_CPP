@@ -1,4 +1,6 @@
-#include "../type_info.hpp"
+#pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
+
+#include <gcl_cpp/type_info.hpp>
 
 namespace gcl
 {
