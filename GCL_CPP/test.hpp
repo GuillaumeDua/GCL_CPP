@@ -1,10 +1,5 @@
 #pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
-#include <gcl_cpp/preprocessor.hpp>
-//
-// No other gcl_cpp components allowed here
-// 
-
 #include <type_traits>
 #include <iomanip>
 #include <sstream>
@@ -13,9 +8,23 @@
 #include <vector>
 #include <algorithm>
 
+#ifndef GCL_PREPROCESSOR__NOT_INSTANTIABLE
+// remove #include <gcl_cpp/preprocessor.hpp> for stand-alone
+#define GCL_PREPROCESSOR__NOT_INSTANTIABLE(type) \
+	type() = delete;				\
+	type(const type &) = delete;	\
+	type(type &&) = delete; 
+#endif
+
 // todo : static SFINAE tests
 // type_trait : test_component<name>::pass / test_component<name>::fail as constexpr booleans value
 // => constexpr testing
+
+// todo : ((always_inline)) + remove macro_invokable area
+
+// todo : remove pack_t to declare tests, replace by static introspection
+//        -> is constexpr ? -> constexpr testing
+//        -> else           -> runtime   testing
 
 namespace gcl
 {
@@ -36,13 +45,13 @@ namespace gcl
 			GCL_PREPROCESSOR__NOT_INSTANTIABLE(check);
 
 			template <typename Fun>
-			static inline void expect(const Fun & to_test, const std::string & user_msg = "")
+			static inline void expect(Fun to_test, const std::string & user_msg = "")
 			{
 				if (!to_test())
 					throw fail_exception("gcl::test::check::expect failed" + (user_msg.empty() ? "" : " : " + user_msg));
 			}
 			template <>
-			static inline void expect<bool>(const bool & test_result, const std::string & user_msg)
+			static inline void expect<bool>(bool test_result, const std::string & user_msg)
 			{
 				if (!test_result)
 					throw fail_exception("gcl::test::check::expect failed" + (user_msg.empty() ? "" : " : " + user_msg));
@@ -77,6 +86,20 @@ namespace gcl
 					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
 			}
 
+			template <typename exception_t, typename func_t>
+			static inline void expect_exception(func_t to_test, const std::string & user_msg = "")
+			{
+				try
+				{
+					to_test();
+				}
+				catch (const exception_t & ex)
+				{
+					return;
+				}
+				throw fail_exception("gcl::test::check::expect_exception failed" + (user_msg.empty() ? "" : " : " + user_msg));
+			}
+
 #define WHERE_VARS const std::string & file, const std::size_t line, const std::string & func // __FILE__, __LINE__, __func__
 #pragma region macro_invokable
 			template <typename value_t>
@@ -106,12 +129,19 @@ namespace gcl
 				if (value != val_after)
 					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
 			}
+
+			template <typename exception_t, typename func_t>
+			static inline void expect_exception(WHERE_VARS, func_t to_test, const std::string & user_msg = "")
+			{
+				expect_exception<exception_t>(to_test, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+			}
 #pragma endregion
 
-#define GCL_TEST__EXPECT(...)					gcl::test::check::expect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
-#define GCL_TEST__EXPECT_VALUE(...)				gcl::test::check::expect_value(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
-#define GCL_TEST__EXPECT_VALUE_IN_RANGE(...)	gcl::test::check::expect_value_in_range(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
-#define GCL_TEST__EXPECT_VALUES(...)			gcl::test::check::expect_values(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT(...)							gcl::test::check::expect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUE(...)						gcl::test::check::expect_value(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUE_IN_RANGE(...)			gcl::test::check::expect_value_in_range(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_VALUES(...)					gcl::test::check::expect_values(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_EXCEPTION(exception_t, ...)	gcl::test::check::expect_exception<exception_t>(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
 		private:
 			static inline std::string make_where_msg(WHERE_VARS)
@@ -216,7 +246,10 @@ namespace gcl
 				implrate_counter.second++;
 
 				if (deepth == 0)
-					winrate_counter = {0, 0};
+				{
+					winrate_counter = { 0, 0 };
+					implrate_counter = { 0, 0 };
+				}
 
 				if_has_pack_then_it();
 				if_has_proceed_then_execute();
@@ -226,7 +259,7 @@ namespace gcl
 					log_t::print<component_t, '='>
 						(
 							"[ " + std::to_string(winrate_counter.first) + " / " + std::to_string(winrate_counter.second) + " ]" +
-							"\t(" + std::to_string(implrate_counter.first) + " not implemented yet)"
+							(implrate_counter.first == 0 ? "" : "\t(" + std::to_string(implrate_counter.first) + " not implemented yet)")
 						);
 				}
 			}
@@ -292,6 +325,8 @@ namespace gcl
 			template <>
 			static void if_has_proceed_then_execute<false>()
 			{
+				if (type_traits::has_pack<component_t>::value) return; // components should have their own test that garther up all subcomponents test ?
+
 				++implrate_counter.first;
 				log_t::print<component_t, '.'>("[SKIP]", "no test implemented");
 			}
@@ -321,6 +356,7 @@ namespace gcl
 			static void test()
 			{
 				component<component_t>::test();
+				std::cout << std::endl;
 				components<components_t...>::test();
 			}
 		};
