@@ -1,12 +1,13 @@
 #ifndef GCL_TUPLE_INFO__
 # define GCL_TUPLE_INFO__
 
+#include <gcl_cpp/preprocessor.hpp>
+
 #include <tuple>
 #include <memory>
 #include <functional>
 #include <cassert>
-
-#include <gcl_cpp/preprocessor.hpp>
+#include <vector>
 
 namespace gcl
 {
@@ -48,8 +49,15 @@ namespace gcl
 		template <typename T>
 		struct id
 		{
+			// Warning : Values change per program instance
 			static const id_type value; // [todo]::[C++14] : MS compiler (VS2015) do not support variable-template
+										// [todo]::[C++17] : seems to no be able to self-reference a template variable
 		};
+
+		template<typename... T>
+		static constexpr std::vector<id_type> make_ids_vector() { return { id<T>::value... }; }
+		template<typename... T>
+		static constexpr std::array<id_type, sizeof...(T)> make_ids_array() { return { id<T>::value... }; }
 
 		template <typename interface_t>
 		struct holder final

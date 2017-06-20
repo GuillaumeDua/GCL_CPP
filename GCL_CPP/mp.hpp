@@ -1,7 +1,7 @@
 #ifndef GCL_TMP_H_
 # define GCL_TMP_H_
 
-# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/type_index.hpp>
 
 namespace gcl
 {

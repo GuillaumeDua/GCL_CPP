@@ -1,10 +1,11 @@
 #ifndef GCL_SERIALIZATION__
 # define GCL_SERIALIZATION__
 
-# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/type_index.hpp>
 # include <gcl_cpp/IO.h>
 # include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/static_introspection.hpp>
+# include <gcl_cpp/type_info.hpp>
 
 # include <sstream>
 # include <map>
@@ -27,7 +28,7 @@ namespace gcl
 			{
 				// TODO : (void)gcl::mp::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
 
-				using type_pack_t = typename gcl::type_trait::TypePack<Types...>;
+				using type_pack_t = typename gcl::type_info::pack<Types...>;
 				using type_t = typename of_types<Types...>;
 
 				template <typename T_IO_POlicy = gcl::IO::Policy::Binary>
@@ -75,7 +76,7 @@ namespace gcl
 				template <typename T_IO_POlicy = gcl::IO::Policy::Binary>
 				struct reader
 				{
-					using type_manager_t = typename type_trait::interface_is<_InterfaceType>::template of_types<Types...>;
+					using type_manager_t = typename type_index::interface_is<_InterfaceType>::template of_types<Types...>;
 
 					explicit				reader(std::istream & istream)
 						: _iStream(istream)
@@ -102,7 +103,7 @@ namespace gcl
 						T_IO_POlicy::read(is, typeIndex);
 						if (is.eof()) return 0x0;
 
-						auto & constructor = type_manager_t::index.at(typeIndex).defaultConstructeurCallerOp;
+						auto & constructor = type_manager_t::index.at(typeIndex).default_constructor;
 						std::unique_ptr<_InterfaceType> elem(constructor());
 						is >> *elem;
 						return elem;
@@ -245,15 +246,15 @@ namespace gcl
 				struct Serializer
 			{
 				using T_IOPolicy = IO_Policy;
-				using T_TypeManager = typename gcl::type_trait::interface_is<T_SerializableInterface>::template of_types<T_SerializableTypes...>;
-				using _index_type = typename gcl::type_trait::interface_is<T_SerializableInterface>::index_type;
+				using T_TypeManager = typename gcl::type_index::interface_is<T_SerializableInterface>::template of_types<T_SerializableTypes...>;
+				using _index_type = typename gcl::type_index::interface_is<T_SerializableInterface>::index_type;
 
 				// static typename T_TypeManager::Indexer _typeIndex;
 
 				template <typename T>
 				static void							write(std::ostream & os, const T & var)
 				{
-					T_IOPolicy::write(os, T_TypeManager::T_TypePack::template indexOf<T>()); // throw out_of_range if T is not part of T_SerializableTypes
+					T_IOPolicy::write(os, T_TypeManager::pack_t::template indexOf<T>()); // throw out_of_range if T is not part of T_SerializableTypes
 					// T_IOPolicy::write(os, _typeIndex.indexOf<T>()); 
 					os << var;
 				}
@@ -261,7 +262,7 @@ namespace gcl
 				{
 					_index_type typeId;
 					T_IOPolicy::read(is, typeId);
-					auto & constructor = T_TypeManager::index.at(typeId).defaultConstructeurCallerOp;
+					auto & constructor = T_TypeManager::index.at(typeId).default_constructor;
 					T_SerializableInterface * obj = constructor();
 					is >> *obj;
 					return obj;

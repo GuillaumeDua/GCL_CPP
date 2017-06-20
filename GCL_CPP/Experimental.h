@@ -1,7 +1,7 @@
 #ifndef GCL_EXPERIMENTAL__
 # define GCL_EXPERIMENTAL__
 
-# include <gcl_cpp/type_traits.hpp>
+# include <gcl_cpp/type_index.hpp>
 # include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/IO.h>
 # include <functional>
@@ -12,11 +12,11 @@
 
 /*
 	/!\ BEWARE /!\
-	This is experimental, uncomplete features, that may become gcl components in the futur.
+	This is experimental, uncomplete features, that MAY (or NOT) become gcl components in the futur.
 	(And thus move to other files, and appropriate namespaces).
 */
 
-using namespace gcl::type_trait;
+using namespace gcl::type_index;
 using namespace gcl::mp;
 
 namespace gcl
@@ -34,7 +34,7 @@ namespace gcl
 				}
 			};
 		}
-		namespace type_trait
+		namespace type_index
 		{
 			struct NullType{};
 
@@ -104,7 +104,7 @@ namespace gcl
 						RegisterType<T, T_TypeId_List::_Next>::Do < (T_TypeId_List::value < T_TypeId_List::_Configuration::_MaxIteration - 1)>();
 					else
 					{
-						T_TypeId_List::_uniqueId = TypeToUniqueId<T>::value;
+						T_TypeId_List::_uniqueId = gcl::type_info::id<T>::value;
 					}
 				}
 				template <>
@@ -134,9 +134,9 @@ namespace gcl
 					TypeIdList<0>::Visit<TestTypeListVisitor_Dump>::Do();
 
 					return
-						gcl::type_trait::TypeToUniqueId<A>::value == gcl::type_trait::TypeToUniqueId<A>::value
-						&& gcl::type_trait::TypeToUniqueId<B>::value == gcl::type_trait::TypeToUniqueId<B>::value
-						&& gcl::type_trait::TypeToUniqueId<A>::value != gcl::type_trait::TypeToUniqueId<B>::value
+						gcl::type_info::id<A>::value == gcl::type_info::id<A>::value
+						&& gcl::type_info::id<B>::value == gcl::type_info::id<B>::value
+						&& gcl::type_info::id<A>::value != gcl::type_info::id<B>::value
 						;
 				}
 			};

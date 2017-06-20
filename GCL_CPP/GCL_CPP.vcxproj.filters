@@ -45,9 +45,6 @@
     <ClInclude Include="functionnal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="type_traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="thread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,6 +117,12 @@
     <ClInclude Include="test\test.hpp">
       <Filter>Header Files\test</Filter>
     </ClInclude>
+    <ClInclude Include="type_index.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\type_index.hpp">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -128,7 +131,7 @@
     <ClCompile Include="serialisation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="type_traits.cpp">
+    <ClCompile Include="type_index.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

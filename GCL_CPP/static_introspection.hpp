@@ -81,7 +81,7 @@ namespace gcl
 namespace gcl
 {
 	namespace OLD {
-		namespace type_trait
+		namespace type_index
 		{
 			// Allow sfinae static type introspection in C++TMP
 #pragma region Waiting_for_Cpp17_constraint_require_reflexion
@@ -95,7 +95,7 @@ namespace gcl
 #define gen_has_nested_type(name)                               \
 namespace gcl {                                                 \
 	namespace OLD {												\
-    namespace type_trait {                                       \
+    namespace type_index {                                       \
     namespace sfinae											\
     {                                                           \
         template<typename T, typename SFINAE = void>            \
@@ -121,7 +121,7 @@ namespace gcl {                                                 \
 #define gen_has_member_function(name)                           \
 namespace gcl {													\
 	namespace OLD {												\
-    namespace type_trait {										\
+    namespace type_index {										\
     namespace sfinae											\
     {                                                           \
         template<typename T, typename SFINAE = void>            \

@@ -92,16 +92,17 @@
     <ClInclude Include="test\event.hpp" />
     <ClInclude Include="test\gcl.hpp" />
     <ClInclude Include="test\test.hpp" />
+    <ClInclude Include="test\type_index.hpp" />
     <ClInclude Include="test\type_info.hpp" />
     <ClInclude Include="thread.hpp" />
     <ClInclude Include="type_info.hpp" />
-    <ClInclude Include="type_traits.hpp" />
+    <ClInclude Include="type_index.hpp" />
     <ClInclude Include="static_introspection.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="serialisation.cpp" />
-    <ClCompile Include="type_traits.cpp" />
+    <ClCompile Include="type_index.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
