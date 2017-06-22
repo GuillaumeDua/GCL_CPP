@@ -349,21 +349,17 @@ namespace gcl
 		};
 
 		template <class ... components_t>
-		struct components;
-		template <typename component_t, class ... components_t>
-		struct components<component_t, components_t...>
+		struct components
 		{
 			static void test()
 			{
-				component<component_t>::test();
-				std::cout << std::endl;
-				components<components_t...>::test();
+				int expand_variadic_[] =
+				{
+					(component<components_t>::test(),
+					std::cout << std::endl,
+					0)...
+				};
 			}
-		};
-		template <>
-		struct components<>
-		{
-			static void test() {}
 		};
 	}
 }
