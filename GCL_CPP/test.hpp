@@ -93,7 +93,7 @@ namespace gcl
 				{
 					to_test();
 				}
-				catch (const exception_t & ex)
+				catch (const exception_t &)
 				{
 					return;
 				}
