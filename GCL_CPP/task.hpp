@@ -270,8 +270,10 @@ namespace gcl
 				{
 					for (size_t i = 0; i < 5; ++i)
 					{
-						const int * unique_rcs_ptr = &(uniqueRsc.Get());
-						GCL_DEBUG_INSTRUCTION(THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << unique_rcs_ptr << ']'));
+						GCL_DEBUG_INSTRUCTION(
+							const int * unique_rcs_ptr = &(uniqueRsc.Get());
+							THREAD_SAFE_STDCOUT('[' << std::setw(8) << std::this_thread::get_id() << "] -> rcs=[0x" << unique_rcs_ptr << ']')
+						);
 						std::this_thread::sleep_for(std::chrono::seconds(1));
 					}
 				}));

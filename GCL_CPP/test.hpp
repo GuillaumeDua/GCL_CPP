@@ -26,6 +26,8 @@
 //        -> is constexpr ? -> constexpr testing
 //        -> else           -> runtime   testing
 
+#pragma warning(disable : 4127) // if constexpr does not work
+
 namespace gcl
 {
 	namespace test
@@ -124,10 +126,10 @@ namespace gcl
 			static inline void expect_values(WHERE_VARS, const value_t & value, const expected_value_t & val_before, Fun what, const expected_value_t & val_after, const std::string & user_msg = "")
 			{
 				if (value != val_before)
-					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+					throw fail_exception("gcl::test::check::expect_values failed : " + make_where_msg(file, line, func) + (user_msg.empty() ? std::string{} : " : " + user_msg));
 				what();
 				if (value != val_after)
-					throw fail_exception("gcl::test::check::expect_values failed" + (user_msg.empty() ? std::string{} : " : " + user_msg));
+					throw fail_exception("gcl::test::check::expect_values failed : " + make_where_msg(file, line, func) + (user_msg.empty() ? std::string{} : " : " + user_msg));
 			}
 
 			template <typename exception_t, typename func_t>
@@ -245,7 +247,7 @@ namespace gcl
 			{
 				implrate_counter.second++;
 
-				if (deepth == 0)
+				if /*constexpr*/ (deepth == 0)
 				{
 					winrate_counter = { 0, 0 };
 					implrate_counter = { 0, 0 };
@@ -254,7 +256,7 @@ namespace gcl
 				if_has_pack_then_it();
 				if_has_proceed_then_execute();
 
-				if (deepth == 0)
+				if /*constexpr*/ (deepth == 0)
 				{
 					log_t::print<component_t, '='>
 						(
@@ -300,11 +302,11 @@ namespace gcl
 				++winrate_counter.second;
 				try
 				{
-					using clock_t = std::chrono::system_clock;
+					using clock_type = std::chrono::steady_clock;
 
-					clock_t::time_point tp_start = clock_t::now();
+					clock_type::time_point tp_start = clock_type::now();
 					auto output = do_proceed(component_t::proceed);
-					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(clock_t::now() - tp_start).count();
+					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(clock_type::now() - tp_start).count();
 
 					log_t::print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " ms", output);
 					++winrate_counter.first;

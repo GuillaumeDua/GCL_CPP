@@ -35,10 +35,10 @@ namespace gcl
 					using T_FilterList = std::list<std::shared_ptr<T_Filter>>;
 					using _ToVisitElement = typename T_Filter::_ToVisitElement;
 
-					void	Process(T_ToVisitElement & elem)
+					void	Process(T_ToVisitElement & /*elem*/)
 					{
-						for (auto & filter : _filters)
-							; // (*filter)(elem); // fixme
+						//for (auto & filter : _filters)
+						//	(*filter)(elem); // fixme
 					}
 
 					T_FilterList	_filters;
@@ -81,7 +81,8 @@ namespace gcl
 				(void inline		_EmergencyCacheFlush(void)
 				{
 					std::unique_lock<std::mutex> lock(_mutex);
-					_cache.swap(T_ElementQueue());
+					T_ElementQueue empty_queue;
+					_cache.swap(empty_queue);
 				})
 				DEBUG_INSTRUCTION
 				(static void inline	EmergencyCacheFlush(void)
@@ -101,7 +102,7 @@ namespace gcl
 					{
 						std::mutex				& _mutex;
 						std::condition_variable & _cv;
-						T_ElementQueue			&_cache;
+						T_ElementQueue			& _cache;
 						T_FilterChain			& _filterChain;
 					} capture { _mutex, _cv, _cache, _filterChain };
 
@@ -127,7 +128,7 @@ namespace gcl
 								(*elem)();
 							}
 						}
-					}, capture);
+					}, std::ref(capture));
 				}
 				void				Stop(void)
 				{

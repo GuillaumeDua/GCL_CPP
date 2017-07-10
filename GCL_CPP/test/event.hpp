@@ -58,11 +58,11 @@ namespace gcl
 
 					std::unique_ptr<gcl_event_t::handler> handler(new handler_t
 					{
-						{ gcl::type_info::id<B_event>::value, [](const gcl_event_t::interface_t & ev) { B_event::counter++; } },
-						{ gcl::type_info::id<C_event>::value, [](const gcl_event_t::interface_t & ev) { C_event::counter++; } }
+						{ gcl::type_info::id<B_event>::value, [](const gcl_event_t::interface_t &) { B_event::counter++; } },
+						{ gcl::type_info::id<C_event>::value, [](const gcl_event_t::interface_t &) { C_event::counter++; } }
 					});
 
-					handler->add_listener<A_event>([](const gcl_event_t::interface_t & ev) { A_event::counter++; });
+					handler->add_listener<A_event>([](const gcl_event_t::interface_t &) { A_event::counter++; });
 
 					GCL_TEST__EXPECT(A_event::counter == 0, "gcl::test::event::handler : bad A_event::counter value");
 					handler->on(A_event{});
@@ -96,7 +96,7 @@ namespace gcl
 						<< gcl::type_info::id<A_event>::value << " => gcl::type_info::id<A_event>::value" << std::endl
 						;*/
 
-					handler1->add_listener<A_event>(std::move([](const event_t & ev) { /*std::cout << "A_event -> handler1 : many_to_one_handler : 1 : " << static_cast<const A_event &>(ev).a_var << std::endl;*/ }));
+					handler1->add_listener<A_event>(std::move([](const event_t &) { /*std::cout << "A_event -> handler1 : many_to_one_handler : 1 : " << static_cast<const A_event &>(ev).a_var << std::endl;*/ }));
 					/*handler1->add_listener<A_event>(std::move([](const event_t & ev) { std::cout << "A_event -> handler2 : many_to_many_handler  : 1 : " << static_cast<const A_event &>(ev).a_var << std::endl; }));
 					handler1->add_listener<A_event>(std::move([](const event_t & ev) { std::cout << "A_event -> handler2 : many_to_many_handler  : 2 : " << static_cast<const A_event &>(ev).a_var << std::endl; }));
 					handler1->add_listener<B_event>(std::move([](const event_t & ev) { std::cout << "B_event -> handler2 : many_to_many_handler  : 3 : " << static_cast<const B_event &>(ev).b_var << std::endl; }));*/

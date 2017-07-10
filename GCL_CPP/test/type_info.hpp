@@ -21,10 +21,10 @@ namespace gcl
 
 					static_assert(std::is_same<gcl::type_info::tuple<int>, gcl::type_info::pack<int>>::value, "gcl::test::type_info::tuple : pack must be an alias");
 
-					using pack_t = typename gcl::type_info::tuple<Toto, Titi, Tata, Tutu>;
+					using my_pack_t = typename gcl::type_info::tuple<Toto, Titi, Tata, Tutu>;
 
-					GCL_TEST__EXPECT_VALUE(pack_t::indexOf<Tata>(), 2);
-					GCL_TEST__EXPECT_EXCEPTION(std::out_of_range, []() { pack_t::indexOf<NotInPack>(); });
+					GCL_TEST__EXPECT_VALUE(my_pack_t::indexOf<Tata>(), std::size_t{ 2 });
+					GCL_TEST__EXPECT_EXCEPTION(std::out_of_range, []() { my_pack_t::indexOf<NotInPack>(); });
 				}
 			};
 
@@ -52,7 +52,10 @@ namespace gcl
 					holder_t t1_from_raw_ptr{ new concret1_t{} };
 					holder_t t1_from_id_and_interface_ptr{ gcl::type_info::id<concret1_t>::value, std::make_unique<interface_t>() };
 
-					GCL_TEST__EXPECT(t1_from_id_and_interface_ptr.id == t1_from_unique_ptr.id == t1_from_raw_ptr.id, "gcl::type_info::holder : bad id");
+					GCL_TEST__EXPECT(
+						t1_from_id_and_interface_ptr.id == t1_from_unique_ptr.id &&
+						t1_from_unique_ptr.id == t1_from_raw_ptr.id, "gcl::type_info::holder : bad id"
+					);
 				}
 			};
 

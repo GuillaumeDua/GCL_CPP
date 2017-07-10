@@ -70,7 +70,7 @@ namespace gcl
 
 			holder(id_type _id, value_type && ptr)
 				: value(std::move(ptr))
-				, id(id)
+				, id(_id)
 			{}
 
 			template <typename concret_t>
