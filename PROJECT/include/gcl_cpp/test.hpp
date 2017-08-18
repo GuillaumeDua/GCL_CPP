@@ -1,12 +1,16 @@
 #pragma once // not using standard header-guard in order to not pollute macro completion on GCL_TEST*
 
 #include <type_traits>
-#include <iomanip>
-#include <sstream>
+#include <algorithm>
 #include <functional>
 #include <chrono>
+#include <cassert>
+#include <string>
+#include <sstream>
 #include <vector>
-#include <algorithm>
+#include <iomanip>
+#include <iostream>
+
 
 #ifndef GCL_PREPROCESSOR__NOT_INSTANTIABLE
 // remove #include <gcl_cpp/preprocessor.hpp> for stand-alone
@@ -15,6 +19,28 @@
 	type(const type &) = delete;	\
 	type(type &&) = delete; 
 #endif
+
+namespace gcl
+{
+	namespace lexical_cast
+	{
+		template <typename T> std::string to_string(const T & var)
+		{
+			std::ostringstream oss;
+			oss << var;
+			return oss.str();
+		}
+		template <> std::string to_string<std::ostringstream>(const std::ostringstream & var)
+		{
+			return var.str();
+		}
+		template <> std::string to_string<std::string>(const std::string & var)
+		{
+			return var;
+		}
+	}
+}
+
 
 // todo : static SFINAE tests
 // type_trait : test_component<name>::pass / test_component<name>::fail as constexpr booleans value
@@ -197,7 +223,7 @@ namespace gcl
 					else
 						std::cout
 						<< std::setw(preindent_width_v) << "" << " `-" << ' '
-						<< std::setfill(fill_char_v) << std::setw(msg_width_v) << "" << "   "
+						<< std::setfill('-') << std::setw(msg_width_v) << "" << "   "
 						<< std::setfill(' ')
 						;
 					last_label = label;
@@ -305,10 +331,10 @@ namespace gcl
 					using clock_type = std::chrono::steady_clock;
 
 					clock_type::time_point tp_start = clock_type::now();
-					auto output = do_proceed(component_t::proceed);
+					auto output = do_proceed(component_t::proceed); //auto output = component_t::proceed();
 					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(clock_type::now() - tp_start).count();
 
-					log_t::print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " ms", output);
+					log_t::print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " us", gcl::lexical_cast::to_string(output));
 					++winrate_counter.first;
 				}
 				catch (const fail_exception & ex)
@@ -321,7 +347,7 @@ namespace gcl
 				}
 				catch (...)
 				{
-					log_t::print<component_t>("[CRASHED]", "FATAL_ERROR");
+					log_t::print<component_t>("[CRASHED]", "[FATAL_ERROR]");
 				}
 			}
 			template <>
@@ -330,23 +356,20 @@ namespace gcl
 				if (type_traits::has_pack<component_t>::value) return; // components should have their own test that garther up all subcomponents test ?
 
 				++implrate_counter.first;
-				log_t::print<component_t, '.'>("[SKIP]", "no test implemented");
+				log_t::print<component_t, '.'>("[SKIP]", "[no test implemented]");
 			}
 
 		protected:
 			template <typename T, typename ... P>
-			static std::string do_proceed(T(*func)(P...))
+			static auto do_proceed(T(*func)(P...))
 			{
-				auto ret = func();
-				std::ostringstream oss;
-				oss << std::left << std::boolalpha << ret;
-				return oss.str();
+				return func();
 			}
 			template <typename ... P>
 			static std::string do_proceed(void(*func)(P...))
 			{
 				func();
-				return std::string{};
+				return {}; // [ISSUE]::[BUG] : cost about 5us
 			}
 		};
 
@@ -365,3 +388,5 @@ namespace gcl
 		};
 	}
 }
+
+#pragma warning(default : 4127)
