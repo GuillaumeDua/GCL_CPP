@@ -28,7 +28,7 @@ namespace gcl
 			{
 				// TODO : (void)gcl::mp::Foreach<Types...>::template Require<IsChildOf<T_Interface>>
 
-				using type_pack_t = typename gcl::type_info::pack<Types...>;
+				using type_pack_t = typename gcl::type_info::tuple<Types...>;
 				using type_t = typename of_types<Types...>;
 
 				template <typename T_IO_POlicy = gcl::IO::Policy::Binary>

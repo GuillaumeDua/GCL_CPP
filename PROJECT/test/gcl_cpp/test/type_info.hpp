@@ -19,7 +19,7 @@ namespace gcl
 					struct Tutu{};
 					struct NotInPack {};
 
-					static_assert(std::is_same<gcl::type_info::tuple<int>, gcl::type_info::pack<int>>::value, "gcl::test::type_info::tuple : pack must be an alias");
+					static_assert(std::is_same<gcl::type_info::tuple<int>, gcl::type_info::tuple<int>>::value, "gcl::test::type_info::tuple : tuple must be an alias");
 
 					using my_pack_t = typename gcl::type_info::tuple<Toto, Titi, Tata, Tutu>;
 

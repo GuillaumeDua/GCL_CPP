@@ -20,7 +20,7 @@ namespace gcl
 		{
 			GCL_PREPROCESSOR__NOT_INSTANTIABLE(tuple)
 
-			using _Types = std::tuple<Ts...>;
+			using types_t = std::tuple<Ts...>;
 
 			template <typename T>
 			static constexpr inline size_t indexOf(void)
@@ -29,15 +29,15 @@ namespace gcl
 			}
 
 			template <size_t N>
-			using type_at = typename std::tuple_element<N, _Types>::type;
+			using type_at = typename std::tuple_element<N, types_t>::type;
 
 		private:
-			template <typename T_Needle, size_t It, typename T_It, typename ... T_HayStack>
+			template <typename needle_t, size_t it_n, typename iterated_t, typename ... haystack_t>
 			static constexpr inline size_t indexOf_impl(void)
 			{
-				return (std::is_same<T_Needle, T_It>::value ? It : indexOf_impl<T_Needle, It + 1, T_HayStack...>());
+				return (std::is_same<needle_t, iterated_t>::value ? it_n : indexOf_impl<needle_t, it_n + 1, haystack_t...>());
 			}
-			template <typename T_Needle, size_t It>
+			template <typename needle_t, size_t iterated_t>
 			static constexpr inline size_t indexOf_impl(void)
 			{
 				throw std::out_of_range("tuple::indexOf_impl : Not found");
