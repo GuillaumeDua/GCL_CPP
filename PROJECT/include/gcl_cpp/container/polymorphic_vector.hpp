@@ -1,7 +1,7 @@
 #ifndef GCL_CONTAINER__POLYMORPHIC_VECTOR_HPP__
 # define GCL_CONTAINER__POLYMORPHIC_VECTOR_HPP__
 
-#include "../type_info.hpp"
+#include <gcl_cpp/type_info.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -23,7 +23,7 @@ namespace gcl
 			{
 				static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
 				content_sorted_accessor[gcl::type_info::id<T>::value].emplace_back(obj.get());
-				content.push_back(std::forward<std::unique_ptr<T>>(obj));
+				content.push_back(std::forward<std::unique_ptr<T>>(obj)); // interface_t ?
 			}
 			void push_back(value_holder_t && holder)
 			{
@@ -36,13 +36,13 @@ namespace gcl
 				static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
 				auto elem{std::make_unique<T>(std::forward<Args>(args)...)};
 				push_back(std::move(elem));
-				return *elem;
+				return static_cast<T&>(*(content.back().get()));
 			}
 
 			template <typename T>
 			inline auto const & get()
 			{
-				static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
+				// static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
 				return content_sorted_accessor.at(gcl::type_info::id<T>::value);
 			}
 			inline auto const & get(gcl::type_info::id_type id)
@@ -56,7 +56,7 @@ namespace gcl
 
 			void visit(std::function<void(const element_t &)> func) const
 			{
-				for (auto & elem : content)
+				for (const auto & elem : content)
 				{
 					func(elem);
 				}
@@ -72,7 +72,7 @@ namespace gcl
 			void visit(std::function<void(const interface_t &)> func) const
 			{
 				static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
-				for (auto & elem : content_sorted_accessor.at(gcl::type_info::id<T>::value))
+				for (const auto & elem : content_sorted_accessor.at(gcl::type_info::id<T>::value))
 				{
 					func(*elem);
 				}
@@ -88,7 +88,7 @@ namespace gcl
 			}
 			void visit(std::function<void(const interface_t &)> func, gcl::type_info::id_type id) const
 			{
-				for (auto & elem : content_sorted_accessor.at(id))
+				for (const auto & elem : content_sorted_accessor.at(id))
 				{
 					func(*elem);
 				}
@@ -118,15 +118,13 @@ namespace gcl
 					std::end(content)
 				);
 			}
-			/*template <class T, class Fun>
-			void remove_if(Fun func); // cost too much */
 
 		protected:
 			using content_t = std::vector<element_t>;
-			using content_sorted_accessor_t = std::unordered_map<gcl::type_info::id_type, std::vector<interface_t*> >;
+			using content_sorted_per_type_t = std::unordered_map<gcl::type_info::id_type, std::vector<interface_t*> >;
 
 			content_t					content;
-			content_sorted_accessor_t	content_sorted_accessor;
+			content_sorted_per_type_t	content_sorted_accessor;
 		};
 	}
 }
