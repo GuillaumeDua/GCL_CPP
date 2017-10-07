@@ -2,9 +2,9 @@
 
 #include <gcl_cpp/test/event.hpp>
 #include <gcl_cpp/test/test.hpp>
-#include <gcl_cpp/test/container/polymorphic_vector.hpp> // todo
 #include <gcl_cpp/test/type_info.hpp>
 #include <gcl_cpp/test/type_index.hpp>
+#include <gcl_cpp/test/container.hpp>
 
 #include <gcl_cpp/test.hpp>
 
@@ -19,7 +19,8 @@ namespace gcl
 				::gcl::test::test,
 				::gcl::test::event,
 				::gcl::test::type_info,
-				::gcl::test::type_index
+				::gcl::test::type_index,
+				::gcl::test::container
 			>::test();
 		}
 	}
