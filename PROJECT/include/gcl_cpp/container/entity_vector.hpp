@@ -63,7 +63,7 @@ namespace gcl
 			>
 			void push_back_properties(value_type * value, properties_pack_t<properties_ts...>)
 			{
-				int _[]{ (push_back_property<properties_ts>(value), 0)... };
+				(void)std::initializer_list<int>{ ((void)push_back_property<properties_ts>(value), 0)... };
 			}
 			template <typename property_t>
 			void push_back_property(value_type * value)
