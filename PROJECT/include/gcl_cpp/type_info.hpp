@@ -54,6 +54,9 @@ namespace gcl
 										// [todo]::[C++17] : seems to no be able to self-reference a template variable
 		};
 
+		template <typename T>
+		constexpr id_type value = &value<T>; // bad : won't compile as &value<T> is not a constant expression
+
 		template<typename... T>
 		static constexpr std::vector<id_type> make_ids_vector() { return { id<T>::value... }; }
 		template<typename... T>
@@ -102,6 +105,27 @@ namespace gcl
 
 		namespace experimental
 		{
+			template <typename T>
+			constexpr std::string_view type_hash(/*no parameters allowed*/)
+			{
+#ifdef _MSC_VER
+				std::string_view str_view = __FUNCSIG__;
+
+				str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
+				str_view.remove_suffix(str_view.length() - str_view.rfind('>'));
+#elif defined (__GNUC__)
+				std::string_view str_view = __PRETTY_FUNCTION__;
+
+				str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
+				const char prefix[] = " [with T = ";
+				str_view.remove_prefix(str_view.find(prefix) + sizeof(prefix) - 1);
+				str_view.remove_suffix(str_view.length() - str_view.find(';'));
+#else
+				static_assert(false, "not supported compiler");
+#endif
+				return str_view;
+			}
+
 			struct any
 			{
 				any(const any &) = delete;
