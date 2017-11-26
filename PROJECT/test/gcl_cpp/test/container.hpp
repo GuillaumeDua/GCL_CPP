@@ -12,7 +12,7 @@ namespace gcl
 			using polymorphic_vector = gcl::test::container_partial_impl::polymorphic_vector;
 			using entity_vector = gcl::test::container_partial_impl::entity_vector;
 
-			using pack_t = std::tuple<polymorphic_vector, entity_vector>;
+			using dependencies_t = std::tuple<polymorphic_vector, entity_vector>;
 		};
 	}
 }

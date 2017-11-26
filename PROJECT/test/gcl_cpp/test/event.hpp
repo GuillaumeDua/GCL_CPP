@@ -161,12 +161,12 @@ namespace gcl
 					}
 				};
 
-				using pack_t = std::tuple<static_socket>;
+				using dependencies_t = std::tuple<static_socket>;
 			};
 
 			struct route {};
 
-			using pack_t = std::tuple<handler, dispatcher, experimental, route>;
+			using dependencies_t = std::tuple<handler, dispatcher, experimental, route>;
 		};
 	}
 }

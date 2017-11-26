@@ -35,7 +35,7 @@ namespace gcl
 				}
 			};
 
-			using pack_t = std::tuple<interface_is>;
+			using dependencies_t = std::tuple<interface_is>;
 		};
 	}
 }

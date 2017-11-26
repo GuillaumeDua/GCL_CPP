@@ -103,10 +103,10 @@ namespace gcl
 							"gcl::any::operator==(const gcl::any &)");
 					}
 				};
-				using pack_t = std::tuple<any>;
+				using dependencies_t = std::tuple<any>;
 			};
 
-			using pack_t = std::tuple<tuple, holder, experimental>;
+			using dependencies_t = std::tuple<tuple, holder, experimental>;
 		};
 	}
 }

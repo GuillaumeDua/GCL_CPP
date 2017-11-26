@@ -48,7 +48,7 @@ namespace gcl
 
 // todo : ((always_inline)) + remove macro_invokable area
 
-// todo : remove pack_t to declare tests, replace by static introspection
+// todo : remove dependencies_t to declare tests, replace by static introspection
 //        -> is constexpr ? -> constexpr testing
 //        -> else           -> runtime   testing
 
@@ -262,9 +262,9 @@ namespace gcl
 		namespace type_traits
 		{
 			template <typename T, typename = void>
-			struct has_pack : std::false_type {};
+			struct has_dependencies : std::false_type {};
 			template <typename T>
-			struct has_pack<T, std::void_t<typename T::pack_t>> : std::true_type {};
+			struct has_dependencies<T, std::void_t<typename T::dependencies_t>> : std::true_type {};
 
 			template <typename T, typename = void>
 			struct has_proceed : std::false_type {};
@@ -293,7 +293,7 @@ namespace gcl
 					implrate_counter = { 0, 0 };
 				}
 
-				if_has_pack_then_it();
+				if_has_dependencies_then_it();
 				if_has_proceed_then_execute();
 
 				if /*constexpr*/ (deepth == 0)
@@ -308,30 +308,30 @@ namespace gcl
 
 		// protected: // disable until VS2015 frienship issue is fix
 
-			// 1 - has test pack ? [2] : skip
-			template <bool has_pack = type_traits::has_pack<component_t>::value>
-			static void if_has_pack_then_it()
+			// 1 - has test dependencies ? [2] : skip
+			template <bool has_dependencies = type_traits::has_dependencies<component_t>::value>
+			static void if_has_dependencies_then_it()
 			{
-				static_assert(type_traits::has_pack<component_t>::value, "component test pack is mandatory");
-				log_t::print<component_t>("[PACK]");
-				foreach_elem_do_test(component_t::pack_t{});
+				static_assert(type_traits::has_dependencies<component_t>::value, "component test dependencies is mandatory");
+				log_t::print<component_t>("[dependencies]");
+				foreach_elem_do_test(component_t::dependencies_t{});
 			}
 			template <>
-			static void if_has_pack_then_it<false>()
+			static void if_has_dependencies_then_it<false>()
 			{
-				static_assert(!type_traits::has_pack<component_t>::value, "component test pack not allowed");
+				static_assert(!type_traits::has_dependencies<component_t>::value, "component test dependencies not allowed");
 			}
-			// 2 - foreach test in pack
+			// 2 - foreach test in dependencies
 			//     has proceed ? do test : "not implemented"
-			//                             or is pack
-			template <template <class...> class pack, class subcomponent_t, class ... T>
-			static void foreach_elem_do_test(pack<subcomponent_t, T...>)
+			//                             or is dependencies
+			template <template <class...> class dependencies, class subcomponent_t, class ... T>
+			static void foreach_elem_do_test(dependencies<subcomponent_t, T...>)
 			{
-				foreach_elem_do_test(pack<subcomponent_t>{});
-				foreach_elem_do_test(pack<T...>{});
+				foreach_elem_do_test(dependencies<subcomponent_t>{});
+				foreach_elem_do_test(dependencies<T...>{});
 			}
-			template <template <class...> class pack, class subcomponent_t>
-			static void foreach_elem_do_test(pack<subcomponent_t>)
+			template <template <class...> class dependencies, class subcomponent_t>
+			static void foreach_elem_do_test(dependencies<subcomponent_t>)
 			{
 				component<subcomponent_t, deepth + 1>::test();
 			}
@@ -367,7 +367,7 @@ namespace gcl
 			template <>
 			static void if_has_proceed_then_execute<false>()
 			{
-				if (type_traits::has_pack<component_t>::value) return; // components should have their own test that garther up all subcomponents test ?
+				if (type_traits::has_dependencies<component_t>::value) return; // components should have their own test that garther up all subcomponents test ?
 
 				++implrate_counter.first;
 				log_t::print<component_t, '.'>("[SKIP]", "[no test implemented]");

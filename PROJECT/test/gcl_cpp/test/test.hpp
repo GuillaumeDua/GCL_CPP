@@ -22,7 +22,7 @@ namespace gcl
 				}
 			};
 
-			using pack_t = std::tuple<check>;
+			using dependencies_t = std::tuple<check>;
 		};
 	}
 }
