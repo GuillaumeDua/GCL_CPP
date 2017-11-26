@@ -92,6 +92,13 @@ namespace gcl
 					throw fail_exception("gcl::test::check::expect_value failed" + (user_msg.empty() ? "" : " : " + user_msg));
 			}
 
+			template <typename value_t, typename U>
+			static inline void expect_not_value(const value_t & value, const U & unexpected_value, const std::string & user_msg = "")
+			{
+				if (value == unexpected_value)
+					throw fail_exception("gcl::test::check::unexpect_value failed" + (user_msg.empty() ? "" : " : " + user_msg));
+			}
+
 			template <typename value_t>
 			using value_range_t = std::pair<value_t, value_t>;
 
@@ -143,6 +150,12 @@ namespace gcl
 			}
 
 			template <typename value_t, typename expected_value_t>
+			static inline void expect_not_value(WHERE_VARS, const value_t & value, const expected_value_t & unexpected_value, const std::string & user_msg = "")
+			{
+				expect_not_value(value, unexpected_value, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
+			}
+
+			template <typename value_t, typename expected_value_t>
 			static inline void expect_value_in_range(WHERE_VARS, const value_t & value, const value_range_t<expected_value_t> & expected_values_range, const std::string & user_msg = "")
 			{
 				expect_value_in_range(value, expected_values_range, make_where_msg(file, line, func) + (user_msg.length() == 0 ? "" : " : ") + user_msg);
@@ -167,6 +180,7 @@ namespace gcl
 
 #define GCL_TEST__EXPECT(...)							gcl::test::check::expect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define GCL_TEST__EXPECT_VALUE(...)						gcl::test::check::expect_value(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define GCL_TEST__EXPECT_NOT_VALUE(...)					gcl::test::check::expect_not_value(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define GCL_TEST__EXPECT_VALUE_IN_RANGE(...)			gcl::test::check::expect_value_in_range(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define GCL_TEST__EXPECT_VALUES(...)					gcl::test::check::expect_values(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define GCL_TEST__EXPECT_EXCEPTION(exception_t, ...)	gcl::test::check::expect_exception<exception_t>(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
