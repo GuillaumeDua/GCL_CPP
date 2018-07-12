@@ -100,6 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,7 +108,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -128,6 +129,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\test;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -138,6 +140,8 @@
   <ItemGroup>
     <ClInclude Include="include\gcl_cpp\color.h" />
     <ClInclude Include="include\gcl_cpp\Container.h" />
+    <ClInclude Include="include\gcl_cpp\container\entity_vector.hpp" />
+    <ClInclude Include="include\gcl_cpp\container\linear_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\container\polymorphic_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\event.hpp" />
     <ClInclude Include="include\gcl_cpp\exception.hpp" />
@@ -152,12 +156,16 @@
     <ClInclude Include="include\gcl_cpp\IO.h" />
     <ClInclude Include="include\gcl_cpp\maths.h" />
     <ClInclude Include="include\gcl_cpp\ownership.hpp" />
+    <ClInclude Include="include\gcl_cpp\pattern\state_machine.hpp" />
+    <ClInclude Include="include\gcl_cpp\pattern\type_erasure.hpp" />
     <ClInclude Include="include\gcl_cpp\preprocessor.hpp" />
     <ClInclude Include="include\gcl_cpp\serialisation.hpp" />
     <ClInclude Include="include\gcl_cpp\task.hpp" />
     <ClInclude Include="include\gcl_cpp\template_meta_programming.hpp" />
     <ClInclude Include="include\gcl_cpp\test.hpp" />
     <ClInclude Include="include\gcl_cpp\TestUtils.h" />
+    <ClInclude Include="test\gcl_cpp\test\container.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\entity_vector.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\polymorphic_vector.hpp" />
     <ClInclude Include="test\gcl_cpp\test\event.hpp" />
     <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
