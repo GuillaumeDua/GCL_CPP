@@ -19,7 +19,7 @@ namespace gcl::functionnal
 				constexpr deduce_t() = default;
 				using return_type = return_t;
 				//static constexpr std::size_t args_size = sizeof...(args_t);
-				using arguments_type = types_holder<args_t...>;
+				using arguments_type = gcl::type_info::pack<args_t...>;
 			};
 			return deduce_t{};
 		}
