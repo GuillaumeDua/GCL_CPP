@@ -7,22 +7,25 @@ namespace gcl
 {
 	namespace functionnal
 	{
-		struct on_destroy_call : public std::function<void()>
+		namespace deprecated
 		{
-			explicit on_destroy_call(std::function<void()> && func)
+			struct on_destroy_call : public std::function<void()>
 			{
-				func.swap(*this);
-			}
-			on_destroy_call(const on_destroy_call & w)
-			{
-				const_cast<on_destroy_call &>(w).swap(*this);
-			}
-			~on_destroy_call()
-			{
-				if (*this)
-					(*this)();
-			}
-		};
+				explicit on_destroy_call(std::function<void()> && func)
+				{
+					func.swap(*this);
+				}
+				on_destroy_call(const on_destroy_call & w)
+				{
+					const_cast<on_destroy_call &>(w).swap(*this);
+				}
+				~on_destroy_call()
+				{
+					if (*this)
+						(*this)();
+				}
+			};
+		}
 	}
 }
 
