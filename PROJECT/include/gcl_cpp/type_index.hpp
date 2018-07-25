@@ -46,7 +46,7 @@ namespace gcl
 				{
 					static_assert(std::is_base_of<interface_t, T>::value, "gcl::type_index::interface_is<I>::of_types<...T>::element<T>");
 					element()
-						: basic_container_type::value_type{ pack_t::template indexOf<T>(), { std::ref(type_helper::get_default_constructor_t<T>::value) } }
+						: basic_container_type::value_type{ pack_t::template index_of<T>(), { std::ref(type_helper::get_default_constructor_t<T>::value) } }
 					{}
 				};
 
@@ -58,14 +58,14 @@ namespace gcl
 					{}
 
 					template <typename T>
-					static inline constexpr index_type indexOf(void)
+					static inline constexpr index_type index_of(void)
 					{
-						return pack_t::template indexOf<T>();
+						return pack_t::template index_of<T>();
 					}
 					template <typename T>
 					inline typename basic_container_type::mapped_type at(void) const
 					{
-						return basic_container_type::at(indexOf<T>());
+						return basic_container_type::at(index_of<T>());
 					}
 				} /*static index*/; // [TODO]::[FixMe] : How to duplicate pack expansion [?]
 				/*template <typename T_Interface>

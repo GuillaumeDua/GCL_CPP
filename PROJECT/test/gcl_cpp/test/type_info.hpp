@@ -23,8 +23,8 @@ namespace gcl
 
 					using my_pack_t = typename gcl::type_info::tuple<Toto, Titi, Tata, Tutu>;
 
-					GCL_TEST__EXPECT_VALUE(my_pack_t::indexOf<Tata>(), std::size_t{ 2 });
-					GCL_TEST__EXPECT_EXCEPTION(std::out_of_range, []() { my_pack_t::indexOf<NotInPack>(); });
+					GCL_TEST__EXPECT_VALUE(my_pack_t::index_of<Tata>(), std::size_t{ 2 });
+					GCL_TEST__EXPECT_EXCEPTION(std::out_of_range, []() { my_pack_t::index_of<NotInPack>(); });
 				}
 			};
 

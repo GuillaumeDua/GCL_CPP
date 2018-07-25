@@ -16,8 +16,6 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	struct tuple
 	{
-		GCL_PREPROCESSOR__NOT_INSTANTIABLE(tuple)
-
 		using types_t = std::tuple<Ts...>;
 
 		template <size_t N>
@@ -27,6 +25,11 @@ namespace gcl::type_info
 		static constexpr inline size_t index_of(void)
 		{
 			return index_of_impl<T, 0, Ts...>();
+		}
+
+		auto to_std()
+		{
+			return std::tuple<Ts...>{};
 		}
 
 	private:

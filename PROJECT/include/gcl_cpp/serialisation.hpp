@@ -61,7 +61,7 @@ namespace gcl
 						template <>
 						static constexpr inline void	write_impl<true>(std::ostream & os, const T & var)
 						{
-							T_IO_POlicy::write(os, type_pack_t::template indexOf<T>());
+							T_IO_POlicy::write(os, type_pack_t::template index_of<T>());
 							os << var; // WTF this is constexpr ?
 						}
 						template <>
@@ -92,7 +92,7 @@ namespace gcl
 					{
 						size_t typeIndex;
 						is >> typeIndex;
-						GCL_ASSERT(type_pack_t::template indexOf<T>() == typeIndex);
+						GCL_ASSERT(type_pack_t::template index_of<T>() == typeIndex);
 						is >> var;
 					}
 					static std::unique_ptr<_InterfaceType> read(std::istream & is)
@@ -254,8 +254,8 @@ namespace gcl
 				template <typename T>
 				static void							write(std::ostream & os, const T & var)
 				{
-					T_IOPolicy::write(os, T_TypeManager::pack_t::template indexOf<T>()); // throw out_of_range if T is not part of T_SerializableTypes
-					// T_IOPolicy::write(os, _typeIndex.indexOf<T>()); 
+					T_IOPolicy::write(os, T_TypeManager::pack_t::template index_of<T>()); // throw out_of_range if T is not part of T_SerializableTypes
+					// T_IOPolicy::write(os, _typeIndex.index_of<T>()); 
 					os << var;
 				}
 				static T_SerializableInterface *	read(std::istream & is)
