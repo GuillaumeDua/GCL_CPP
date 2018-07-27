@@ -87,8 +87,8 @@ template
 	class F1, class F2,
 	typename std::enable_if_t
 	<
-		std::is_invocable<F1>::value &&
-		std::is_invocable<F2>::value
+		std::is_invocable_v<F1> &&
+		std::is_invocable_v<F2>
 		, int
 	> = 0
 >
