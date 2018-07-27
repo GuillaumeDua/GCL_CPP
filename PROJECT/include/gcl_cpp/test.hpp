@@ -335,6 +335,11 @@ namespace gcl
 			{
 				component<subcomponent_t, deepth + 1>::test();
 			}
+			template <template <class...> class dependencies>
+			static void foreach_elem_do_test(dependencies<>)
+			{
+				// empty dependencies
+			}
 
 			template <bool has_proceed = type_traits::has_proceed<component_t>::value>
 			static void if_has_proceed_then_execute()
