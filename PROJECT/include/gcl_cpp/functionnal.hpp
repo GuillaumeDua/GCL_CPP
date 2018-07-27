@@ -31,10 +31,10 @@ namespace gcl::functionnal
 		using arguments_type = typename deducer::arguments_type;
 	};
 
-	template <typename T, typename = void>
-	struct is_callable : std::false_type {};
-	template <typename T>
-	struct is_callable<T, std::void_t<decltype(std::declval<T>().operator())>> : std::true_type {};
+	//template <typename T, typename = void>
+	//struct is_callable : std::false_type {};
+	//template <typename T>
+	//struct is_callable<T, std::void_t<decltype(std::declval<T>().operator())>> : std::true_type {}; // std::decay_t
 
 	template <typename ... Fs, typename ... args_t>
 	auto combine_impl(gcl::type_info::pack<args_t...>, Fs && ... funcs)
@@ -84,10 +84,16 @@ namespace gcl::functionnal
 
 template
 <
-	typename F1, typename F2,
-	typename = std::enable_if_t<gcl::functionnal::trait::is_callable<F1>::value && gcl::functionnal::trait::is_callable<F2>::value> = 0
+	class F1, class F2,
+	typename std::enable_if_t
+	<
+		std::is_invocable<F1>::value &&
+		std::is_invocable<F2>::value
+		, int
+	> = 0
 >
-auto operator+(F1 && f1, F2 && f2)
+static auto operator+(F1 && f1, F2 && f2)
 {
-	return gcl::func::combine(std::forward<F1>(f1), std::forward<F2>(f2));
+	return gcl::functionnal::combine(std::forward<F1>(f1), std::forward<F2>(f2));
 }
+

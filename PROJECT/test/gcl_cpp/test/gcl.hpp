@@ -5,6 +5,7 @@
 #include <gcl_cpp/test/type_info.hpp>
 #include <gcl_cpp/test/type_index.hpp>
 #include <gcl_cpp/test/container.hpp>
+#include <gcl_cpp/test/functionnal.hpp>
 
 #include <gcl_cpp/test.hpp>
 
@@ -20,7 +21,8 @@ namespace gcl
 				::gcl::test::event,
 				::gcl::test::type_info,
 				::gcl::test::type_index,
-				::gcl::test::container
+				::gcl::test::container,
+				::gcl::test::functionnal
 			>::test();
 		}
 	}
