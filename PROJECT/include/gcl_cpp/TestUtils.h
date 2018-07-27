@@ -43,12 +43,13 @@ namespace gcl
 					static volatile bool	_isActive;
 					static void								OnPropertyChanged(value_type & property)
 					{
-						std::async(std::launch::async, [&property]()
+						auto f = std::async(std::launch::async, [&property]()
 						{
 							std::lock_guard<std::mutex> lock(_obs_mutex);
 							for (auto & obs : _observers)
 								obs->NotifyPropertyChanged(property);
 						});
+						f.wait();
 					}
 
 				public:
