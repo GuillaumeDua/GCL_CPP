@@ -43,7 +43,7 @@ namespace gcl
 						std::cerr << "[Warning] : Attempt to register an existing element" << std::endl;
 
 					// Note : elem is **(ret.first)
-					elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::on_destroy_call([this, &elem]()
+					elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::finally([this, &elem]()
 					{
 						this->remove(elem);
 					})));
@@ -88,7 +88,7 @@ namespace gcl
 						{
 							gcl::old::events::EventHandler<> eventHandler;
 							{
-								eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::on_destroy_call([&was_cb_called]() { was_cb_called = true; })));
+								eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::finally([&was_cb_called]() { was_cb_called = true; })));
 							}
 							if (was_cb_called)
 								return false;

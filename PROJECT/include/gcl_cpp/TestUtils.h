@@ -125,7 +125,7 @@ namespace gcl
 														gcl::experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && gcl::experimental::test_utils::Inline::RT_scope_controler::Get<true>(key);	\
 														if (hook_active)																																															\
 														{																																																			\
-															gcl::functionnal::deprecated::on_destroy_call onDestroyExecute([](){ gcl::experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
+															gcl::functionnal::deprecated::finally onDestroyExecute([](){ gcl::experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
 															expr																																																	\
 														}																																																			\
 													}
