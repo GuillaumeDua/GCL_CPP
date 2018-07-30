@@ -18,7 +18,6 @@ namespace gcl::functionnal
 			{
 				constexpr deduce_t() = default;
 				using return_type = return_t;
-				//static constexpr std::size_t args_size = sizeof...(args_t);
 				using arguments_type = gcl::type_info::pack<args_t...>;
 			};
 			return deduce_t{};
@@ -56,6 +55,8 @@ namespace gcl::functionnal
 		using type = typename std::tuple_element<0, std::tuple<Fs...>>::type;
 		using trait = trait<type>;
 
+		// todo : static_assert(is_all<...>, "failed to combine heterogenous functions types");
+
 		return combine_impl(typename trait::arguments_type{}, std::forward<Fs>(funcs)...);
 	}
 	template <>
@@ -63,17 +64,17 @@ namespace gcl::functionnal
 
 	namespace deprecated
 	{
-		struct on_destroy_call : public std::function<void()>
+		struct finally : public std::function<void()>
 		{
-			explicit on_destroy_call(std::function<void()> && func)
+			explicit finally(std::function<void()> && func)
 			{
 				func.swap(*this);
 			}
-			on_destroy_call(const on_destroy_call & w)
+			finally(const finally & w)
 			{
-				const_cast<on_destroy_call &>(w).swap(*this);
+				const_cast<finally &>(w).swap(*this);
 			}
-			~on_destroy_call()
+			~finally()
 			{
 				if (*this)
 					(*this)();
