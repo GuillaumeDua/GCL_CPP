@@ -16,10 +16,10 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	struct tuple
 	{
-		using types_t = std::tuple<Ts...>;
+		using tuple_type = std::tuple<Ts...>;
 
 		template <size_t N>
-		using type_at = typename std::tuple_element<N, types_t>::type;
+		using type_at = typename std::tuple_element<N, tuple_type>::type;
 
 		template <typename T>
 		static constexpr inline size_t index_of(void)
@@ -27,9 +27,11 @@ namespace gcl::type_info
 			return index_of_impl<T, 0, Ts...>();
 		}
 
+		constexpr inline static std::size_t size = sizeof...(Ts);
+
 		auto to_std()
 		{
-			return std::tuple<Ts...>{};
+			return tuple_type{};
 		}
 
 	private:
