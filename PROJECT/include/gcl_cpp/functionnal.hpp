@@ -36,7 +36,7 @@ namespace gcl::functionnal
 	//struct is_callable<T, std::void_t<decltype(std::declval<T>().operator())>> : std::true_type {}; // std::decay_t
 
 	template <typename ... Fs, typename ... args_t>
-	auto combine_impl(gcl::type_info::pack<args_t...>, Fs && ... funcs)
+	auto combine_homogeneous_impl(gcl::type_info::pack<args_t...>, Fs && ... funcs)
 	{
 		if constexpr (sizeof...(args_t) == 0)
 			return [=]()
@@ -50,17 +50,34 @@ namespace gcl::functionnal
 		};
 	}
 	template <typename ... Fs>
-	auto combine(Fs && ... funcs)
+	auto combine_homogeneous(Fs && ... funcs)
 	{
 		using type = typename std::tuple_element<0, std::tuple<Fs...>>::type;
 		using trait = trait<type>;
 
 		// todo : static_assert(is_all<...>, "failed to combine heterogenous functions types");
+		//        or constexpr if that call combine_heterogeneous
 
-		return combine_impl(typename trait::arguments_type{}, std::forward<Fs>(funcs)...);
+		return combine_homogeneous_impl(typename trait::arguments_type{}, std::forward<Fs>(funcs)...);
 	}
 	template <>
-	auto combine() { return []() {}; }
+	auto combine_homogeneous() { return []() {}; }
+
+	template <typename ... Fs>
+	auto combine_heterogeneous(Fs ... funcs)
+	{
+		struct adapter : std::decay_t<Fs>...
+		{
+			adapter(std::decay_t<Fs> ... values)
+				: std::decay_t<Fs>(std::move(values))...
+			{}
+
+			using Fs::operator()...;
+		};
+		return adapter{ std::forward<Fs>(funcs)... };
+	}
+
+	// todo : combine(Fs ... funcs)
 
 	namespace deprecated
 	{
@@ -95,6 +112,6 @@ template
 >
 static auto operator+(F1 && f1, F2 && f2)
 {
-	return gcl::functionnal::combine(std::forward<F1>(f1), std::forward<F2>(f2));
+	return gcl::functionnal::combine_homogeneous(std::forward<F1>(f1), std::forward<F2>(f2));
 }
 
