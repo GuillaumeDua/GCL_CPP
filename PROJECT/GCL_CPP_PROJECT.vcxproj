@@ -142,6 +142,7 @@
     <ClInclude Include="include\gcl_cpp\Container.h" />
     <ClInclude Include="include\gcl_cpp\container\entity_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\container\linear_vector.hpp" />
+    <ClInclude Include="include\gcl_cpp\container\polymorphic_reference.hpp" />
     <ClInclude Include="include\gcl_cpp\container\polymorphic_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\event.hpp" />
     <ClInclude Include="include\gcl_cpp\exception.hpp" />
@@ -166,8 +167,10 @@
     <ClInclude Include="include\gcl_cpp\TestUtils.h" />
     <ClInclude Include="test\gcl_cpp\test\container.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\entity_vector.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\polymorphic_reference.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\polymorphic_vector.hpp" />
     <ClInclude Include="test\gcl_cpp\test\event.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\functionnal.hpp" />
     <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
     <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
     <ClInclude Include="include\gcl_cpp\thread.hpp" />
