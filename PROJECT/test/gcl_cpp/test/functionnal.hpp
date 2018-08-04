@@ -19,7 +19,7 @@ namespace gcl::test
 			}
 		};
 
-		struct combine
+		struct combine_homogeneous
 		{
 			static void proceed()
 			{
@@ -37,7 +37,7 @@ namespace gcl::test
 					}
 				} toto_instance;
 
-				auto ret = gcl::functionnal::combine
+				auto ret = gcl::functionnal::combine_homogeneous
 				(
 					func_t{ [](std::string & str) { str += "a"; } },
 					func_t{ [](std::string & str) { str += "b"; } },
@@ -49,7 +49,7 @@ namespace gcl::test
 
 				GCL_TEST__EXPECT_VALUE(str, "abcd");
 
-				auto empty_func = gcl::functionnal::combine();
+				auto empty_func = gcl::functionnal::combine_homogeneous();
 			}
 		};
 
@@ -63,6 +63,6 @@ namespace gcl::test
 			}
 		};
 
-		using dependencies_t = gcl::type_info::pack<trait, combine>;
+		using dependencies_t = gcl::type_info::pack<trait, combine_homogeneous>;
 	};
 }
