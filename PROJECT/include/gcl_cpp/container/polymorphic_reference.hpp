@@ -7,9 +7,17 @@ namespace gcl::container
 {
 	struct polymorphic_reference
 	{	// basically, a mix between a std::reference_wrapper and std::any
-		// do not store nor extend life-time of value;
+		// No ressource acquisition,
+		// thus it does not store nor extend life-time of value;
 
-		template <typename T>
+		polymorphic_reference(const polymorphic_reference &) = default;
+		polymorphic_reference(polymorphic_reference &&) = default;
+
+		template
+		<
+			typename T,
+			typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<polymorphic_reference>>>
+		>
 		explicit polymorphic_reference(T & value) noexcept
 			: value{ std::addressof(value) }
 			, index{ typeid(T) }
@@ -29,13 +37,24 @@ namespace gcl::container
 			return static_cast<T&>(*this);
 		}
 
-		template <typename T>
+		polymorphic_reference& operator=(const polymorphic_reference&) = default;
+		polymorphic_reference& operator=(polymorphic_reference&&) = default;
+
+		template
+		<
+			typename T,
+			typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<polymorphic_reference>>>
+		>
 		polymorphic_reference & operator=(const T & new_value)
 		{
 			static_cast<T&>(*this) = new_value;
 			return *this;
 		}
-		template <typename T>
+		template
+		<
+			typename T,
+			typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<polymorphic_reference>>>
+		>
 		polymorphic_reference & operator=(T && new_value)
 		{
 			static_cast<T&>(*this) = std::forward<T>(new_value);
