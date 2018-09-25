@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <vector>
+
 namespace gcl::container
 {
 	template <typename element_type, typename ... Ts>
