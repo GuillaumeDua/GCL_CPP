@@ -53,16 +53,59 @@ namespace gcl::test
 			}
 		};
 
+		struct combine_heterogeneous
+		{
+			static void proceed()
+			{
+				struct parameter_type_1 {};
+				struct parameter_type_2 {};
+
+				struct type_1 { int operator()(parameter_type_1) { return 1; } };
+				struct type_2 { int operator()(parameter_type_2) { return 2; } };
+
+				auto merged = gcl::functionnal::combine_heterogeneous(type_1{}, type_2{});
+
+				GCL_TEST__EXPECT_VALUE(merged(parameter_type_1{}), 1);
+				GCL_TEST__EXPECT_VALUE(merged(parameter_type_2{}), 2);
+			}
+		};
+
+		struct combine_heterogeneous_t
+		{
+			static void proceed()
+			{
+				struct parameter_type_1 {};
+				struct parameter_type_2 {};
+
+				struct type_1 { int operator()(parameter_type_1) { return 1; } };
+				struct type_2 { int operator()(parameter_type_2) { return 2; } };
+
+				using merged_type = gcl::functionnal::combine_heterogeneous_t
+				<
+					type_1,
+					type_2
+				>;
+				GCL_TEST__EXPECT_VALUE(merged_type{}(parameter_type_1{}), 1);
+				GCL_TEST__EXPECT_VALUE(merged_type{}(parameter_type_2{}), 2);
+			}
+		};
+
 		struct callable_operator_plus
 		{
 			static void proceed()
 			{
 				int i = 0;
-				auto merged_lambdas = std::function{ [&i]() { ++i; } } +std::function{ [&i]() { ++i; } };
+				auto merged_lambdas = std::function{ [&i]() { ++i; } } + std::function{ [&i]() { ++i; } };
 				GCL_TEST__EXPECT_VALUE(i, 2);
 			}
 		};
 
-		using dependencies_t = gcl::type_info::pack<trait, combine_homogeneous>;
+		using dependencies_t = gcl::type_info::pack
+		<
+			trait,
+			combine_homogeneous,
+			combine_heterogeneous,
+			combine_heterogeneous_t
+		>;
 	};
 }

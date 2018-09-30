@@ -57,6 +57,7 @@ namespace gcl::functionnal
 
 		// todo : static_assert(is_all<...>, "failed to combine heterogenous functions types");
 		//        or constexpr if that call combine_heterogeneous
+		// std::conjunction_v
 
 		return combine_homogeneous_impl(typename trait::arguments_type{}, std::forward<Fs>(funcs)...);
 	}
@@ -78,6 +79,12 @@ namespace gcl::functionnal
 	}
 
 	// todo : combine(Fs ... funcs)
+	// -> if duplicate signatures, then merge them using combine_homogeneous / operator+
+	//    e.g [](int){ 1; } + [](int){ 2; } + [](int){ 3; } => [](int){ 1; 2; 3; }
+	// -> then, merge all types heterogeneously combine_heterogeneous / combine_heterogeneous_t
+
+	template<class... Ts> struct combine_heterogeneous_t : Ts... { using Ts::operator()...; };
+	template<class... Ts> combine_heterogeneous_t (Ts...) -> combine_heterogeneous_t<Ts...>;
 
 	namespace deprecated
 	{
