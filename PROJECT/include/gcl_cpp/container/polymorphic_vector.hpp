@@ -13,7 +13,9 @@ namespace gcl
 	{
 		template <typename interface_t>
 		struct polymorphic_vector
-		{
+		{	// vector with type abstraction, and type operations
+			// e.g for (auto && elem : polymorphic_vector<interface_t>::get<impl_1>())
+
 			using value_type = interface_t;
 			using value_holder_t = gcl::type_info::holder<value_type>;
 			using element_t = std::unique_ptr<value_type>;
