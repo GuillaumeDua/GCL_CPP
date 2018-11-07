@@ -10,7 +10,7 @@ namespace gcl
 	{
 		struct container
 		{
-			using polymorphic_vector = gcl::test::container_partial_impl::polymorphic_vector;
+			using polymorphic_vector = gcl::test::polymorphic_vector;
 			using entity_vector = gcl::test::container_partial_impl::entity_vector;
 			using polymorphic_reference = gcl::test::container_partial_impl::polymorphic_reference;
 

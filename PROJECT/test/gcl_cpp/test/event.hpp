@@ -73,7 +73,7 @@ namespace gcl
 					handler->on(gcl::type_info::id<B_event>::value, *ev);
 					GCL_TEST__EXPECT(B_event::counter == 1, "gcl::test::event::handler : bad B_event::counter value");
 
-					gcl::type_info::holder<gcl_event_t::interface_t> event_value_holder(new C_event());
+					gcl::type_info::deprecated::holder<gcl_event_t::interface_t> event_value_holder(new C_event());
 					GCL_TEST__EXPECT(C_event::counter == 0, "gcl::test::event::handler : bad C_event::counter value");
 					handler->on(event_value_holder);
 					GCL_TEST__EXPECT(C_event::counter == 1, "gcl::test::event::handler : bad C_event::counter value");

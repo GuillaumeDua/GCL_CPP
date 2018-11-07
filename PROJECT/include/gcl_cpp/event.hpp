@@ -29,7 +29,7 @@ namespace gcl
 
 		struct handler
 		{
-			using typeinfo_holder_t = gcl::type_info::holder<interface_t>;
+			using typeinfo_holder_t = gcl::type_info::deprecated::holder<interface_t>;
 			using event_callback_t = std::function<void(const interface_t &)>;
 
 			handler() = default;
@@ -268,7 +268,7 @@ namespace gcl
 		struct dispatcher
 		{	// subject
 			using handler_t = handler;
-			using holder_event_t = gcl::type_info::holder<interface_t>;
+			using holder_event_t = gcl::type_info::deprecated::holder<interface_t>;
 
 			template <typename event_t>
 			void subscribe(const std::shared_ptr<handler_t> & handler)
@@ -308,7 +308,7 @@ namespace gcl
 
 		struct system
 		{
-			using event_holder_t = gcl::type_info::holder<interface_t>;
+			using event_holder_t = gcl::type_info::deprecated::holder<interface_t>;
 
 			template <typename event_t>
 			void process(const event_t & ev)
@@ -324,7 +324,7 @@ namespace gcl
 				event_ptr_t tmp = const_cast<event_ptr_t>(&ev);
 				process(event_holder_t(event_id, event_unique_ptr_t(std::move(tmp))));
 			}
-			void process(const gcl::type_info::holder<interface_t> & holder)
+			void process(const gcl::type_info::deprecated::holder<interface_t> & holder)
 			{
 				route.drive_sync(holder);
 				dispatcher.dispatch(holder);

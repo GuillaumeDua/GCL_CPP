@@ -17,8 +17,9 @@ namespace gcl
 	namespace container
 	{
 		template <typename T>
-		struct entity_vector : private polymorphic_vector<T>
+		struct entity_vector : public deprecated::polymorphic_vector<T>
 		{
+			using value_type = T;
 			using base_t = polymorphic_vector<T>;
 
 			using base_t::get;
@@ -72,62 +73,4 @@ namespace gcl
 			}
 		};
 	}
-}
-
-namespace entity_properties
-{
-	struct collision {};
-	struct control {};
-	struct garbage {};
-}
-using namespace entity_properties;
-
-struct entity {};
-struct entity_A : entity {};
-struct entity_B : entity
-{
-	using properties_t = std::tuple<collision, control, garbage>;
-};
-struct entity_C : entity
-{
-	using properties_t = std::tuple<control>;
-};
-struct entity_D : entity
-{
-	using properties_t = std::tuple<collision>;
-};
-
-#include <iostream>
-#include <iomanip>
-
-void test_entity_vector()
-{
-	using entity_container_t = gcl::container::entity_vector<entity>;
-
-	try
-	{
-		entity_container_t container;
-		container.push_back(std::make_unique<entity_A>());	// no property
-		container.push_back(std::make_unique<entity_A>());	// no property
-		container.push_back(std::make_unique<entity_B>());	// collision, control, garbage
-		container.push_back(std::make_unique<entity_C>());	// control
-		container.push_back(std::make_unique<entity_D>());	// collision
-
-		std::cout << "entity_A :\n";
-		for (const auto & entity : container.get<entity_A>())
-		{
-			std::cout << '\t' << entity << std::endl;
-		}
-
-		std::cout << "entity_properties::collision :\n";
-		for (const auto & entity : container.get<entity_properties::collision>())
-		{
-			std::cout << '\t' << entity << std::endl;
-		}
-	}
-	catch (const std::exception & ex)
-	{
-		std::cerr << "exception : " << ex.what() << std::endl;
-	}
-	std::cout << std::endl;
 }

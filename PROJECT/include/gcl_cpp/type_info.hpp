@@ -11,7 +11,7 @@
 
 namespace gcl::type_info
 {
-	using id_type = uint32_t;
+	using id_type = uint64_t;
 
 	template <typename ... Ts>
 	struct tuple
@@ -65,6 +65,82 @@ namespace gcl::type_info
 	template<typename... T>
 	static constexpr std::array<id_type, sizeof...(T)> make_ids_array() { return { id<T>::value... }; }
 
+	namespace experimental
+	{
+		template <typename T>
+		constexpr std::string_view type_name(/*no parameters allowed*/)
+		{
+#ifdef _MSC_VER
+			std::string_view str_view = __FUNCSIG__;
+
+			str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
+			str_view.remove_suffix(str_view.length() - str_view.rfind('>'));
+#elif defined (__GNUC__)
+			std::string_view str_view = __PRETTY_FUNCTION__;
+
+			str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
+			const char prefix[] = " [with T = ";
+			str_view.remove_prefix(str_view.find(prefix) + sizeof(prefix) - 1);
+			str_view.remove_suffix(str_view.length() - str_view.find(';'));
+#else
+			static_assert(false, "not supported compiler");
+#endif
+			return str_view;
+		}
+
+		struct holder final
+		{	// hold a value anonymously
+			// /!\ cost much more than std::any
+			struct interface_t
+			{	// as interface, for safe y-shaped inheritance tree (type erasure)
+				interface_t() = default;
+				interface_t(const interface_t &) = delete;
+				interface_t(interface_t &&) = delete;
+				virtual ~interface_t() = default;
+			};
+			using value_type = std::unique_ptr<interface_t>;
+			template <typename T>
+			struct type_eraser : interface_t, std::decay_t<T>
+			{
+				using target_type = std::decay_t<T>;
+
+				type_eraser(target_type && value)
+					: target_type{ std::forward<target_type>(value) }
+				{}
+			};
+
+			holder() = delete;
+			holder(holder &) = delete;
+			holder(holder &&) = default;
+
+			template <typename concret_t>
+			holder(concret_t && elem)
+				: value(std::unique_ptr<interface_t>(new type_eraser<concret_t>{ std::forward<concret_t>(elem) }))
+				, id(type_info::id<concret_t>::value)
+			{}
+
+			template <typename T>
+			T & cast() const
+			{
+				using target_type = std::decay_t<T>;
+
+				if (id != gcl::type_info::id<target_type>::value)
+					throw std::bad_cast();
+
+				auto * as_type_eraser_ptr = static_cast<type_eraser<target_type&>*>(value.get());
+				return static_cast<target_type&>(*as_type_eraser_ptr);
+			}
+
+			const gcl::type_info::id_type id;
+			const value_type value;
+		};
+	}
+}
+
+#include <memory>
+
+namespace gcl::type_info::deprecated
+{	//	C++11
 	template <typename interface_t>
 	struct holder final
 	{
@@ -108,27 +184,6 @@ namespace gcl::type_info
 
 	namespace experimental
 	{
-		template <typename T>
-		constexpr std::string_view type_name(/*no parameters allowed*/)
-		{
-#ifdef _MSC_VER
-			std::string_view str_view = __FUNCSIG__;
-
-			str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
-			str_view.remove_suffix(str_view.length() - str_view.rfind('>'));
-#elif defined (__GNUC__)
-			std::string_view str_view = __PRETTY_FUNCTION__;
-
-			str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
-			const char prefix[] = " [with T = ";
-			str_view.remove_prefix(str_view.find(prefix) + sizeof(prefix) - 1);
-			str_view.remove_suffix(str_view.length() - str_view.find(';'));
-#else
-			static_assert(false, "not supported compiler");
-#endif
-			return str_view;
-		}
-
 		struct any
 		{
 			any(const any &) = delete;
