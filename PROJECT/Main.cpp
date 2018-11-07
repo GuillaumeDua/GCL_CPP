@@ -8,7 +8,7 @@
 # include <gcl_cpp/mp.hpp>
 # include <gcl_cpp/serialisation.hpp>
 # include <gcl_cpp/pattern.hpp>
-# include <gcl_cpp/TestUtils.h>
+# include <gcl_cpp/TestUtils.h>	// todo : refactoring
 
 //
 // Link symbols :
@@ -18,7 +18,7 @@ namespace gcl
 	namespace experimental
 	{
 		namespace test_utils
-		{
+		{	// todo : refactoring
 			std::mutex									Inline::RT_scope_controler::_container_mutex;
 			std::mutex									Inline::RT_scope_controler::_obs_mutex;
 			volatile bool								Inline::RT_scope_controler::_isActive;
@@ -41,28 +41,8 @@ namespace gcl
 
 # include <gcl_cpp/test/gcl.hpp>
 
-
 auto	main(int, char const * []) -> int
 {
-	//Tool::Test::TestMultipleComponents
-	//<
-	//	gcl::serialization::Test
-	//	, gcl::experimental::type_index::Test
-	//	, gcl::mp::Test
-	//	, gcl::type_index::Test
-	//	, gcl::Introspection::Test
-	//	
-	//	//, gcl::task::Test
-	//	//, gcl::Events::Test
-	//	//, gcl::Container::Test
-	//	//, gcl::ownership::Test
-
-	//	, gcl::experimental::type_index::Test
-	//	// gcl::experimental::Puzzle::Test
-	//	// , gcl::Color::Test // FIXME
-	//	, gcl::experimental::pattern::Test
-	//	, gcl::experimental::test_utils::Inline::Test
-	//>();
 	gcl::test::proceed();
 
 	// todo : is_constexpr trait
