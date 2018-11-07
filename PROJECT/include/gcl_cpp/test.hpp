@@ -227,7 +227,7 @@ namespace gcl
 					}
 					label = (label.length() > msg_width_v ? label.substr(0, msg_width_v - 4) + "..." : label) + " ";
 
-					if (label != last_label)
+					if (last_label != typeid(T).name()) // not label != last_label to avoid names collisions. ex : foo::bar and foo::deprecated::bar
 						std::cout
 						<< std::left
 						<< std::setw(preindent_width_v) << "" << (preindent_w == 0 ? "[+]" : " |-") << ' '
@@ -240,7 +240,7 @@ namespace gcl
 						<< std::setfill('-') << std::setw(msg_width_v) << "" << "   "
 						<< std::setfill(' ')
 						;
-					last_label = label;
+					last_label = typeid(T).name();
 
 					std::cout
 						<< value
