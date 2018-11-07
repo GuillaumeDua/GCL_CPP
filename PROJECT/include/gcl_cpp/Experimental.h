@@ -64,7 +64,7 @@ namespace gcl
 			{
 				enum { value = _I };
 
-				static int _uniqueId;
+				static uint64_t _uniqueId;
 
 				using _Configuration = T_Configuration;
 
@@ -92,7 +92,7 @@ namespace gcl
 				};
 			};
 			template <int _I, typename T_Configuration = _TypeIdListConfiguration>
-			int TypeIdList<_I, T_Configuration>::_uniqueId = TypeIdList<_I, T_Configuration>::_Configuration::_NoValue;
+			uint64_t TypeIdList<_I, T_Configuration>::_uniqueId = TypeIdList<_I, T_Configuration>::_Configuration::_NoValue;
 
 			template <typename T, typename T_TypeId_List = TypeIdList<0> >
 			struct RegisterType
