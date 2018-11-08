@@ -4,7 +4,7 @@
 # include <gcl_cpp/type_index.hpp>
 # include <gcl_cpp/IO.h>
 # include <gcl_cpp/mp.hpp>
-# include <gcl_cpp/static_introspection.hpp>
+# include <gcl_cpp/introspection.hpp>
 # include <gcl_cpp/type_info.hpp>
 
 # include <sstream>
@@ -12,7 +12,7 @@
 # include <queue>
 # include <memory>
 
-GCL_Introspection__GenHasNested(NotSerializable);
+GCL_Introspection_Generate__has_nested(not_serializable);
 
 namespace gcl
 {
@@ -54,7 +54,7 @@ namespace gcl
 					template <typename T>
 					struct writer_impl
 					{
-						static constexpr bool isSerializable = !gcl::Introspection::has_NotSerializable_nested<T>::value;
+						static constexpr bool isSerializable = !gcl::introspection::generated::has_nested_type::not_serializable<T>::value;
 
 						template <bool _isSerializable = isSerializable>
 						static constexpr inline void	write_impl(std::ostream & os, const T & var);

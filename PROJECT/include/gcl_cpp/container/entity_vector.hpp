@@ -3,21 +3,20 @@
 // stand-alone POC : https://godbolt.org/g/2VHRHE
 
 #include <gcl_cpp/container/polymorphic_vector.hpp>
+#include <gcl_cpp/introspection.hpp>
+
+GCL_Introspection_Generate__has_nested(properties_t)
 
 namespace gcl
 {
-	struct entity_helper
+	namespace container
 	{
-		template< class, class = std::void_t<> >
-		struct has_properties : std::false_type { };
-		template< class T >
-		struct has_properties<T, std::void_t<typename T::properties_t>> : std::true_type { };
-	};
 
-	namespace container::deprecated
+	}
+	namespace deprecated::container
 	{
 		template <typename T>
-		struct entity_vector : public deprecated::polymorphic_vector<T>
+		struct entity_vector : public polymorphic_vector<T>
 		{
 			using value_type = T;
 			using base_t = polymorphic_vector<T>;
@@ -29,7 +28,7 @@ namespace gcl
 			template
 			<
 				typename entity_t,
-				typename std::enable_if_t<entity_helper::has_properties<entity_t>::value>* = nullptr
+				typename std::enable_if_t<gcl::introspection::generated::has_nested_type::properties_t<entity_t>::value>* = nullptr
 			>
 			void push_back(std::unique_ptr<entity_t> && value)
 			{
@@ -40,7 +39,7 @@ namespace gcl
 			template
 			<
 				typename entity_t,
-				typename std::enable_if_t<!entity_helper::has_properties<entity_t>::value>* = nullptr
+				typename std::enable_if_t<!gcl::introspection::generated::has_nested_type::properties_t<entity_t>::value>* = nullptr
 			>
 			void push_back(std::unique_ptr<entity_t> && value)
 			{
@@ -69,7 +68,7 @@ namespace gcl
 			template <typename property_t>
 			void push_back_property(value_type * value)
 			{
-				content_sorted_accessor[gcl::type_info::deprecated::id<property_t>::value].push_back(value);
+				content_sorted_accessor[gcl::deprecated::type_info::id<property_t>::value].push_back(value);
 			}
 		};
 	}

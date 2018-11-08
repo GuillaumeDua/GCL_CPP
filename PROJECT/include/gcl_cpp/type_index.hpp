@@ -1,7 +1,7 @@
 #ifndef GCL_TYPE_INDEX_HPP__
 # define GCL_TYPE_INDEX_HPP__
 
-# include <gcl_cpp/static_introspection.hpp> // append to current file
+# include <gcl_cpp/introspection.hpp> // append to current file
 # include <gcl_cpp/preprocessor.hpp>
 # include <gcl_cpp/type_info.hpp>
 

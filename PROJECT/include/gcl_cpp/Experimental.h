@@ -56,7 +56,7 @@ namespace gcl
 
 				struct _TypeIdListConfiguration
 				{
-					static inline const gcl::type_info::deprecated::id_type _NoValue = gcl::type_info::deprecated::id<void>::value;
+					static inline const gcl::deprecated::type_info::id_type _NoValue = gcl::deprecated::type_info::id<void>::value;
 					static const int _MaxIteration = 100;
 				};
 
@@ -66,7 +66,7 @@ namespace gcl
 				{
 					enum { value = _I };
 
-					static gcl::type_info::deprecated::id_type _uniqueId;
+					static gcl::deprecated::type_info::id_type _uniqueId;
 
 					using _Configuration = T_Configuration;
 
@@ -94,7 +94,7 @@ namespace gcl
 					};
 				};
 				template <int _I, typename T_Configuration = _TypeIdListConfiguration>
-				gcl::type_info::deprecated::id_type TypeIdList<_I, T_Configuration>::_uniqueId = TypeIdList<_I, T_Configuration>::_Configuration::_NoValue;
+				gcl::deprecated::type_info::id_type TypeIdList<_I, T_Configuration>::_uniqueId = TypeIdList<_I, T_Configuration>::_Configuration::_NoValue;
 
 				template <typename T, typename T_TypeId_List = TypeIdList<0> >
 				struct RegisterType
@@ -106,7 +106,7 @@ namespace gcl
 							RegisterType<T, T_TypeId_List::_Next>::Do < (T_TypeId_List::value < T_TypeId_List::_Configuration::_MaxIteration - 1)>();
 						else
 						{
-							T_TypeId_List::_uniqueId = gcl::type_info::deprecated::id<T>::value;
+							T_TypeId_List::_uniqueId = gcl::deprecated::type_info::id<T>::value;
 						}
 					}
 					template <>
@@ -136,9 +136,9 @@ namespace gcl
 						TypeIdList<0>::Visit<TestTypeListVisitor_Dump>::Do();
 
 						return
-							gcl::type_info::deprecated::id<A>::value == gcl::type_info::deprecated::id<A>::value
-							&& gcl::type_info::deprecated::id<B>::value == gcl::type_info::deprecated::id<B>::value
-							&& gcl::type_info::deprecated::id<A>::value != gcl::type_info::deprecated::id<B>::value
+							gcl::deprecated::type_info::id<A>::value == gcl::deprecated::type_info::id<A>::value
+							&& gcl::deprecated::type_info::id<B>::value == gcl::deprecated::type_info::id<B>::value
+							&& gcl::deprecated::type_info::id<A>::value != gcl::deprecated::type_info::id<B>::value
 							;
 					}
 				};

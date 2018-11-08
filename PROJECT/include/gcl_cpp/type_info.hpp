@@ -140,7 +140,7 @@ inline std::ostream & operator<<(std::ostream & os, const std::type_index & inde
 
 #include <memory>
 
-namespace gcl::type_info::deprecated
+namespace gcl::deprecated::type_info
 {	//	C++11
 #if (defined _DEBUG && defined GCL_UNSAFE_CODE)
 	using id_type = uint64_t;
@@ -155,8 +155,8 @@ namespace gcl::type_info::deprecated
 
 #pragma warning (disable : 4311 4302)
 	template <typename T>
-	const gcl::type_info::deprecated::id_type gcl::type_info::deprecated::id<T>::value
-		= reinterpret_cast<gcl::type_info::deprecated::id_type>(&(gcl::type_info::deprecated::id<T>::value));
+	const gcl::deprecated::type_info::id_type gcl::deprecated::type_info::id<T>::value
+		= reinterpret_cast<gcl::deprecated::type_info::id_type>(&(gcl::deprecated::type_info::id<T>::value));
 #pragma warning (default : 4311 4302)
 #else
 	using id_type = std::type_index;
@@ -185,14 +185,14 @@ namespace gcl::type_info::deprecated
 		template <typename concret_t>
 		explicit holder(std::unique_ptr<concret_t> && ptr)
 			: value(std::forward<std::unique_ptr<concret_t>>(ptr))
-			, id(type_info::deprecated::id<concret_t>::value)
+			, id(gcl::deprecated::type_info::id<concret_t>::value)
 		{
 			check_<concret_t>();
 		}
 		template <typename concret_t>
 		explicit holder(concret_t * ptr)
 			: value(std::move(ptr))
-			, id(type_info::deprecated::id<concret_t>::value)
+			, id(gcl::deprecated::type_info::id<concret_t>::value)
 		{
 			check_<concret_t>();
 		}
@@ -217,7 +217,7 @@ namespace gcl::type_info::deprecated
 			any(const any &&) = delete;
 			virtual inline ~any() = 0 {}
 
-			virtual inline const type_info::deprecated::id_type id() const = 0;
+			virtual inline const gcl::deprecated::type_info::id_type id() const = 0;
 
 			inline bool operator==(const any & other)
 			{
@@ -247,9 +247,9 @@ namespace gcl::type_info::deprecated
 				return static_cast<T&>(*this);
 			}
 
-			inline const type_info::deprecated::id_type id() const override
+			inline const gcl::deprecated::type_info::id_type id() const override
 			{
-				return gcl::type_info::deprecated::id<T>::value;
+				return gcl::deprecated::type_info::id<T>::value;
 			}
 			inline const bool compare_impl(const any & other) const override
 			{

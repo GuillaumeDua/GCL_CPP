@@ -42,7 +42,7 @@ namespace gcl::test::deprecated::container_impl
 
 		static void proceed()
 		{
-			using entity_container_t = gcl::container::deprecated::entity_vector<entity>;
+			using entity_container_t = gcl::deprecated::container::entity_vector<entity>;
 			entity_container_t container;
 
 			container.push_back(std::make_unique<entity_A>());	// no property

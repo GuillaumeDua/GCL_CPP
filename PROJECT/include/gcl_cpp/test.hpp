@@ -30,7 +30,7 @@ namespace gcl
 		template <typename T> std::string to_string(const T & var)
 		{
 			std::ostringstream oss;
-			oss << var;
+			oss << std::boolalpha << var;
 			return oss.str();
 		}
 		template <> std::string to_string<std::ostringstream>(const std::ostringstream & var)

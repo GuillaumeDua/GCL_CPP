@@ -169,8 +169,8 @@ namespace gcl::test::deprecated::container_impl
 		static void proceed()
 		{
 
-			gcl::container::deprecated::polymorphic_vector<A> container;
-			using container_elem_t = gcl::container::deprecated::polymorphic_vector<A>::element_t;
+			gcl::deprecated::container::polymorphic_vector<A> container;
+			using container_elem_t = gcl::deprecated::container::polymorphic_vector<A>::element_t;
 
 			container.emplace_back<B>(1);
 			container.emplace_back<C>("one");

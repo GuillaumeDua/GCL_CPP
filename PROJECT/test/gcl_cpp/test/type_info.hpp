@@ -114,8 +114,8 @@ namespace gcl::test::deprecated
 			static void proceed()
 			{
 				int i;
-				GCL_TEST__EXPECT(gcl::type_info::deprecated::id<int>::value == gcl::type_info::deprecated::id<decltype(i)>::value, "gcl::type_info::id : bad value");
-				GCL_TEST__EXPECT(gcl::type_info::deprecated::id<int>::value != gcl::type_info::deprecated::id<std::string>::value, "gcl::type_info::id : bad value");
+				GCL_TEST__EXPECT(gcl::deprecated::type_info::id<int>::value == gcl::deprecated::type_info::id<decltype(i)>::value, "gcl::type_info::id : bad value");
+				GCL_TEST__EXPECT(gcl::deprecated::type_info::id<int>::value != gcl::deprecated::type_info::id<std::string>::value, "gcl::type_info::id : bad value");
 			}
 		};
 
@@ -127,11 +127,11 @@ namespace gcl::test::deprecated
 				struct concret1_t : interface_t {};
 				struct concret1_2 : interface_t {};
 
-				using holder_t = gcl::type_info::deprecated::holder<interface_t>;
+				using holder_t = gcl::deprecated::type_info::holder<interface_t>;
 
 				holder_t t1_from_unique_ptr{ std::move(std::unique_ptr<concret1_t>{}) };
 				holder_t t1_from_raw_ptr{ new concret1_t{} };
-				holder_t t1_from_id_and_interface_ptr{ gcl::type_info::deprecated::id<concret1_t>::value, std::make_unique<interface_t>() };
+				holder_t t1_from_id_and_interface_ptr{ gcl::deprecated::type_info::id<concret1_t>::value, std::make_unique<interface_t>() };
 
 				GCL_TEST__EXPECT(
 					t1_from_id_and_interface_ptr.id == t1_from_unique_ptr.id &&
@@ -170,10 +170,10 @@ namespace gcl::test::deprecated
 						uint32_t value_;
 					};
 
-					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_1(new gcl::type_info::deprecated::experimental::any_impl<type_1>("13"));
-					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_2(new gcl::type_info::deprecated::experimental::any_impl<type_1>("42"));
-					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_1(new gcl::type_info::deprecated::experimental::any_impl<type_2>(13));
-					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_2(new gcl::type_info::deprecated::experimental::any_impl<type_2>(42));
+					std::unique_ptr<gcl::deprecated::type_info::experimental::any> any_str_1(new gcl::deprecated::type_info::experimental::any_impl<type_1>("13"));
+					std::unique_ptr<gcl::deprecated::type_info::experimental::any> any_str_2(new gcl::deprecated::type_info::experimental::any_impl<type_1>("42"));
+					std::unique_ptr<gcl::deprecated::type_info::experimental::any> any_uint32_t_1(new gcl::deprecated::type_info::experimental::any_impl<type_2>(13));
+					std::unique_ptr<gcl::deprecated::type_info::experimental::any> any_uint32_t_2(new gcl::deprecated::type_info::experimental::any_impl<type_2>(42));
 
 					GCL_TEST__EXPECT(
 						(*any_str_1 == *any_str_1)
