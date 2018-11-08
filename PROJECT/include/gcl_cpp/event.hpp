@@ -41,43 +41,43 @@ namespace gcl
 			void on(const event_t & ev)
 			{
 				static_assert(std::is_base_of<interface_t, event_t>::value, "event_t does not derive from interface_t");
-				this->on(gcl::type_info::id<event_t>::value, ev);
+				this->on(gcl::type_info::deprecated::id<event_t>::value, ev);
 			}
 			void on(const typeinfo_holder_t & holder)
 			{
 				this->on(holder.id, *(holder.value));
 			}
-			virtual void on(gcl::type_info::id_type event_id, const interface_t & ev) = 0;
+			virtual void on(gcl::type_info::deprecated::id_type event_id, const interface_t & ev) = 0;
 
 		//protected:
 			template <typename event_t>
 			void add_listener(event_callback_t && callback)
 			{
-				add_listener(gcl::type_info::id<event_t>::value, std::forward<event_callback_t>(callback));
+				add_listener(gcl::type_info::deprecated::id<event_t>::value, std::forward<event_callback_t>(callback));
 			}
-			virtual void add_listener(gcl::type_info::id_type event_id, event_callback_t && callback) = 0;
+			virtual void add_listener(gcl::type_info::deprecated::id_type event_id, event_callback_t && callback) = 0;
 		};
 
 		struct one_to_one_handler : handler
 		{
 			using event_callback_t = handler::event_callback_t;
-			using socket_container_t = std::pair<gcl::type_info::id_type, event_callback_t>;
+			using socket_container_t = std::pair<gcl::type_info::id::type, event_callback_t>;
 
 			one_to_one_handler() = default;
-			one_to_one_handler(gcl::type_info::id_type event_id, event_callback_t && cb)
+			one_to_one_handler(gcl::type_info::id::type event_id, event_callback_t && cb)
 				: socket(event_id, std::forward<event_callback_t>(cb))
 			{}
 			one_to_one_handler(socket_container_t && socket)
 				: socket(socket)
 			{}
 
-			void on(gcl::type_info::id_type event_id, const interface_t & ev) override
+			void on(gcl::type_info::id::type event_id, const interface_t & ev) override
 			{
 				if (event_id != socket.first)
 					throw std::domain_error("one_to_one_handler::on : bad event_id");
 				socket.second(ev);
 			}
-			void add_listener(gcl::type_info::id_type event_id, event_callback_t && callback) override
+			void add_listener(gcl::type_info::id::type event_id, event_callback_t && callback) override
 			{
 				socket.first = event_id;
 				socket.second = std::move(callback);
@@ -89,27 +89,27 @@ namespace gcl
 		struct one_to_many_handler : handler
 		{
 			using event_callback_t = handler::event_callback_t;
-			using socket_container_t = std::pair<gcl::type_info::id_type, std::vector<event_callback_t>>;
+			using socket_container_t = std::pair<gcl::type_info::id::type, std::vector<event_callback_t>>;
 
 			one_to_many_handler() = default;
-			one_to_many_handler(gcl::type_info::id_type event_id, event_callback_t && cb)
+			one_to_many_handler(gcl::type_info::id::type event_id, event_callback_t && cb)
 				: socket(event_id, { std::forward<event_callback_t>(cb) })
 			{}
-			one_to_many_handler(gcl::type_info::id_type event_id, typename socket_container_t::second_type && cbs)
+			one_to_many_handler(gcl::type_info::id::type event_id, typename socket_container_t::second_type && cbs)
 				: socket(event_id, std::forward<socket_container_t::second_type>(cbs) )
 			{}
 			one_to_many_handler(socket_container_t && socket)
 				: socket(socket)
 			{}
 
-			void on(gcl::type_info::id_type event_id, const interface_t & ev) override
+			void on(gcl::type_info::id::type event_id, const interface_t & ev) override
 			{
 				if (event_id != socket.first)
 					throw std::domain_error("one_to_one_handler::on : bad event_id");
 				for (auto & cb : socket.second)
 					cb(ev);
 			}
-			void add_listener(gcl::type_info::id_type event_id, event_callback_t && callback) override
+			void add_listener(gcl::type_info::id::type event_id, event_callback_t && callback) override
 			{
 				if (socket.first != event_id)
 				{
@@ -125,18 +125,18 @@ namespace gcl
 		struct many_to_one_handler : handler
 		{
 			using event_callback_t = handler::event_callback_t;
-			using socket_container_t = std::unordered_map<gcl::type_info::id_type, event_callback_t>;
+			using socket_container_t = std::unordered_map<gcl::type_info::deprecated::id_type, event_callback_t>;
 
 			many_to_one_handler() = default;
 			many_to_one_handler(std::initializer_list<typename socket_container_t::value_type> && il)
 				: sockets{ il }
 			{}
 
-			void on(gcl::type_info::id_type event_id, const interface_t & ev) override
+			void on(gcl::type_info::deprecated::id_type event_id, const interface_t & ev) override
 			{
 				sockets.at(event_id)(ev);
 			}
-			void add_listener(gcl::type_info::id_type event_id, event_callback_t && callback)  override
+			void add_listener(gcl::type_info::deprecated::id_type event_id, event_callback_t && callback)  override
 			{
 				sockets[event_id] = callback;
 			}
@@ -147,20 +147,20 @@ namespace gcl
 		struct many_to_many_handler : handler
 		{
 			using event_callback_t = handler::event_callback_t;
-			using socket_container_t = std::unordered_multimap<gcl::type_info::id_type, event_callback_t>;
+			using socket_container_t = std::unordered_multimap<gcl::type_info::deprecated::id_type, event_callback_t>;
 
 			many_to_many_handler() = default;
 			many_to_many_handler(std::initializer_list<typename socket_container_t::value_type> && il)
 				: sockets{ il }
 			{}
 
-			void on(gcl::type_info::id_type event_id, const interface_t & ev) override
+			void on(gcl::type_info::deprecated::id_type event_id, const interface_t & ev) override
 			{
 				auto range = sockets.equal_range(event_id);
 				for (auto it = range.first; it != range.second; ++it)
 					it->second(ev);
 			}
-			void add_listener(gcl::type_info::id_type event_id, event_callback_t && callback)  override
+			void add_listener(gcl::type_info::deprecated::id_type event_id, event_callback_t && callback)  override
 			{
 				sockets.insert(socket_container_t::value_type{ event_id, callback });
 			}
@@ -273,7 +273,7 @@ namespace gcl
 			template <typename event_t>
 			void subscribe(const std::shared_ptr<handler_t> & handler)
 			{
-				subscribers[gcl::type_info::id<event_t>::value].insert(handler);
+				subscribers[gcl::type_info::deprecated::id<event_t>::value].insert(handler);
 			}
 			template <typename event_t>
 			void unsubscribe(const std::shared_ptr<handler_t> & handler)
@@ -287,7 +287,7 @@ namespace gcl
 				static_assert(std::is_base_of<event::interface_t, event_t>::value, "event_t does not derive from event::interface_t");
 
 				holder_event_t holder{ std::move(new event_t{ev}) };
-				for (auto & subscriber : subscribers.at(gcl::type_info::id<event_t>::value))
+				for (auto & subscriber : subscribers.at(gcl::type_info::deprecated::id<event_t>::value))
 					subscriber->on(holder);
 			}
 			void dispatch(const holder_event_t & holder)
@@ -295,7 +295,7 @@ namespace gcl
 				for (auto & subscriber : subscribers.at(holder.id))
 					subscriber->on(holder);
 			}
-			void dispatch(gcl::type_info::id_type event_id, const interface_t & ev)
+			void dispatch(gcl::type_info::id::type event_id, const interface_t & ev)
 			{
 				for (auto & subscriber : subscribers.at(event_id))
 					subscriber->on(event_id, ev);
@@ -303,7 +303,7 @@ namespace gcl
 
 		protected:
 			using handler_set_t = std::unordered_set<std::shared_ptr<handler_t>>;
-			std::unordered_map<gcl::type_info::id_type, handler_set_t> subscribers;
+			std::unordered_map<gcl::type_info::deprecated::id_type, handler_set_t> subscribers;
 		};
 
 		struct system
@@ -316,7 +316,7 @@ namespace gcl
 				static_assert(std::is_base_of<event::interface_t, event_t>::value, "event_t do not derive from interface_t");
 				process(gcl::type_info::id<T>::value, ev);
 			}
-			void process(gcl::type_info::id_type event_id, const interface_t & ev)
+			void process(gcl::type_info::id::type event_id, const interface_t & ev)
 			{
 				using event_ptr_t = event::interface_t*;
 				using event_unique_ptr_t = std::unique_ptr<event::interface_t>;

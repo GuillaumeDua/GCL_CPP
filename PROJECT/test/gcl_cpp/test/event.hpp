@@ -58,8 +58,8 @@ namespace gcl
 
 					std::unique_ptr<gcl_event_t::handler> handler(new handler_t
 					{
-						{ gcl::type_info::id<B_event>::value, [](const gcl_event_t::interface_t &) { B_event::counter++; } },
-						{ gcl::type_info::id<C_event>::value, [](const gcl_event_t::interface_t &) { C_event::counter++; } }
+						{ gcl::type_info::deprecated::id<B_event>::value, [](const gcl_event_t::interface_t &) { B_event::counter++; } },
+						{ gcl::type_info::deprecated::id<C_event>::value, [](const gcl_event_t::interface_t &) { C_event::counter++; } }
 					});
 
 					handler->add_listener<A_event>([](const gcl_event_t::interface_t &) { A_event::counter++; });
@@ -70,7 +70,7 @@ namespace gcl
 
 					gcl_event_t::interface_t * ev = new B_event();
 					GCL_TEST__EXPECT(B_event::counter == 0, "gcl::test::event::handler : bad B_event::counter value");
-					handler->on(gcl::type_info::id<B_event>::value, *ev);
+					handler->on(gcl::type_info::deprecated::id<B_event>::value, *ev);
 					GCL_TEST__EXPECT(B_event::counter == 1, "gcl::test::event::handler : bad B_event::counter value");
 
 					gcl::type_info::deprecated::holder<gcl_event_t::interface_t> event_value_holder(new C_event());

@@ -1,5 +1,5 @@
-#ifndef GCL_TUPLE_INFO__
-# define GCL_TUPLE_INFO__
+#ifndef GCL_TYPE_INFO__
+# define GCL_TYPE_INFO__
 
 #include <gcl_cpp/preprocessor.hpp>
 
@@ -8,10 +8,17 @@
 #include <functional>
 #include <cassert>
 #include <vector>
+#include <typeindex>
 
 namespace gcl::type_info
 {
-	using id_type = uint64_t;
+	namespace id
+	{
+		using type = std::type_index;
+
+		template <typename T>
+		static const type value = typeid(T);
+	}
 
 	template <typename ... Ts>
 	struct tuple
@@ -49,21 +56,10 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	using pack = tuple<Ts...>;
 
-	template <typename T>
-	struct id
-	{
-		// Warning : Values change per program instance
-		static const id_type value; // [todo]::[C++14] : MS compiler (VS2015) do not support variable-template
-									// [todo]::[C++17] : seems to no be able to self-reference a template variable
-	};
-
-	//template <typename T>
-	//constexpr id_type value = &value<T>; // bad : won't compile as &value<T> is not a constant expression
-
 	template<typename... T>
-	static constexpr std::vector<id_type> make_ids_vector() { return { id<T>::value... }; }
+	static constexpr std::vector<id::type> make_ids_vector() { return { id<T>::value... }; }
 	template<typename... T>
-	static constexpr std::array<id_type, sizeof...(T)> make_ids_array() { return { id<T>::value... }; }
+	static constexpr std::array<id::type, sizeof...(T)> make_ids_array() { return { id<T>::value... }; }
 
 	namespace experimental
 	{
@@ -104,7 +100,7 @@ namespace gcl::type_info
 			{
 				using target_type = std::decay_t<T>;
 
-				type_eraser(target_type && value)
+				explicit type_eraser(target_type && value)
 					: target_type{ std::forward<target_type>(value) }
 				{}
 			};
@@ -114,9 +110,9 @@ namespace gcl::type_info
 			holder(holder &&) = default;
 
 			template <typename concret_t>
-			holder(concret_t && elem)
+			explicit holder(concret_t && elem)
 				: value(std::unique_ptr<interface_t>(new type_eraser<concret_t>{ std::forward<concret_t>(elem) }))
-				, id(type_info::id<concret_t>::value)
+				, id(type_info::id::value<concret_t>)
 			{}
 
 			template <typename T>
@@ -124,26 +120,57 @@ namespace gcl::type_info
 			{
 				using target_type = std::decay_t<T>;
 
-				if (id != gcl::type_info::id<target_type>::value)
+				if (id != gcl::type_info::id::value<target_type>)
 					throw std::bad_cast();
 
 				auto * as_type_eraser_ptr = static_cast<type_eraser<target_type&>*>(value.get());
 				return static_cast<target_type&>(*as_type_eraser_ptr);
 			}
 
-			const gcl::type_info::id_type id;
+			const gcl::type_info::id::type id;
 			const value_type value;
 		};
 	}
+}
+
+inline std::ostream & operator<<(std::ostream & os, const std::type_index & index)
+{
+	return os << "type_id=[(" << index.hash_code() << ')' << index.name() << ']';
 }
 
 #include <memory>
 
 namespace gcl::type_info::deprecated
 {	//	C++11
+#if (defined _DEBUG && defined GCL_UNSAFE_CODE)
+	using id_type = uint64_t;
+	template <typename T>
+	struct id
+	{
+		// Warning : Values change per program instance
+		// Error   : compiler optimization may set the same value per instance
+		static const id_type value; // [todo]::[C++14] : MS compiler (VS2015) do not support variable-template
+									// [todo]::[C++17] : seems to no be able to self-reference a template variable
+	};
+
+#pragma warning (disable : 4311 4302)
+	template <typename T>
+	const gcl::type_info::deprecated::id_type gcl::type_info::deprecated::id<T>::value
+		= reinterpret_cast<gcl::type_info::deprecated::id_type>(&(gcl::type_info::deprecated::id<T>::value));
+#pragma warning (default : 4311 4302)
+#else
+	using id_type = std::type_index;
+	template <typename T>
+	struct id
+	{
+		static inline const id_type value = typeid(T);
+	};
+#endif
+
 	template <typename interface_t>
 	struct holder final
 	{
+		using typeid_type = id_type;
 		using value_type = std::unique_ptr<interface_t>;
 
 		holder() = delete;
@@ -156,16 +183,16 @@ namespace gcl::type_info::deprecated
 		{}
 
 		template <typename concret_t>
-		holder(std::unique_ptr<concret_t> && ptr)
+		explicit holder(std::unique_ptr<concret_t> && ptr)
 			: value(std::forward<std::unique_ptr<concret_t>>(ptr))
-			, id(type_info::id<concret_t>::value)
+			, id(type_info::deprecated::id<concret_t>::value)
 		{
 			check_<concret_t>();
 		}
 		template <typename concret_t>
-		holder(concret_t * ptr)
+		explicit holder(concret_t * ptr)
 			: value(std::move(ptr))
-			, id(type_info::id<concret_t>::value)
+			, id(type_info::deprecated::id<concret_t>::value)
 		{
 			check_<concret_t>();
 		}
@@ -190,7 +217,7 @@ namespace gcl::type_info::deprecated
 			any(const any &&) = delete;
 			virtual inline ~any() = 0 {}
 
-			virtual inline const type_info::id_type id() const = 0;
+			virtual inline const type_info::deprecated::id_type id() const = 0;
 
 			inline bool operator==(const any & other)
 			{
@@ -209,7 +236,7 @@ namespace gcl::type_info::deprecated
 			using type_t = any_impl<T>;
 
 			template <typename ... Args>
-			any_impl(Args... args)
+			explicit any_impl(Args... args)
 				: any()
 				, T(std::forward<std::decay<Args...>::type>(args...))
 			{}
@@ -220,11 +247,11 @@ namespace gcl::type_info::deprecated
 				return static_cast<T&>(*this);
 			}
 
-			inline const type_info::id_type id() const
+			inline const type_info::deprecated::id_type id() const override
 			{
-				return gcl::type_info::id<T>::value;
+				return gcl::type_info::deprecated::id<T>::value;
 			}
-			inline const bool compare_impl(const any & other) const
+			inline const bool compare_impl(const any & other) const override
 			{
 				assert(id() == other.id());
 				return (dynamic_cast<const T &>(dynamic_cast<const type_t &>(other)) == dynamic_cast<const T&>(*this));
@@ -233,9 +260,4 @@ namespace gcl::type_info::deprecated
 	}
 }
 
-#pragma warning (disable : 4311 4302)
-template <typename T>
-const gcl::type_info::id_type gcl::type_info::id<T>::value = reinterpret_cast<gcl::type_info::id_type>(&(gcl::type_info::id<T>::value));
-#pragma warning (default : 4311 4302)
-
-#endif // GCL_TUPLE_INFO__
+#endif // GCL_TYPE_INFO__

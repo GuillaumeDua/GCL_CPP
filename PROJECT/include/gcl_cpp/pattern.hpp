@@ -49,7 +49,7 @@ namespace gcl
 			struct control_center final
 			{
 				RELEASE_INSTRUCTION
-				(static_assert(std::is_constructible<T_ElementType>::value == false, "Optimization error : T_ElementType cannot be constructible");)
+				(static_assert(std::is_constructible<T_ElementType>::value == true, "Optimization error : T_ElementType cannot be constructible");)
 
 				using T_ThisType		= control_center<T_ElementType>;
 				using T_Element			= typename std::unique_ptr<T_ElementType>;
@@ -201,6 +201,7 @@ namespace gcl
 						std::cout << "\t |- Processed elements : " << (qty - ControlCenterType::GetInstance().Pending()) << " in 1 second" << std::endl; // [+ 200.000, 215.000]
 					}
 
+#ifdef _DEBUG
 					ControlCenterType::EmergencyCacheFlush();
 
 					{	// Test 2 : Produce take more time than consuming
@@ -217,6 +218,7 @@ namespace gcl
 						if (ControlCenterType::GetInstance().Pending() != 0)
 							return false;
 					}
+#endif
 
 					return true;
 				}

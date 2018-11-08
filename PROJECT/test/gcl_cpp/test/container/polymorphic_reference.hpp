@@ -3,7 +3,7 @@
 # include <gcl_cpp/test.hpp>
 # include <gcl_cpp/container/polymorphic_reference.hpp>
 
-namespace gcl::test::container_partial_impl
+namespace gcl::test::container_impl
 {
 	struct polymorphic_reference
 	{

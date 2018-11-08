@@ -4,22 +4,27 @@
 #include <gcl_cpp/test/container/entity_vector.hpp>
 #include <gcl_cpp/test/container/polymorphic_reference.hpp>
 
-namespace gcl
+namespace gcl::test
 {
-	namespace test
+	struct container
 	{
-		struct container
-		{
-			using polymorphic_vector = gcl::test::polymorphic_vector;
-			using entity_vector = gcl::test::container_partial_impl::entity_vector;
-			using polymorphic_reference = gcl::test::container_partial_impl::polymorphic_reference;
-
-			using dependencies_t = std::tuple
+		using dependencies_t = std::tuple
 			<
-				polymorphic_vector,
-				entity_vector,
-				polymorphic_reference
+			gcl::test::container_impl::polymorphic_vector,
+			gcl::test::container_impl::entity_vector,
+			gcl::test::container_impl::polymorphic_reference
 			>;
-		};
-	}
+	};
+}
+
+namespace gcl::test::deprecated
+{
+	struct container
+	{
+		using dependencies_t = std::tuple
+		<
+			gcl::test::deprecated::container_impl::polymorphic_vector,
+			gcl::test::deprecated::container_impl::entity_vector
+		>;
+	};
 }

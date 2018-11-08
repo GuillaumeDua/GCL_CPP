@@ -39,14 +39,31 @@ namespace gcl
 	}
 }
 
-# include <gcl_cpp/test/gcl.hpp>
+#include <gcl_cpp/test/gcl.hpp>
+#include <gcl_cpp/signals.hpp>
+
+
 
 auto	main(int, char const * []) -> int
 {
-	gcl::test::proceed();
+	try
+	{
+		gcl::signals::initialize();
+		gcl::test::proceed();
+	}
+	catch (const std::exception & ex)
+	{
+		std::cerr << "Error : " << ex.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cerr << "Error : unknown" << std::endl;
+	}
 
 	// todo : is_constexpr trait
 
+#ifdef _WIN32
 	system("pause");
+#endif
 	return 0;
 }

@@ -24,6 +24,12 @@ namespace gcl
 				::gcl::test::container,
 				::gcl::test::functionnal
 			>::test();
+
+			::gcl::test::components
+			<
+				::gcl::test::deprecated::type_info,
+				::gcl::test::deprecated::container
+			>::test();
 		}
 	}
 }

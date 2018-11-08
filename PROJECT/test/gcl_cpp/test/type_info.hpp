@@ -33,8 +33,8 @@ namespace gcl::test
 			static void proceed()
 			{
 				int i;
-				GCL_TEST__EXPECT(gcl::type_info::id<int>::value == gcl::type_info::id<decltype(i)>::value, "gcl::type_info::id : bad value");
-				GCL_TEST__EXPECT(gcl::type_info::id<int>::value != gcl::type_info::id<std::string>::value, "gcl::type_info::id : bad value");
+				GCL_TEST__EXPECT(gcl::type_info::id::value<int> == gcl::type_info::id::value<decltype(i)>, "gcl::type_info::id : bad value");
+				GCL_TEST__EXPECT(gcl::type_info::id::value<int> != gcl::type_info::id::value<std::string>, "gcl::type_info::id : bad value");
 			}
 		};
 		struct experimental
@@ -55,7 +55,7 @@ namespace gcl::test
 						GCL_TEST__EXPECT_VALUE(holder_A_1.id, holder_A_2.id);
 						GCL_TEST__EXPECT_NOT_VALUE(holder_A_1.id, holder_B_2.id);
 						GCL_TEST__EXPECT_EXCEPTION(std::bad_cast, [&holder_A_1]() { holder_A_1.cast<B>(); });
-						A & value = holder_A_1.cast<A>();
+						[[maybe_unused]] A & value = holder_A_1.cast<A>();
 					}
 				};
 				struct cleaning
@@ -101,79 +101,92 @@ namespace gcl::test
 			using dependencies_t = std::tuple<holder, type_name>;
 		};
 
-		struct deprecated
+		using dependencies_t = std::tuple<tuple, id, experimental>;
+	};
+}
+
+namespace gcl::test::deprecated
+{
+	struct type_info
+	{
+		struct id
 		{
-			struct holder
+			static void proceed()
+			{
+				int i;
+				GCL_TEST__EXPECT(gcl::type_info::deprecated::id<int>::value == gcl::type_info::deprecated::id<decltype(i)>::value, "gcl::type_info::id : bad value");
+				GCL_TEST__EXPECT(gcl::type_info::deprecated::id<int>::value != gcl::type_info::deprecated::id<std::string>::value, "gcl::type_info::id : bad value");
+			}
+		};
+
+		struct holder
+		{
+			static void proceed()
+			{
+				struct interface_t {};
+				struct concret1_t : interface_t {};
+				struct concret1_2 : interface_t {};
+
+				using holder_t = gcl::type_info::deprecated::holder<interface_t>;
+
+				holder_t t1_from_unique_ptr{ std::move(std::unique_ptr<concret1_t>{}) };
+				holder_t t1_from_raw_ptr{ new concret1_t{} };
+				holder_t t1_from_id_and_interface_ptr{ gcl::type_info::deprecated::id<concret1_t>::value, std::make_unique<interface_t>() };
+
+				GCL_TEST__EXPECT(
+					t1_from_id_and_interface_ptr.id == t1_from_unique_ptr.id &&
+					t1_from_unique_ptr.id == t1_from_raw_ptr.id, "gcl::type_info::holder : bad id"
+				);
+			}
+		};
+
+		struct experimental
+		{
+			struct any
 			{
 				static void proceed()
 				{
-					struct interface_t {};
-					struct concret1_t : interface_t {};
-					struct concret1_2 : interface_t {};
+					struct type_1 : std::string
+					{
+						type_1(std::string && str)
+							: std::string(str)
+						{}
+					};
+					struct type_2
+					{
+						type_2(uint32_t && value)
+							: value_(value)
+						{}
 
-					using holder_t = gcl::type_info::deprecated::holder<interface_t>;
+						inline uint32_t get_value(void) const
+						{
+							return value_;
+						}
+						inline bool operator==(const type_2 & other) const
+						{
+							return this->value_ == other.get_value();
+						}
+					private:
+						uint32_t value_;
+					};
 
-					holder_t t1_from_unique_ptr{ std::move(std::unique_ptr<concret1_t>{}) };
-					holder_t t1_from_raw_ptr{ new concret1_t{} };
-					holder_t t1_from_id_and_interface_ptr{ gcl::type_info::id<concret1_t>::value, std::make_unique<interface_t>() };
+					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_1(new gcl::type_info::deprecated::experimental::any_impl<type_1>("13"));
+					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_2(new gcl::type_info::deprecated::experimental::any_impl<type_1>("42"));
+					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_1(new gcl::type_info::deprecated::experimental::any_impl<type_2>(13));
+					std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_2(new gcl::type_info::deprecated::experimental::any_impl<type_2>(42));
 
 					GCL_TEST__EXPECT(
-						t1_from_id_and_interface_ptr.id == t1_from_unique_ptr.id &&
-						t1_from_unique_ptr.id == t1_from_raw_ptr.id, "gcl::type_info::holder : bad id"
-					);
+						(*any_str_1 == *any_str_1)
+						&& !(*any_str_1 == *any_str_2)
+						&& (*any_uint32_t_1 == *any_uint32_t_1)
+						&& !(*any_uint32_t_1 == *any_uint32_t_2)
+						&& !(*any_uint32_t_1 == *any_str_1),
+						"gcl::any::operator==(const gcl::any &)");
 				}
 			};
-
-			struct experimental
-			{
-				struct any
-				{
-					static void proceed()
-					{
-						struct type_1 : std::string
-						{
-							type_1(std::string && str)
-								: std::string(str)
-							{}
-						};
-						struct type_2
-						{
-							type_2(uint32_t && value)
-								: value_(value)
-							{}
-
-							inline uint32_t get_value(void) const
-							{
-								return value_;
-							}
-							inline bool operator==(const type_2 & other) const
-							{
-								return this->value_ == other.get_value();
-							}
-						private:
-							uint32_t value_;
-						};
-
-						std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_1(new gcl::type_info::deprecated::experimental::any_impl<type_1>("13"));
-						std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_str_2(new gcl::type_info::deprecated::experimental::any_impl<type_1>("42"));
-						std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_1(new gcl::type_info::deprecated::experimental::any_impl<type_2>(13));
-						std::unique_ptr<gcl::type_info::deprecated::experimental::any> any_uint32_t_2(new gcl::type_info::deprecated::experimental::any_impl<type_2>(42));
-
-						GCL_TEST__EXPECT(
-							(*any_str_1 == *any_str_1)
-							&& !(*any_str_1 == *any_str_2)
-							&& (*any_uint32_t_1 == *any_uint32_t_1)
-							&& !(*any_uint32_t_1 == *any_uint32_t_2)
-							&& !(*any_uint32_t_1 == *any_str_1),
-							"gcl::any::operator==(const gcl::any &)");
-					}
-				};
-				using dependencies_t = std::tuple<any>;
-			};
-
-			using dependencies_t = std::tuple<holder, experimental>;
+			using dependencies_t = std::tuple<any>;
 		};
 
-		using dependencies_t = std::tuple<tuple, id, experimental, deprecated>;
+		using dependencies_t = std::tuple<id, holder, experimental>;
 	};
 }

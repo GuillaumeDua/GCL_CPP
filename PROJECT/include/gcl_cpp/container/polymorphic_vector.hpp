@@ -25,7 +25,7 @@ namespace gcl
 
 			template <typename ... values_t>
 			polymorphic_vector(values_t && ... values)
-				// : content(sizeof...(values_t))
+				// : content(sizeof...(values_t)) + std::generate
 			{
 				(push_back(std::forward<values_t>(values)), ...);
 			}
@@ -213,7 +213,7 @@ namespace gcl
 				void push_back(std::unique_ptr<T> && obj)
 				{
 					static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
-					content_sorted_accessor[gcl::type_info::id<T>::value].emplace_back(obj.get());
+					content_sorted_accessor[gcl::type_info::deprecated::id<T>::value].emplace_back(obj.get());
 					content.push_back(std::forward<std::unique_ptr<T>>(obj)); // interface_t ?
 				}
 				void push_back(value_holder_t && holder)
@@ -234,9 +234,9 @@ namespace gcl
 				inline auto const & get()
 				{
 					// static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
-					return content_sorted_accessor.at(gcl::type_info::id<T>::value);
+					return content_sorted_accessor.at(gcl::type_info::deprecated::id<T>::value);
 				}
-				inline auto const & get(gcl::type_info::id_type id)
+				inline auto const & get(gcl::type_info::deprecated::id_type id)
 				{
 					return content_sorted_accessor.at(id);
 				}
@@ -263,7 +263,7 @@ namespace gcl
 				void visit(std::function<void(const interface_t &)> func) const
 				{
 					static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
-					for (const auto & elem : content_sorted_accessor.at(gcl::type_info::id<T>::value))
+					for (const auto & elem : content_sorted_accessor.at(gcl::type_info::deprecated::id<T>::value))
 					{
 						func(*elem);
 					}
@@ -272,19 +272,19 @@ namespace gcl
 				void visit(std::function<void(interface_t &)> func)
 				{
 					static_assert(std::is_base_of<value_type, T>::value, "T does not derive from value_type");
-					for (auto & elem : content_sorted_accessor.at(gcl::type_info::id<T>::value))
+					for (auto & elem : content_sorted_accessor.at(gcl::type_info::deprecated::id<T>::value))
 					{
 						func(*elem);
 					}
 				}
-				void visit(std::function<void(const interface_t &)> func, gcl::type_info::id_type id) const
+				void visit(std::function<void(const interface_t &)> func, gcl::type_info::deprecated::id_type id) const
 				{
 					for (const auto & elem : content_sorted_accessor.at(id))
 					{
 						func(*elem);
 					}
 				}
-				void visit(std::function<void(interface_t &)> func, gcl::type_info::id_type id)
+				void visit(std::function<void(interface_t &)> func, gcl::type_info::deprecated::id_type id)
 				{
 					for (auto & elem : content_sorted_accessor.at(id))
 					{
@@ -312,7 +312,7 @@ namespace gcl
 
 			//private:
 				using content_t = std::vector<element_t>;
-				using content_sorted_per_type_t = std::unordered_map<gcl::type_info::id_type, std::vector<interface_t*> >;
+				using content_sorted_per_type_t = std::unordered_map<gcl::type_info::deprecated::id_type, std::vector<interface_t*> >;
 
 				content_t					content;
 				content_sorted_per_type_t	content_sorted_accessor;

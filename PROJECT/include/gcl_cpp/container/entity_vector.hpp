@@ -14,7 +14,7 @@ namespace gcl
 		struct has_properties<T, std::void_t<typename T::properties_t>> : std::true_type { };
 	};
 
-	namespace container
+	namespace container::deprecated
 	{
 		template <typename T>
 		struct entity_vector : public deprecated::polymorphic_vector<T>
@@ -69,7 +69,7 @@ namespace gcl
 			template <typename property_t>
 			void push_back_property(value_type * value)
 			{
-				content_sorted_accessor[gcl::type_info::id<property_t>::value].push_back(value);
+				content_sorted_accessor[gcl::type_info::deprecated::id<property_t>::value].push_back(value);
 			}
 		};
 	}

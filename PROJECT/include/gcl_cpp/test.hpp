@@ -11,6 +11,9 @@
 #include <iomanip>
 #include <iostream>
 
+// todo :
+// #include <gcl_cpp/signals.hpp> 
+// gcl::signals::initialize
 
 #ifndef GCL_PREPROCESSOR__NOT_INSTANTIABLE
 // remove #include <gcl_cpp/preprocessor.hpp> for stand-alone
@@ -60,11 +63,8 @@ namespace gcl
 	{
 		struct fail_exception : std::exception
 		{
-			fail_exception(const std::string & msg)
+			explicit fail_exception(const std::string & msg)
 				: std::exception(msg.c_str())
-			{}
-			fail_exception(const char* msg)
-				: std::exception(msg)
 			{}
 		};
 
@@ -397,7 +397,7 @@ namespace gcl
 		{
 			static void test()
 			{
-				int expand_variadic_[] =
+				[[maybe_unused]] int expand_variadic_[] =
 				{
 					(component<components_t>::test(),
 					std::cout << std::endl,
