@@ -298,7 +298,7 @@ namespace gcl
 
 				if /*constexpr*/ (deepth == 0)
 				{
-					log_t::print<component_t, '='>
+					log_t::template print<component_t, '='>
 						(
 							"[ " + std::to_string(winrate_counter.first) + " / " + std::to_string(winrate_counter.second) + " ]" +
 							(implrate_counter.first == 0 ? "" : "\t(" + std::to_string(implrate_counter.first) + " not implemented yet)")
@@ -313,7 +313,7 @@ namespace gcl
 			static void if_has_dependencies_then_it()
 			{
 				static_assert(type_traits::has_dependencies<component_t>::value, "component test dependencies is mandatory");
-				log_t::print<component_t>("[dependencies]");
+				log_t::template print<component_t>("[dependencies]");
 				foreach_elem_do_test(component_t::dependencies_t{});
 			}
 			template <>
@@ -353,20 +353,20 @@ namespace gcl
 					auto output = do_proceed(component_t::proceed); //auto output = component_t::proceed();
 					const long long elasped_usec = std::chrono::duration_cast<std::chrono::microseconds>(clock_type::now() - tp_start).count();
 
-					log_t::print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " us", gcl::lexical_cast::to_string(output));
+					log_t::template print<component_t>("[PASSED] in " + std::to_string(elasped_usec) + " us", gcl::lexical_cast::to_string(output));
 					++winrate_counter.first;
 				}
 				catch (const fail_exception & ex)
 				{
-					log_t::print<component_t>("[FAILED]", ex.what());
+					log_t::template print<component_t>("[FAILED]", ex.what());
 				}
 				catch (const std::exception & ex)
 				{
-					log_t::print<component_t>("[CRASHED]", ex.what());
+					log_t::template print<component_t>("[CRASHED]", ex.what());
 				}
 				catch (...)
 				{
-					log_t::print<component_t>("[CRASHED]", "[FATAL_ERROR]");
+					log_t::template print<component_t>("[CRASHED]", "[FATAL_ERROR]");
 				}
 			}
 			template <>
@@ -375,7 +375,7 @@ namespace gcl
 				if (type_traits::has_dependencies<component_t>::value) return; // components should have their own test that garther up all subcomponents test ?
 
 				++implrate_counter.first;
-				log_t::print<component_t, '.'>("[SKIP]", "[no test implemented]");
+				log_t::template print<component_t, '.'>("[SKIP]", "[no test implemented]");
 			}
 
 		protected:
