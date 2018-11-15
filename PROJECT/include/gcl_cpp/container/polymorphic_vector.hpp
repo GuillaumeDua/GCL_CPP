@@ -32,7 +32,6 @@ namespace gcl::container
 		T & emplace_back(Args&&... args)
 		{
 			static_assert((std::is_constructible_v<T, Args&&> && ...));
-
 			push_back(std::move(T{ std::forward<Args>(args)... }));
 			return std::any_cast<T&>(*(content.back().get()));
 		}
@@ -40,8 +39,8 @@ namespace gcl::container
 		void push_back(T && obj)
 		{
 			content.push_back(std::make_unique<std::any>(std::forward<T>(obj)));
-			auto & elem = *content.back();
-			content_sorted_accessor[elem.type()].emplace_back(&elem);
+			auto & elem = content.back();
+			register_type(elem);
 		}
 
 		template <typename T>
@@ -187,7 +186,19 @@ namespace gcl::container
 			);
 		}
 
-	private:
+	protected:
+
+		template <typename T>
+		void register_type(const value_type_ptr & value, const std::type_index & type = typeid(T))
+		{
+			content_sorted_accessor[type].emplace_back(value.get());
+		}
+		void register_type(const value_type_ptr & value)
+		{
+			content_sorted_accessor[value->type()].emplace_back(value.get());
+		}
+
+		private:
 
 		using content_t = std::vector<value_type_ptr>;
 		using content_sorted_per_type_t = std::unordered_map<std::type_index, std::vector<value_type_raw_ptr> >;
