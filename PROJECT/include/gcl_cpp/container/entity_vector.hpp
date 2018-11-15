@@ -11,7 +11,52 @@ namespace gcl
 {
 	namespace container
 	{
+		struct entity_vector : private gcl::container::polymorphic_vector
+		{
+			using base_t = polymorphic_vector;
 
+			using base_t::get;
+			using base_t::visit;
+			//using base_t::remove_if;
+
+			template <typename ... values_t>
+			entity_vector(values_t && ... values)
+			{
+				(push_back(std::forward<values_t>(values)), ...);
+			}
+
+			template
+			<
+				typename T,
+				typename std::enable_if_t<gcl::introspection::generated::has_nested_type::properties_t<T>::value>* = nullptr
+			>
+			void push_back(T && value)
+			{
+				base_t::push_back(std::forward<decltype(value)>(value));
+				register_properties(get().back(), T::properties_t{});
+			}
+			template
+			<
+				typename T,
+				typename std::enable_if_t<!gcl::introspection::generated::has_nested_type::properties_t<T>::value>* = nullptr
+			>
+			void push_back(T && value)
+			{
+				base_t::push_back(std::forward<decltype(value)>(value));
+			}
+
+
+		private:
+			template
+			<
+				template <typename ...> class properties_pack_t,
+				typename ... properties_ts
+			>
+			void register_properties(const value_type_ptr & value, properties_pack_t<properties_ts...>)
+			{
+				(void)std::initializer_list<int>{ ((void)register_type<properties_ts>(value), 0)... };
+			}
+		};
 	}
 	namespace deprecated::container
 	{

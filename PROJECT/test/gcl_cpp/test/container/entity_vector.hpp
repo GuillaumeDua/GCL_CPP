@@ -5,7 +5,48 @@
 
 namespace gcl::test::container_impl
 {
-	struct entity_vector {};
+	struct entity_vector
+	{
+		struct properties
+		{
+			struct is_drawable {};
+			struct is_controlable {};
+		};
+		struct types
+		{
+			struct A
+			{
+				using properties_t = std::tuple<properties::is_drawable, properties::is_controlable>;
+			};
+			struct B
+			{
+				using properties_t = std::tuple<properties::is_drawable>;
+			};
+			struct C
+			{
+				using properties_t = std::tuple<properties::is_controlable>;
+			};
+			struct D {};
+		};
+
+		static void proceed()
+		{
+			gcl::container::entity_vector entities
+			{
+				types::A{},
+				types::B{},
+				types::C{},
+				types::D{}
+			};
+
+			GCL_TEST__EXPECT_VALUE(entities.get().size(), 4);
+
+			GCL_TEST__EXPECT_VALUE(entities.get<types::A>().size(), 1);
+			GCL_TEST__EXPECT_VALUE(entities.get<properties::is_controlable>().size(), 2);
+			GCL_TEST__EXPECT_VALUE(entities.get<properties::is_drawable>().size(), 2);
+
+		}
+	};
 }
 
 namespace gcl::test::deprecated::container_impl
