@@ -134,8 +134,41 @@ namespace gcl::test::container_impl
 				visit_type
 				>;
 		};
+		struct move_constructor
+		{
+			static void proceed()
+			{
+				type container{ A{}, B{}, A{ "titi" } };
+				type copy = std::move(container);
 
-		using dependencies_t = std::tuple<create_and_get, visit>;
+				GCL_TEST__EXPECT_VALUE(container.get().size(), 0);
+				GCL_TEST__EXPECT_VALUE(copy.get().size(), 3);
+				auto second_A = std::any_cast<A>(*copy.get<A>().at(1));
+				GCL_TEST__EXPECT_VALUE(second_A.str, "titi");
+			}
+		};
+		struct deep_copy
+		{
+			static void proceed()
+			{
+				type container{ A{}, B{}, A{ "titi" } };
+				type copy; copy = container;
+
+				GCL_TEST__EXPECT_VALUE(container.get().size(), 3);
+				GCL_TEST__EXPECT_VALUE(copy.get().size(), 3);
+				GCL_TEST__EXPECT_NOT_VALUE(container.get().at(0).get(), copy.get().at(0).get());
+				{
+					auto second_A = std::any_cast<A>(*container.get<A>().at(1));
+					GCL_TEST__EXPECT_VALUE(second_A.str, "titi");
+				}
+				{
+					auto second_A = std::any_cast<A>(*copy.get<A>().at(1));
+					GCL_TEST__EXPECT_VALUE(second_A.str, "titi");
+				}
+			}
+		};
+
+		using dependencies_t = std::tuple<create_and_get, visit, move_constructor, deep_copy>;
 	};
 }
 

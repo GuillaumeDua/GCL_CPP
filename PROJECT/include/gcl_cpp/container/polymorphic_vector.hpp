@@ -10,6 +10,8 @@
 #include <typeinfo>
 #include <typeindex>
 
+#include <gcl_cpp/type_info.hpp>
+
 namespace gcl::container
 {
 	struct polymorphic_vector
@@ -21,11 +23,41 @@ namespace gcl::container
 		using value_type_ptr = std::unique_ptr<value_type>;
 		using value_type_raw_ptr = value_type * ;
 
-		template <typename ... values_t>
+		polymorphic_vector() = default;
+		polymorphic_vector(polymorphic_vector&&) = default;
+		polymorphic_vector(const polymorphic_vector & other)
+			: content(other.content.size())
+			, content_sorted_accessor(other.content_sorted_accessor.size())
+		{	// deep copy for std::vector initializer_list
+			for (const auto & elem : other.content)
+			{
+				value_type value = *elem;
+				push_back(value);
+			}
+		}
+		polymorphic_vector & operator=(const polymorphic_vector & other)
+		{
+			clear();
+			for (const auto & elem : other.content)
+			{
+				value_type value = *elem;
+				push_back(value);
+			}
+			return *this;
+		}
+
+		template
+		<
+			typename ... values_t
+		>
 		polymorphic_vector(values_t && ... values)
 			// : content(sizeof...(values_t)) + std::generate
 		{
-			(push_back(std::forward<values_t>(values)), ...);
+			/*using first_arg_type = std::decay_t<gcl::type_info::tuple<values_t...>::type_at<0>>;
+			if constexpr (sizeof...(values_t) == 1 && std::is_same_v<first_arg_type, polymorphic_vector>)
+				*this = std::forward<values_t>(values);
+			else*/
+				(push_back(std::forward<values_t>(values)), ...);
 		}
 
 		template <typename T, typename ... Args>
@@ -93,6 +125,12 @@ namespace gcl::container
 			{
 				func(std::any_cast<T&>(*elem));
 			}
+		}
+
+		void clear()
+		{
+			content.clear();
+			content_sorted_accessor.clear();
 		}
 
 		template <typename T>
