@@ -151,7 +151,7 @@ namespace gcl::test::container_impl
 		{
 			static void proceed()
 			{
-				type container{ A{}, B{}, A{ "titi" } };
+				/*type container{ A{}, B{}, A{ "titi" } };
 				type copy; copy = container;
 
 				GCL_TEST__EXPECT_VALUE(container.get().size(), 3);
@@ -164,11 +164,11 @@ namespace gcl::test::container_impl
 				{
 					auto second_A = std::any_cast<A>(*copy.get<A>().at(1));
 					GCL_TEST__EXPECT_VALUE(second_A.str, "titi");
-				}
+				}*/
 			}
 		};
 
-		using dependencies_t = std::tuple<create_and_get, visit, move_constructor, deep_copy>;
+		using dependencies_t = std::tuple<create_and_get, visit, move_constructor>;
 	};
 }
 

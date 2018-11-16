@@ -11,6 +11,7 @@
 #include <typeindex>
 
 #include <gcl_cpp/type_info.hpp>
+#include <gcl_cpp/container/utility.hpp>
 
 namespace gcl::container
 {
@@ -25,39 +26,17 @@ namespace gcl::container
 
 		polymorphic_vector() = default;
 		polymorphic_vector(polymorphic_vector&&) = default;
-		polymorphic_vector(const polymorphic_vector & other)
-			: content(other.content.size())
-			, content_sorted_accessor(other.content_sorted_accessor.size())
-		{	// deep copy for std::vector initializer_list
-			for (const auto & elem : other.content)
-			{
-				value_type value = *elem;
-				push_back(value);
-			}
-		}
-		polymorphic_vector & operator=(const polymorphic_vector & other)
-		{
-			clear();
-			for (const auto & elem : other.content)
-			{
-				value_type value = *elem;
-				push_back(value);
-			}
-			return *this;
-		}
+		polymorphic_vector & operator=(polymorphic_vector&&) = default;
+		polymorphic_vector(const polymorphic_vector & other) = delete;
 
 		template
 		<
 			typename ... values_t
 		>
 		polymorphic_vector(values_t && ... values)
-			// : content(sizeof...(values_t)) + std::generate
+			//: content(sizeof...(values))
 		{
-			/*using first_arg_type = std::decay_t<gcl::type_info::tuple<values_t...>::type_at<0>>;
-			if constexpr (sizeof...(values_t) == 1 && std::is_same_v<first_arg_type, polymorphic_vector>)
-				*this = std::forward<values_t>(values);
-			else*/
-				(push_back(std::forward<values_t>(values)), ...);
+			(push_back(std::forward<values_t>(values)), ...);
 		}
 
 		template <typename T, typename ... Args>
@@ -245,6 +224,33 @@ namespace gcl::container
 		content_sorted_per_type_t	content_sorted_accessor;
 	};
 }
+
+//
+// deep copy implementation
+//
+//struct polymorphic_vector
+//{
+//	polymorphic_vector(const polymorphic_vector & other)
+//		: content(other.content.size())
+//		, content_sorted_accessor(other.content_sorted_accessor.size())
+//	{	// deep copy for std::vector initializer_list
+//		for (const auto & elem : other.content)
+//		{
+//			value_type value = *elem;
+//			push_back(value);
+//		}
+//	}
+//	polymorphic_vector & operator=(const polymorphic_vector & other)
+//	{
+//		clear();
+//		for (const auto & elem : other.content)
+//		{
+//			value_type value = *elem;
+//			push_back(value);
+//		}
+//		return *this;
+//	}
+//};
 
 namespace gcl::deprecated::container
 {	// C++11

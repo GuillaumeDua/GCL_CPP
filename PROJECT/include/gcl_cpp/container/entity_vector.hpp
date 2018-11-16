@@ -61,7 +61,7 @@ namespace gcl
 	namespace deprecated::container
 	{
 		template <typename T>
-		struct entity_vector : public polymorphic_vector<T>
+		struct entity_vector : public deprecated::container::polymorphic_vector<T>
 		{
 			using value_type = T;
 			using base_t = polymorphic_vector<T>;
@@ -79,7 +79,7 @@ namespace gcl
 			{
 				static_assert(std::is_base_of<value_type, entity_t>::value, "value_type is not base of entity_t");
 				base_t::push_back(std::forward<decltype(value)>(value));
-				push_back_properties(content.back().get(), entity_t::properties_t{});
+				push_back_properties(base_t::content.back().get(), entity_t::properties_t{});
 			}
 			template
 			<
@@ -97,7 +97,7 @@ namespace gcl
 				static_assert(std::is_base_of<value_type, entity_t>::value, "value_type is not base of entity_t");
 				auto elem{ std::make_unique<entity_t>(std::forward<Args>(args)...) };
 				push_back<entity_t>(std::move(elem));
-				return static_cast<entity_t&>(*(content.back().get()));
+				return static_cast<entity_t&>(*(base_t::content.back().get()));
 			}
 
 		private:
@@ -113,7 +113,7 @@ namespace gcl
 			template <typename property_t>
 			void push_back_property(value_type * value)
 			{
-				content_sorted_accessor[gcl::deprecated::type_info::id<property_t>::value].push_back(value);
+				base_t::content_sorted_accessor[gcl::deprecated::type_info::id<property_t>::value].push_back(value);
 			}
 		};
 	}
