@@ -42,8 +42,6 @@ namespace gcl
 #include <gcl_cpp/test/gcl.hpp>
 #include <gcl_cpp/signals.hpp>
 
-
-
 auto	main(int, char const * []) -> int
 {
 	try

@@ -181,7 +181,7 @@ namespace gcl::container
 			};
 			content.erase
 			(
-				std::remove_if(std::begin(content), std::end(content), remover),
+				std::remove_if(std::begin(content), std::end(content), content_remover),
 				std::end(content)
 			);
 		}
