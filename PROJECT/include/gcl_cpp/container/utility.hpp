@@ -17,4 +17,14 @@ namespace gcl::container
 			std::move_iterator<array_type::iterator>(std::end(values_as_array))
 		};
 	}
+
+	template <typename T>
+	static auto to_ref(std::vector<T*> & container)
+	{	// todo : dig that idea. costly as-is
+		std::vector<std::reference_wrapper<T>> container_as_ref;
+		for (auto & elem : container)
+			container_as_ref.emplace_back(*elem);
+		return container_as_ref;
+	}
+
 }
