@@ -12,12 +12,13 @@ namespace gcl
 	namespace container
 	{
 		struct entity_vector : private gcl::container::polymorphic_vector
-		{
+		{	// similar to polymorphic_vector, but grouped by T::properties_t
+
 			using base_t = polymorphic_vector;
 
 			using base_t::get;
 			using base_t::visit;
-			//using base_t::remove_if;
+			using base_t::clear;
 
 			template <typename ... values_t>
 			entity_vector(values_t && ... values)
@@ -45,6 +46,20 @@ namespace gcl
 				base_t::push_back(std::forward<decltype(value)>(value));
 			}
 
+			template <typename T>
+			void remove()
+			{	// costly
+				try
+				{
+					while (!base_t::get<T>().empty())
+					{
+						std::cout << "removing : " << base_t::get<T>().back()->type().name() << std::endl;
+						remove(base_t::get<T>().back());
+					}
+				}
+				catch (const std::out_of_range &)
+				{}
+			}
 
 		private:
 			template
@@ -55,6 +70,13 @@ namespace gcl
 			void register_properties(const value_type_ptr & value, properties_pack_t<properties_ts...>)
 			{
 				(void)std::initializer_list<int>{ ((void)register_type<properties_ts>(value), 0)... };
+			}
+			void remove(const base_t::value_type & to_remove)
+			{	// deep-scan removal
+				base_t::remove_if([&to_remove](const base_t::value_type & value)
+				{
+					return &value == &to_remove;
+				});
 			}
 		};
 	}

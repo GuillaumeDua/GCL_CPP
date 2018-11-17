@@ -12,6 +12,15 @@ namespace gcl::test::container_impl
 			A(std::string && s = "")
 				: str{ std::forward<std::string>(s) }
 			{}
+			bool operator==(const A & other) const
+			{
+				return other.str == str;
+			}
+			bool operator!=(const A & other) const
+			{
+				return !(*this == other);
+			}
+
 			std::string str;
 		};
 		struct B {};
@@ -167,8 +176,27 @@ namespace gcl::test::container_impl
 				}*/
 			}
 		};
+		struct remove
+		{
+			struct remove_by_value
+			{
+				static void proceed()
+				{
+					type container{ A{}, B{}, B{}, A{"titi"} };
+					container.remove(A{"titi"});
+					GCL_TEST__EXPECT_VALUE(container.get().size(), 3);
+					GCL_TEST__EXPECT_VALUE(container.get<A>().size(), 1);
+					auto remaining_A_value = std::any_cast<A>(*container.get<A>().at(0));
+					GCL_TEST__EXPECT_NOT_VALUE(remaining_A_value, A{"titi"});
+					GCL_TEST__EXPECT_VALUE(remaining_A_value, A{});
+				}
+			};
+			
 
-		using dependencies_t = std::tuple<create_and_get, visit, move_constructor>;
+			using dependencies_t = std::tuple<remove_by_value>;
+		};
+
+		using dependencies_t = std::tuple<create_and_get, visit, move_constructor, remove>;
 	};
 }
 

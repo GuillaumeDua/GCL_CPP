@@ -116,18 +116,18 @@ namespace gcl::container
 		void remove(const T & value)
 		{
 			auto & container = content_sorted_accessor.at(typeid(T));
-			auto container_remover = [&value](const std::decay_t<decltype(container)>::value_type & elem)
+			auto container_remover = [&value](const std::decay_t<decltype(container)>::value_type & elem) -> bool
 			{
-				return std::any_cast<const T&>(*elem) == value;
+				return std::any_cast<const T&>(*elem) == value; // C++20 : default comparison
 			};
 			container.erase
 			(
 				std::remove_if(std::begin(container), std::end(container), container_remover),
 				std::end(container)
 			);
-			auto content_remover = [&value, type_id = typeid(T)](const std::decay_t<decltype(container)>::value_type & elem)
+			auto content_remover = [&value](const std::decay_t<decltype(content)>::value_type & elem)
 			{
-				return elem->type() == type_id && std::any_cast<const T&>(*elem) == value;
+				return elem->type() == typeid(T) && std::any_cast<const T&>(*elem) == value;
 			};
 			content.erase
 			(
@@ -215,7 +215,7 @@ namespace gcl::container
 			content_sorted_accessor[value->type()].emplace_back(value.get());
 		}
 
-		private:
+	private:
 
 		using content_t = std::vector<value_type_ptr>;
 		using content_sorted_per_type_t = std::unordered_map<std::type_index, std::vector<value_type_raw_ptr> >;
