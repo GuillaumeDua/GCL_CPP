@@ -53,8 +53,8 @@ namespace gcl
 				{
 					while (!base_t::get<T>().empty())
 					{
-						std::cout << "removing : " << base_t::get<T>().back()->type().name() << std::endl;
-						remove(base_t::get<T>().back());
+						const auto & elem = base_t::get<T>().back();
+						remove(*elem);
 					}
 				}
 				catch (const std::out_of_range &)

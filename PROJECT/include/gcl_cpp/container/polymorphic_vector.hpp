@@ -22,17 +22,14 @@ namespace gcl::container
 
 		using value_type = std::any;
 		using value_type_ptr = std::unique_ptr<value_type>;
-		using value_type_raw_ptr = value_type * ;
+		using value_type_raw_ptr = value_type*;
 
 		polymorphic_vector() = default;
 		polymorphic_vector(polymorphic_vector&&) = default;
 		polymorphic_vector & operator=(polymorphic_vector&&) = default;
 		polymorphic_vector(const polymorphic_vector & other) = delete;
 
-		template
-		<
-			typename ... values_t
-		>
+		template <typename ... values_t>
 		polymorphic_vector(values_t && ... values)
 			//: content(sizeof...(values))
 		{
@@ -125,6 +122,7 @@ namespace gcl::container
 				std::remove_if(std::begin(container), std::end(container), container_remover),
 				std::end(container)
 			);
+
 			auto content_remover = [&value](const std::decay_t<decltype(content)>::value_type & elem)
 			{
 				return elem->type() == typeid(T) && std::any_cast<const T&>(*elem) == value;
@@ -157,7 +155,6 @@ namespace gcl::container
 			{
 				return func(*elem);
 			};
-
 			for (auto & content_accessor : content_sorted_accessor)
 			{
 				content_accessor.second.erase
@@ -171,7 +168,6 @@ namespace gcl::container
 			{
 				return func(*elem);
 			};
-
 			content.erase
 			(
 				std::remove_if(std::begin(content), std::end(content), content_remover),
