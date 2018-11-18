@@ -191,9 +191,19 @@ namespace gcl::test::container_impl
 					GCL_TEST__EXPECT_VALUE(remaining_A_value, A{});
 				}
 			};
-			
+			struct remove_by_type
+			{
+				static void proceed()
+				{
+					type container{ A{}, B{}, B{}, A{"titi"} };
+					container.remove<A>();
+					GCL_TEST__EXPECT_VALUE(container.get().size(), 2);
+					GCL_TEST__EXPECT_VALUE(container.get<A>().size(), 0);
+					GCL_TEST__EXPECT_VALUE(container.get<B>().size(), 2);
+				}
+			};
 
-			using dependencies_t = std::tuple<remove_by_value>;
+			using dependencies_t = std::tuple<remove_by_value, remove_by_type>;
 		};
 
 		using dependencies_t = std::tuple<create_and_get, visit, move_constructor, remove>;

@@ -29,23 +29,81 @@ namespace gcl::test::container_impl
 			struct D {};
 		};
 
-		static void proceed()
+		static auto generate_container()
 		{
-			gcl::container::entity_vector entities
+			return gcl::container::entity_vector
 			{
+				types::A{},
+				types::B{},
+				types::C{},
+				types::D{},
 				types::A{},
 				types::B{},
 				types::C{},
 				types::D{}
 			};
-
-			GCL_TEST__EXPECT_VALUE(entities.get().size(), 4);
-
-			GCL_TEST__EXPECT_VALUE(entities.get<types::A>().size(), 1);
-			GCL_TEST__EXPECT_VALUE(entities.get<properties::is_controlable>().size(), 2);
-			GCL_TEST__EXPECT_VALUE(entities.get<properties::is_drawable>().size(), 2);
-
 		}
+
+		struct create
+		{
+			static void proceed()
+			{
+				gcl::container::entity_vector entities = generate_container();
+
+				GCL_TEST__EXPECT_VALUE(entities.get().size(), 8);
+				GCL_TEST__EXPECT_VALUE(entities.get<types::A>().size(), 2);
+				GCL_TEST__EXPECT_VALUE(entities.get<types::B>().size(), 2);
+				GCL_TEST__EXPECT_VALUE(entities.get<types::C>().size(), 2);
+				GCL_TEST__EXPECT_VALUE(entities.get<types::D>().size(), 2);
+
+				GCL_TEST__EXPECT_VALUE(entities.get<properties::is_drawable>().size(), 4);
+				GCL_TEST__EXPECT_VALUE(entities.get<properties::is_controlable>().size(), 4);
+			}
+		};
+
+		struct remove
+		{
+			struct remove_by_type
+			{
+				static void proceed()
+				{
+					gcl::container::entity_vector entities = generate_container();
+
+					entities.remove<types::A>();
+
+					GCL_TEST__EXPECT_VALUE(entities.get().size(), 6);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::A>().size(), 0);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::B>().size(), 2);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::C>().size(), 2);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::D>().size(), 2);
+
+					GCL_TEST__EXPECT_VALUE(entities.get<properties::is_drawable>().size(), 2);
+					GCL_TEST__EXPECT_VALUE(entities.get<properties::is_controlable>().size(), 2);
+				}
+			};
+			struct remove_by_property
+			{
+				static void proceed()
+				{
+					gcl::container::entity_vector entities = generate_container();
+
+					entities.remove<properties::is_drawable>();
+
+					GCL_TEST__EXPECT_VALUE(entities.get().size(), 4);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::A>().size(), 0);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::B>().size(), 0);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::C>().size(), 2);
+					GCL_TEST__EXPECT_VALUE(entities.get<types::D>().size(), 2);
+
+					GCL_TEST__EXPECT_VALUE(entities.get<properties::is_drawable>().size(), 0);
+					GCL_TEST__EXPECT_VALUE(entities.get<properties::is_controlable>().size(), 2);
+				}
+			};
+
+			using dependencies_t = std::tuple<remove_by_type, remove_by_property>;
+		};
+
+		using dependencies_t = std::tuple<create, remove>;
 	};
 }
 
