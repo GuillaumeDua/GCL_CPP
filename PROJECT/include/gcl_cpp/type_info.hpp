@@ -25,6 +25,8 @@ namespace gcl::type_info
 	{
 		using tuple_type = std::tuple<Ts...>;
 
+		inline static constexpr auto size = sizeof...(Ts); // or std::tuple_size_v<tuple_type>
+
 		template <size_t N>
 		using type_at = typename std::tuple_element<N, tuple_type>::type;
 
@@ -34,7 +36,14 @@ namespace gcl::type_info
 			return index_of_impl<T, 0, Ts...>();
 		}
 
-		constexpr inline static std::size_t size = sizeof...(Ts);
+		template <typename func_type, typename ... Ts>
+		void for_each(std::tuple<Ts...> & value, func_type func)
+		{
+			using tuple_type = std::decay_t<decltype(value)>;
+			using indexes_type = std::make_index_sequence<std::tuple_size_v<tuple_type>>;
+
+			toto_impl(func, value, indexes_type{});
+		}
 
 		auto to_std()
 		{
@@ -51,6 +60,12 @@ namespace gcl::type_info
 		static constexpr inline size_t index_of_impl(void)
 		{
 			throw std::out_of_range("tuple::index_of_impl : Not found");
+		}
+
+		template <typename func_type, typename tuple_type, std::size_t ... indexes>
+		void for_each_impl(func_type func, tuple_type & tuple, std::index_sequence<indexes...>)
+		{
+			(func(std::get<indexes>(tuple)), ...);
 		}
 	};
 	template <typename ... Ts>
