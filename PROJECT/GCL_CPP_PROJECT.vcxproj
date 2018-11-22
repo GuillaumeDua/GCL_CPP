@@ -159,6 +159,7 @@
     <ClInclude Include="include\gcl_cpp\old\SelfUpdate.h" />
     <ClInclude Include="include\gcl_cpp\old\task.hpp" />
     <ClInclude Include="include\gcl_cpp\old\TestUtils.h" />
+    <ClInclude Include="include\gcl_cpp\old\thread.hpp" />
     <ClInclude Include="include\gcl_cpp\pattern.hpp" />
     <ClInclude Include="include\gcl_cpp\IO.h" />
     <ClInclude Include="include\gcl_cpp\maths.h" />
@@ -180,7 +181,6 @@
     <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
     <ClInclude Include="test\gcl_cpp\test\mp.hpp" />
     <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
-    <ClInclude Include="include\gcl_cpp\thread.hpp" />
     <ClInclude Include="include\gcl_cpp\type_info.hpp" />
     <ClInclude Include="include\gcl_cpp\type_traits.hpp" />
     <ClInclude Include="include\gcl_cpp\introspection.hpp" />
