@@ -149,10 +149,11 @@
     <ClInclude Include="include\gcl_cpp\container\polymorphic_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\event.hpp" />
     <ClInclude Include="include\gcl_cpp\exception.hpp" />
-    <ClInclude Include="include\gcl_cpp\filesystem.hpp" />
     <ClInclude Include="include\gcl_cpp\functionnal.hpp" />
+    <ClInclude Include="include\gcl_cpp\old\control_center.hpp" />
     <ClInclude Include="include\gcl_cpp\old\EventHandler.h" />
     <ClInclude Include="include\gcl_cpp\old\Experimental.h" />
+    <ClInclude Include="include\gcl_cpp\old\filesystem.hpp" />
     <ClInclude Include="include\gcl_cpp\old\log.hpp" />
     <ClInclude Include="include\gcl_cpp\old\Monitoring.h" />
     <ClInclude Include="include\gcl_cpp\old\ownership.hpp" />
@@ -160,7 +161,6 @@
     <ClInclude Include="include\gcl_cpp\old\task.hpp" />
     <ClInclude Include="include\gcl_cpp\old\TestUtils.h" />
     <ClInclude Include="include\gcl_cpp\old\thread.hpp" />
-    <ClInclude Include="include\gcl_cpp\pattern.hpp" />
     <ClInclude Include="include\gcl_cpp\IO.h" />
     <ClInclude Include="include\gcl_cpp\maths.h" />
     <ClInclude Include="include\gcl_cpp\pattern\state_machine.hpp" />
