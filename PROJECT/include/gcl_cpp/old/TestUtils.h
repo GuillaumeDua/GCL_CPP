@@ -160,3 +160,15 @@ namespace gcl::experimental::test_utils::Inline
 		}
 	};
 }
+
+//
+// symbols :
+//
+//namespace gcl::experimental::test_utils
+//{
+//	std::mutex									Inline::RT_scope_controler::_container_mutex;
+//	std::mutex									Inline::RT_scope_controler::_obs_mutex;
+//	volatile bool								Inline::RT_scope_controler::_isActive;
+//	Inline::RT_scope_controler::T_Container		Inline::RT_scope_controler::_container;
+//	Inline::RT_scope_controler::T_ObserversList	Inline::RT_scope_controler::_observers;
+//}
