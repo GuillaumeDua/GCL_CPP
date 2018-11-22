@@ -25,6 +25,7 @@ Each **component** *(split by namespace)* aims to be :
 | `serialization`                    | generic serializer with static/dynamic polymorphism<br>see my [talk at CppFRug](https://github.com/cpp-frug/paris/tree/master/events/2017-01-19_n14/Serial)              |
 | `type_index`                       | static-to-dynamic and dynamic-to-static brige for class instanciation                      |
 | `type_info`                        | helpers to type informations<br>*(type_id, variadic_template::index_of, variadic_template::type_at, ... )*<br>and *constexpr std::string_view experimental::type_name\<T\>* |
+| `color`                            | colors for console output                                                                  |
 
 ### incomplete
 | **component** name               | description                              |                   todo                          |
@@ -32,13 +33,7 @@ Each **component** *(split by namespace)* aims to be :
 | `io`                             | basic std::ostream/std::istream wrapper  |  merge with gcl\:\:poc\:\:fd_proxy              |
 | `maths`                          | basic maths functions                    |  C++17 refactoring / constexpr                  |
 
-### buggy
-| **component** name               | description                              |                   issue                         |
-|----------------------------------|------------------------------------------|-------------------------------------------------|
-| `color`                          | color for console output                 | MSVC : no colors in Windows console             |
-
 ### other namespaces :
-
 | **component** name                 | description                                                                                |
 |------------------------------------|--------------------------------------------------------------------------------------------|
 | `gcl::<component_name>::experimental` | features that are still in development and may or may not work properly.<br>*(not fully tested, may rely on a language bug/hack, ...)* |
