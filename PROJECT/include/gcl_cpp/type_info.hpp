@@ -22,7 +22,14 @@ namespace gcl::type_info
 		template <typename T>
 		static const type value = typeid(T);
 #endif
+		template <typename T>
+		static constexpr auto type_name = experimental::type_name<T>();
 	}
+
+	template<typename ... Ts>
+	static constexpr std::vector<id::type> make_ids_vector() { return { id<Ts>::value... }; }
+	template<typename ... Ts>
+	static constexpr std::array<id::type, sizeof...(Ts)> make_ids_array() { return { id<T>::value... }; }
 
 	template <typename ... Ts>
 	struct variadic_template
@@ -47,11 +54,6 @@ namespace gcl::type_info
 	};
 	template <typename ... Ts>
 	using pack = variadic_template<Ts...>;
-
-	template<typename... T>
-	static constexpr std::vector<id::type> make_ids_vector() { return { id<T>::value... }; }
-	template<typename... T>
-	static constexpr std::array<id::type, sizeof...(T)> make_ids_array() { return { id<T>::value... }; }
 
 	namespace experimental
 	{
