@@ -10,10 +10,8 @@
 # include <cassert>
 # include <map>
 
-namespace gcl
+namespace gcl::old
 {
-	namespace old
-	{
 		// state-machine
 		struct Runnable
 		{
@@ -114,7 +112,6 @@ namespace gcl
 		protected:
 			T_FilterList	_modules;
 		};
-	}
 }
 
 #endif // GCL_OLD__MONITORING_HPP__
