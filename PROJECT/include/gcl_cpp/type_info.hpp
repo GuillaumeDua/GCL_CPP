@@ -42,7 +42,7 @@ namespace gcl::type_info
 			using tuple_type = std::decay_t<decltype(value)>;
 			using indexes_type = std::make_index_sequence<std::tuple_size_v<tuple_type>>;
 
-			toto_impl(func, value, indexes_type{});
+			for_each_impl(func, value, indexes_type{});
 		}
 
 		auto to_std()
