@@ -29,13 +29,13 @@ Each **component** *(split by namespace)* aims to be :
 ### incomplete
 | **component** name               | description                              |                   todo                          |
 |----------------------------------|------------------------------------------|-------------------------------------------------|
-| io                               | basic std::ostream/std::istream wrapper  |  merge with gcl\:\:poc\:\:fd_proxy              |
-| maths                            | basic maths functions                    |  C++17 refactoring / constexpr                  |
+| `io`                             | basic std::ostream/std::istream wrapper  |  merge with gcl\:\:poc\:\:fd_proxy              |
+| `maths`                          | basic maths functions                    |  C++17 refactoring / constexpr                  |
 
 ### buggy
 | **component** name               | description                              |                   issue                         |
 |----------------------------------|------------------------------------------|-------------------------------------------------|
-| color                            | color for console output                 | MSVC : no colors in Windows console             |
+| `color`                          | color for console output                 | MSVC : no colors in Windows console             |
 
 ### other namespaces :
 
