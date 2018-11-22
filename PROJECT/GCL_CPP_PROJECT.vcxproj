@@ -177,6 +177,7 @@
     <ClInclude Include="test\gcl_cpp\test\functionnal.hpp" />
     <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
     <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\mp.hpp" />
     <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
     <ClInclude Include="include\gcl_cpp\thread.hpp" />
     <ClInclude Include="include\gcl_cpp\type_info.hpp" />

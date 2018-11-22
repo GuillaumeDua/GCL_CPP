@@ -1,12 +1,54 @@
 #ifndef GCL_TMP_H_
 # define GCL_TMP_H_
 
-# include <gcl_cpp/type_index.hpp>
+#include <gcl_cpp/type_index.hpp>
+#include <array>
 
 namespace gcl
 {
-    namespace mp
-    {	// todo : refactor in C++17
+	namespace mp
+	{	// C++17
+		template <typename ... ts>
+		struct super : ts...
+		{};
+
+		template <template <typename...> class trait_type, typename ... ts>
+		struct partial_template
+		{
+			template <typename ... us>
+			using type = trait_type<ts..., us...>;
+
+			template <typename ... us>
+			static constexpr bool value = trait_type<ts..., us...>::value;
+		};
+
+		// todo : type_list ?
+
+		template <template <typename> class ... constraint_type>
+		struct require
+		{
+			template <typename T>
+			static constexpr void on()
+			{
+				(check_constraint<constraint_type, T>(), ...);
+			}
+
+			template <typename T>
+			static inline constexpr
+				std::array<bool, sizeof...(constraint_type)>
+				values_on{ std::move(constraint_type<T>::value)... };
+
+		private:
+			template <template <typename> class constraint_type, typename T>
+			static constexpr void check_constraint()
+			{
+				static_assert(constraint_type<T>::value, "constraint failed to apply. see template context for more infos");
+			}
+		};
+	}
+
+    namespace deprecated::mp
+    {	// C++98
 		template <class T, class ... T_Classes>
 		struct super
 		{
@@ -19,6 +61,7 @@ namespace gcl
 			using Type = T;
 		};
 
+		// constexpr if
 		template <bool condition, typename _THEN, typename _ELSE>	struct IF
         {};
 		template <typename _THEN, typename _ELSE>					struct IF<true, _THEN, _ELSE>

@@ -7,6 +7,7 @@
 #include <gcl_cpp/test/container.hpp>
 #include <gcl_cpp/test/functionnal.hpp>
 #include <gcl_cpp/test/introspection.hpp>
+#include <gcl_cpp/test/mp.hpp>
 
 #include <gcl_cpp/test.hpp>
 
@@ -24,11 +25,12 @@ namespace gcl
 				::gcl::test::type_index,
 				::gcl::test::container,
 				::gcl::test::functionnal,
-				::gcl::test::introspection
+				::gcl::test::introspection,
+				::gcl::test::mp
 			>::test();
 
 			::gcl::test::components
-			<
+			<	// deprecated components
 				::gcl::test::deprecated::type_info,
 				::gcl::test::deprecated::container
 			>::test();
