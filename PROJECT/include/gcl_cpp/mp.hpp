@@ -22,8 +22,6 @@ namespace gcl
 			static constexpr bool value = trait_type<ts..., us...>::value;
 		};
 
-		// todo : type_list ?
-
 		template <template <typename> class ... constraint_type>
 		struct require
 		{
