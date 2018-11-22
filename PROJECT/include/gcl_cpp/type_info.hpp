@@ -10,66 +10,43 @@
 #include <vector>
 #include <typeindex>
 
+#include <gcl_cpp/mp.hpp>
+#include <gcl_cpp/tuple_utils.hpp>
+
 namespace gcl::type_info
 {
 	namespace id
 	{
 		using type = std::type_index;
-
+#if defined(__cpp_rtti)
 		template <typename T>
 		static const type value = typeid(T);
+#endif
 	}
 
 	template <typename ... Ts>
-	struct tuple
+	struct variadic_template
 	{
-		using tuple_type = std::tuple<Ts...>;
+		using std_type = std::tuple<Ts...>;
 
 		inline static constexpr auto size = sizeof...(Ts); // or std::tuple_size_v<tuple_type>
 
 		template <size_t N>
-		using type_at = typename std::tuple_element<N, tuple_type>::type;
+		using type_at = typename std::tuple_element<N, std_type>::type;
 
 		template <typename T>
 		static constexpr inline size_t index_of(void)
 		{
-			return index_of_impl<T, 0, Ts...>();
-		}
-
-		template <typename func_type, typename ... Ts>
-		void for_each(std::tuple<Ts...> & value, func_type func)
-		{
-			using tuple_type = std::decay_t<decltype(value)>;
-			using indexes_type = std::make_index_sequence<std::tuple_size_v<tuple_type>>;
-
-			for_each_impl(func, value, indexes_type{});
+			return gcl::tuple_utils::index_of<T>(std_type{});
 		}
 
 		auto to_std()
 		{
-			return tuple_type{};
-		}
-
-	private:
-		template <typename needle_t, size_t it_n, typename iterated_t, typename ... haystack_t>
-		static constexpr inline size_t index_of_impl(void)
-		{
-			return (std::is_same<needle_t, iterated_t>::value ? it_n : index_of_impl<needle_t, it_n + 1, haystack_t...>());
-		}
-		template <typename needle_t, size_t iterated_t>
-		static constexpr inline size_t index_of_impl(void)
-		{
-			throw std::out_of_range("tuple::index_of_impl : Not found");
-		}
-
-		template <typename func_type, typename tuple_type, std::size_t ... indexes>
-		void for_each_impl(func_type func, tuple_type & tuple, std::index_sequence<indexes...>)
-		{
-			(func(std::get<indexes>(tuple)), ...);
+			return std_type{};
 		}
 	};
 	template <typename ... Ts>
-	using pack = tuple<Ts...>;
+	using pack = variadic_template<Ts...>;
 
 	template<typename... T>
 	static constexpr std::vector<id::type> make_ids_vector() { return { id<T>::value... }; }
@@ -157,6 +134,40 @@ inline std::ostream & operator<<(std::ostream & os, const std::type_index & inde
 
 namespace gcl::deprecated::type_info
 {	//	C++11
+	template <typename ... Ts>
+	struct variadic_template
+	{
+		using tuple_type = std::tuple<Ts...>;
+
+		inline static constexpr auto size = sizeof...(Ts); // or std::tuple_size_v<tuple_type>
+
+		template <size_t N>
+		using type_at = typename std::tuple_element<N, tuple_type>::type;
+
+		template <typename T>
+		static constexpr inline size_t index_of(void)
+		{
+			return index_of_impl<T, 0, Ts...>();
+		}
+
+		auto to_std()
+		{
+			return tuple_type{};
+		}
+
+	private:
+		template <typename needle_t, size_t it_n, typename iterated_t, typename ... haystack_t>
+		static constexpr inline size_t index_of_impl(void)
+		{
+			return (std::is_same<needle_t, iterated_t>::value ? it_n : index_of_impl<needle_t, it_n + 1, haystack_t...>());
+		}
+		template <typename needle_t, size_t iterated_t>
+		static constexpr inline size_t index_of_impl(void)
+		{
+			throw std::out_of_range("variadic_template::index_of_impl : Not found");
+		}
+};
+
 #if (defined _DEBUG && defined GCL_UNSAFE_CODE)
 	using id_type = uint64_t;
 	template <typename T>

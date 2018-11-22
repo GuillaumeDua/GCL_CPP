@@ -39,7 +39,7 @@ namespace gcl
 			template <typename ... Types>
 			struct of_types
 			{
-				using pack_t = gcl::type_info::tuple<Types...>;
+				using pack_t = gcl::type_info::variadic_template<Types...>;
 
 				template <typename T>
 				struct element : basic_container_type::value_type

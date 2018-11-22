@@ -43,6 +43,29 @@ namespace gcl
 				static_assert(constraint_type<T>::value, "constraint failed to apply. see template context for more infos");
 			}
 		};
+
+		template <typename to_find, typename ... ts>
+		/*constexpr */auto get_index()
+		{	// [C++20] constexpr => std::count, std::find
+			constexpr auto result = gcl::mp::require
+			<
+				gcl::mp::partial_template<std::is_same, ts>::type
+				...
+			>::values_on<to_find>;
+
+			//static_assert(std::count(std::cbegin(result), std::cend(result), true) <= 1);
+			auto count = std::count(std::cbegin(result), std::cend(result), true);
+			if (count > 1)
+				throw std::runtime_error("get_index : duplicate type");
+			if (count == 0)
+				throw std::runtime_error("get_index : no match");
+
+			return std::distance
+			(
+				std::cbegin(result),
+				std::find(std::cbegin(result), std::cend(result), true)
+			);
+		}
 	}
 
     namespace deprecated::mp

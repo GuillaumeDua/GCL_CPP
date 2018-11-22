@@ -168,6 +168,7 @@
     <ClInclude Include="include\gcl_cpp\template_meta_programming.hpp" />
     <ClInclude Include="include\gcl_cpp\test.hpp" />
     <ClInclude Include="include\gcl_cpp\TestUtils.h" />
+    <ClInclude Include="include\gcl_cpp\tuple_utils.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\component_aggregator.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\entity_vector.hpp" />

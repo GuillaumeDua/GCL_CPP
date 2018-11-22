@@ -10,7 +10,7 @@ namespace gcl::test
 {
 	struct type_info
 	{
-		struct tuple
+		struct variadic_template
 		{
 			static void proceed()
 			{
@@ -20,9 +20,9 @@ namespace gcl::test
 				struct Tutu {};
 				struct NotInPack {};
 
-				static_assert(std::is_same<gcl::type_info::tuple<int>, gcl::type_info::tuple<int>>::value, "gcl::test::type_info::tuple : tuple must be an alias");
+				static_assert(std::is_same<gcl::type_info::variadic_template<int>, gcl::type_info::variadic_template<int>>::value, "gcl::test::type_info::variadic_template : variadic_template must be an alias");
 
-				using my_pack_t = typename gcl::type_info::tuple<Toto, Titi, Tata, Tutu>;
+				using my_pack_t = typename gcl::type_info::variadic_template<Toto, Titi, Tata, Tutu>;
 
 				GCL_TEST__EXPECT_VALUE(my_pack_t::index_of<Tata>(), std::size_t{ 2 });
 				GCL_TEST__EXPECT_EXCEPTION(std::out_of_range, []() { my_pack_t::index_of<NotInPack>(); });
@@ -101,7 +101,7 @@ namespace gcl::test
 			using dependencies_t = std::tuple<holder, type_name>;
 		};
 
-		using dependencies_t = std::tuple<tuple, id, experimental>;
+		using dependencies_t = std::tuple<variadic_template, id, experimental>;
 	};
 }
 

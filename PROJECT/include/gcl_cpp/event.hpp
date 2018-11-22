@@ -342,7 +342,7 @@ namespace gcl
 			{
 				using socket_callback = std::function<void()>;
 				using socket_type = std::vector<socket_callback>;
-				using tuple_info_t = gcl::type_info::tuple<t_events...>;
+				using tuple_info_t = gcl::type_info::variadic_template<t_events...>;
 
 				template <typename T>
 				socket_type & on()
