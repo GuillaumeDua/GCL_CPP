@@ -42,5 +42,6 @@ Each **component** *(split by namespace)* aims to be :
 | **component** name                 | description                                                                                |
 |------------------------------------|--------------------------------------------------------------------------------------------|
 | `gcl::<component_name>::experimental` | features that are still in development and may or may not work properly.<br>*(not fully tested, may rely on a language bug/hack, ...)* |
-| `gcl::test`                        | use for both `gcl::test` component, and all tests<br>*(e.g `gcl::test::<component_name>`)*|
+| `gcl::test`                        | use for both `gcl::test` component, and all tests<br>*(e.g `gcl::test::<component_name>`)* |
 | `gcl::deprecated`                  | deprecated components implementation<br>*(c++0x, c++11)*<br>interface may change between a component like `gcl::deprecated::<component_name>` and `gcl::<component_name>` |
+| `gcL::old`                         | shameful C++98/0x components that are not supported anymore                                 |
