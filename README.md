@@ -1,5 +1,4 @@
 # GCL_CPP
-### Guss's Common library, in CPP
 
 This library is a stack of useful and convinient components that makes my projects and everyday jobs way easier
 
@@ -40,3 +39,5 @@ Each **component** *(split by namespace)* aims to be :
 | `gcl::test`                        | use for both `gcl::test` component, and all tests<br>*(e.g `gcl::test::<component_name>`)* |
 | `gcl::deprecated`                  | deprecated components implementation<br>*(c++0x, c++11)*<br>interface may change between a component like `gcl::deprecated::<component_name>` and `gcl::<component_name>` |
 | `gcL::old`                         | shameful C++98/0x components that are not supported anymore                                 |
+
+> About the name : GCL comes from `Guss's Common library`
