@@ -1,6 +1,8 @@
 #ifndef GCL_OLD__MONITORING_HPP__
 # define GCL_OLD__MONITORING_HPP__
 
+# error this file is deprecated (too old / unstable) and will be delete shortly
+
 # include <gcl_cpp/pattern.hpp>
 # include <list>
 # include <cstdint>

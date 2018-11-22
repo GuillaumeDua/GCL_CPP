@@ -1,6 +1,8 @@
 #ifndef GCL_LOG_HPP__
 # define GCL_LOG_HPP__
 
+# error this file is deprecated (too old / unstable) and will be delete shortly
+
 #include <iostream>
 #include <map>
 #include <unordered_map>

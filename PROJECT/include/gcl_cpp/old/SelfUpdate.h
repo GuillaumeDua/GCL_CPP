@@ -1,6 +1,8 @@
 #ifndef GCL_OLD__SELF_UPDATE_HPP__
 # define GCL_OLD__SELF_UPDATE_HPP__
 
+# error this file is deprecated (too old / unstable) and will be delete shortly
+
 # include <set>
 # include <vector>
 # include <functional>
