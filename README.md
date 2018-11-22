@@ -40,4 +40,5 @@ Each **component** *(split by namespace)* aims to be :
 | `gcl::deprecated`                  | deprecated components implementation<br>*(c++0x, c++11)*<br>interface may change between a component like `gcl::deprecated::<component_name>` and `gcl::<component_name>` |
 | `gcL::old`                         | shameful C++98/0x components that are not supported anymore                                 |
 
-> About the name : GCL comes from `Guss's Common library`
+### About the name :
+> GCL comes from `Guss's Common Library`
