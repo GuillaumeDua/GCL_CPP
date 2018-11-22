@@ -58,7 +58,7 @@ namespace gcl
 			if (count > 1)
 				throw std::runtime_error("get_index : duplicate type");
 			if (count == 0)
-				throw std::runtime_error("get_index : no match");
+				throw std::out_of_range("get_index : no match");
 
 			return std::distance
 			(
