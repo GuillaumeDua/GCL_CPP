@@ -157,51 +157,6 @@ namespace gcl
 				throw std::out_of_range("template <typename ... T> struct for_each::call_at_with_return_value");
 			}
 		};
-
-        struct Test
-        {
-            template <typename T>
-            struct Visitor_ListIdPrinter
-            {
-                static void visit()
-                {
-					std::cout << T::_ID << ' ';
-                }
-            };
-
-			struct A
-			{
-				struct _MandatoryNested {};
-			};
-			struct B
-			{
-				struct _MandatoryNested {};
-			};
-			struct C
-			{
-				struct _MandatoryNested {};
-			};
-			
-			template <typename T>
-			struct T_Constraint
-			{
-				using _MandatoryNested = typename T::_MandatoryNested;
-			};
-
-            static bool    Proceed()
-            {
-				// static require constraint
-				(void)mp::for_each<A, B, C>::template require<T_Constraint>();
-
-				/*for_each<A, B, C>::Call<TypenamePrint>();
-				for_each<_Types>::CallAt<TypenamePrint>(0);*/
-
-				return std::is_convertible<super<A, B, C>::Type, A>::value
-					&& std::is_convertible<super<A, B, C>::Type, B>::value
-					&& std::is_convertible<super<A, B, C>::Type, C>::value
-					;
-            }
-        };
     }
 }
 
