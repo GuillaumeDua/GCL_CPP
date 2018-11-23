@@ -45,10 +45,11 @@ namespace gcl::mp
 	static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
 
 	template <typename to_find, typename ... ts>
-	/*constexpr */auto get_index()
-	{	// [C++20] constexpr => std::count, std::find
-
-		static_assert(contains<to_find, ts...>);
+	constexpr auto get_index()
+	{
+		return index_of<to_find, ts...>;
+		// [C++20] constexpr => std::count, std::find
+		/*static_assert(contains<to_find, ts...>);
 
 		constexpr auto result = gcl::mp::require
 		<
@@ -66,7 +67,20 @@ namespace gcl::mp
 		(
 			std::cbegin(result),
 			std::find(std::cbegin(result), std::cend(result), true)
-		);
+		);*/
+	}
+
+	// C++17 constexpr index_of. Use recursion. remove when C++20 is ready. see get_index comments for more infos.
+	template <typename T, typename ...ts>
+	static constexpr inline auto index_of = index_of_impl<T, ts...>();
+	template <typename T, typename T_it = void, typename... ts>
+	static constexpr std::size_t index_of_impl()
+	{
+		if constexpr (std::is_same_v<T, T_it>)
+			return 0;
+		if constexpr (sizeof...(ts) == 0)
+			throw 0; // "index_of : no match found";
+		return 1 + index_of_impl<T, ts...>();
 	}
 }
 
