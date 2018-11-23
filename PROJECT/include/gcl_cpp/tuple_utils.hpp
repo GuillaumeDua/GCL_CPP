@@ -21,6 +21,12 @@ namespace gcl
 			return gcl::mp::get_index<to_find, Ts...>();
 		}
 
+		template <typename T, typename ... ts>
+		constexpr bool contains(const std::tuple<ts...>&)
+		{
+			return std::disjunction<std::is_same<T, ts>...>::value;
+		}
+
 		template <typename func_type, typename ... Ts>
 		static void for_each(std::tuple<Ts...> & value, func_type func)
 		{

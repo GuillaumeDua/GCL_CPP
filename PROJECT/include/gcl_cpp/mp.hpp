@@ -1,7 +1,6 @@
 #ifndef GCL_TMP_H_
 # define GCL_TMP_H_
 
-//#include <gcl_cpp/type_index.hpp>
 #include <array>
 
 namespace gcl::mp
@@ -22,7 +21,7 @@ namespace gcl::mp
 
 	template <template <typename> class ... constraint_type>
 	struct require
-	{
+	{	// todo : std::conjunction ?
 		template <typename T>
 		static constexpr void on()
 		{
@@ -42,16 +41,21 @@ namespace gcl::mp
 		}
 	};
 
+	template <typename T, typename ... ts>
+	static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
+
 	template <typename to_find, typename ... ts>
 	/*constexpr */auto get_index()
 	{	// [C++20] constexpr => std::count, std::find
+
+		static_assert(contains<to_find, ts...>);
+
 		constexpr auto result = gcl::mp::require
 		<
 			gcl::mp::partial_template<std::is_same, ts>::type
 			...
 		>::values_on<to_find>;
 
-		//static_assert(std::count(std::cbegin(result), std::cend(result), true) <= 1);
 		auto count = std::count(std::cbegin(result), std::cend(result), true);
 		if (count > 1)
 			throw std::runtime_error("get_index : duplicate type");
