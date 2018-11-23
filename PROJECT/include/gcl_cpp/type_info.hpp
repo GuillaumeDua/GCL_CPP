@@ -42,13 +42,8 @@ namespace gcl::type_info
 		using type_at = typename std::tuple_element<N, std_type>::type;
 
 		// C++20 :
-		/*template <typename T>
-		static constexpr inline size_t index_of = gcl::tuple_utils::index_of<T>(std_type{});*/
 		template <typename T>
-		static constexpr inline size_t index_of(void)
-		{
-			return gcl::tuple_utils::index_of<T>(std_type{});
-		}
+		static constexpr inline size_t index_of = gcl::mp::index_of<T, Ts...>;
 
 		template <typename T>
 		static constexpr inline bool contains = gcl::mp::contains<T, Ts...>;

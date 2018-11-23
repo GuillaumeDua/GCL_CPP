@@ -43,7 +43,7 @@ namespace gcl::type_index
 			{
 				static_assert(std::is_base_of<interface_t, T>::value, "gcl::type_index::interface_is<I>::of_types<...T>::element<T>");
 				element()
-					: basic_container_type::value_type{ pack_t::template index_of<T>(), { std::ref(type_helper::get_default_constructor_t<T>::value) } }
+					: basic_container_type::value_type{ pack_t::template index_of<T>, { std::ref(type_helper::get_default_constructor_t<T>::value) } }
 				{}
 			};
 
@@ -57,7 +57,7 @@ namespace gcl::type_index
 				template <typename T>
 				static inline constexpr index_type index_of(void)
 				{
-					return pack_t::template index_of<T>();
+					return pack_t::template index_of<T>;
 				}
 				template <typename T>
 				inline typename basic_container_type::mapped_type at(void) const

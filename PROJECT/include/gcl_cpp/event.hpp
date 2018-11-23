@@ -347,12 +347,12 @@ namespace gcl
 				template <typename T>
 				socket_type & on()
 				{
-					return sockets[tuple_info_t::index_of<T>()];
+					return sockets[tuple_info_t::index_of<T>];
 				}
 				template <typename T>
 				void add(socket_callback cb)
 				{
-					sockets[tuple_info_t::index_of<T>()].push_back(cb);
+					sockets[tuple_info_t::index_of<T>].push_back(cb);
 				}
 
 				template <typename T>

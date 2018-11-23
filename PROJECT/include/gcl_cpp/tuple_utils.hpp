@@ -16,13 +16,13 @@ namespace gcl
 		}
 
 		template <typename to_find, typename ... Ts>
-		static std::size_t index_of(const std::tuple<Ts...> &)
+		static constexpr std::size_t index_of(const std::tuple<Ts...> &)
 		{
 			return gcl::mp::get_index<to_find, Ts...>();
 		}
 
 		template <typename T, typename ... ts>
-		constexpr bool contains(const std::tuple<ts...>&)
+		static constexpr  bool contains(const std::tuple<ts...>&)
 		{
 			return std::disjunction<std::is_same<T, ts>...>::value;
 		}
