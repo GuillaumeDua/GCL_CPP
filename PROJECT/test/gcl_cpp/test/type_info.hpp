@@ -24,7 +24,7 @@ namespace gcl::test
 
 				using my_pack_t = typename gcl::type_info::variadic_template<Toto, Titi, Tata, Tutu>;
 
-				GCL_TEST__EXPECT_VALUE(my_pack_t::index_of<Tata>(), std::size_t{ 2 });
+				GCL_TEST__EXPECT_VALUE(my_pack_t::index_of<Tata>, std::size_t{ 2 });
 				GCL_TEST__EXPECT(!my_pack_t::contains<NotInPack>);
 			}
 		};
