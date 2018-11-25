@@ -6,6 +6,12 @@
 namespace gcl::mp
 {	// C++17
 	template <typename ... ts>
+	struct type_pack
+	{	// constexpr type that has variadic parameter
+		// use this instead of std::tuple for viariadic-as-std-tuple-parameter
+	};
+
+	template <typename ... ts>
 	struct super : ts...
 	{};
 
@@ -92,27 +98,27 @@ namespace gcl::mp
 		static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
 
 		template <typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset_initializer(std::tuple<ts...> const&, std::tuple<us...> const&)
+		constexpr static auto or_as_bitset_initializer(type_pack<ts...> const&, type_pack<us...> const&)
 		{
-			return or_as_bitset_initializer_impl(std::tuple<ts...>{}, std::tuple<us...>{}, 0);
+			return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, 0);
 		}
 		template <typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset(std::tuple<ts...> const&, std::tuple<us...> const&)
+		constexpr static auto or_as_bitset(type_pack<ts...> const&, type_pack<us...> const&)
 		{
-			const auto initializer = or_as_bitset_initializer(std::tuple<ts...>{}, std::tuple<us...>{});
+			const auto initializer = or_as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
 			return std::bitset<sizeof...(ts)>{initializer};
 		}
 
 	private:
 		template <typename T_it, typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset_initializer_impl(std::tuple<T_it, ts...> const&, std::tuple<us...> const&, std_bitset_initializer_type value = 0)
+		constexpr static auto or_as_bitset_initializer_impl(type_pack<T_it, ts...> const&, type_pack<us...> const&, std_bitset_initializer_type value = 0)
 		{	// todo : no recursion. something like :
 			// return ((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1), ...;
 			value |= gcl::mp::contains<T_it, us...>;
 			if constexpr (sizeof...(ts) == 0)
 				return value;
 			else
-				return or_as_bitset_initializer_impl(std::tuple<ts...>{}, std::tuple<us...>{}, value << 1);
+				return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, value << 1);
 		}
 	};
 }
