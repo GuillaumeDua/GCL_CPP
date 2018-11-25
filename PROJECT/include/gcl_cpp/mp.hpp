@@ -82,6 +82,39 @@ namespace gcl::mp
 			throw 0; // "index_of : no match found";
 		return 1 + index_of_impl<T, ts...>();
 	}
+
+	struct filter
+	{	// allow filtering operation on variadic type,
+		// using gcl::mp::contains and std::bitset
+		// or_as_bitset impl is :
+		// { T0, T1, T2 } | {T4, T1, T5} => 010
+		using std_bitset_initializer_type = unsigned long long;
+		static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
+
+		template <typename ... ts, typename ... us>
+		constexpr static auto or_as_bitset_initializer(std::tuple<ts...> const&, std::tuple<us...> const&)
+		{
+			return or_as_bitset_initializer_impl(std::tuple<ts...>{}, std::tuple<us...>{}, 0);
+		}
+		template <typename ... ts, typename ... us>
+		constexpr static auto or_as_bitset(std::tuple<ts...> const&, std::tuple<us...> const&)
+		{
+			const auto initializer = or_as_bitset_initializer(std::tuple<ts...>{}, std::tuple<us...>{});
+			return std::bitset<sizeof...(ts)>{initializer};
+		}
+
+	private:
+		template <typename T_it, typename ... ts, typename ... us>
+		constexpr static auto or_as_bitset_initializer_impl(std::tuple<T_it, ts...> const&, std::tuple<us...> const&, std_bitset_initializer_type value = 0)
+		{	// todo : no recursion. something like :
+			// return ((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1), ...;
+			value |= gcl::mp::contains<T_it, us...>;
+			if constexpr (sizeof...(ts) == 0)
+				return value;
+			else
+				return or_as_bitset_initializer_impl(std::tuple<ts...>{}, std::tuple<us...>{}, value << 1);
+		}
+	};
 }
 
 namespace gcl::deprecated::mp
