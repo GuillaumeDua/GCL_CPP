@@ -33,13 +33,14 @@ namespace gcl::type_info
 
 	template <typename ... Ts>
 	struct variadic_template
-	{
+	{	// wrapper to gcl::mp::<function_name>
+
 		using std_type = std::tuple<Ts...>;
 
 		inline static constexpr auto size = sizeof...(Ts); // or std::tuple_size_v<tuple_type>
 
 		template <size_t N>
-		using type_at = typename std::tuple_element<N, std_type>::type;
+		using type_at = gcl::mp::type_at<N, Ts...>;
 
 		template <typename T>
 		static constexpr inline size_t index_of = gcl::mp::index_of<T, Ts...>;

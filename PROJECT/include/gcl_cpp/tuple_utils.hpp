@@ -9,7 +9,7 @@ namespace gcl
 		// using std::tuple<ts...> parameter for ts resolution
 
 		template <size_t N, typename ... ts>
-		using type_at = typename std::tuple_element<N, std::tuple<ts...>>::type;
+		using type_at = gcl::mp::type_at<N, ts...>;
 
 		template <typename to_find, typename ... Ts>
 		static constexpr std::size_t index_of(const std::tuple<Ts...> &)

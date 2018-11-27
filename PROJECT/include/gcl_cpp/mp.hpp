@@ -84,6 +84,9 @@ namespace gcl
 		template <typename T, typename ...ts>
 		static constexpr inline auto index_of = index_of_impl<T, ts...>();
 
+		template <size_t N, typename ...ts>
+		using type_at = typename std::tuple_element<N, std::tuple<ts...>>::type;
+
 		template <typename T, typename ... ts>
 		constexpr static bool is_unique()
 		{
