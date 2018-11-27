@@ -80,12 +80,31 @@ namespace gcl::test
 			};
 			using dependencies_t = std::tuple<on, values_on>;
 		};
+		struct is_unique
+		{
+			static constexpr void proceed()
+			{
+				constexpr bool yes = gcl::mp::is_unique_v
+				<
+					int,
+					double, int, char, float
+				>;
+				static_assert(yes);
+				constexpr bool no = gcl::mp::is_unique_v
+				<
+					int,
+					double, int, char, float, int
+				>;
+				static_assert(not no);
+			}
+		};
 
 		using dependencies_t = std::tuple
 		<
 			super,
 			partial_template,
-			require
+			require,
+			is_unique
 		>;
 	};
 }

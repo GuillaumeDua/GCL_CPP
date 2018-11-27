@@ -2,124 +2,149 @@
 # define GCL_TMP_H_
 
 #include <array>
+#include <bitset>
 
-namespace gcl::mp
-{	// C++17
-	template <typename ... ts>
-	struct type_pack
-	{	// constexpr type that has variadic parameter
-		// use this instead of std::tuple for viariadic-as-std-tuple-parameter
-	};
+namespace gcl
+{
+	struct mp
+	{	// C++17
+		template <typename ... ts>
+		struct type_pack
+		{	// constexpr type that has variadic parameter
+			// use this instead of std::tuple for viariadic-as-std-tuple-parameter,
+			// if your optimization level does not skip unused variables
+		};
 
-	template <typename ... ts>
-	struct super : ts...
-	{};
+		template <typename ... ts>
+		struct super : ts...
+		{};
 
-	template <template <typename...> class trait_type, typename ... ts>
-	struct partial_template
-	{
-		template <typename ... us>
-		using type = trait_type<ts..., us...>;
-
-		template <typename ... us>
-		static constexpr bool value = trait_type<ts..., us...>::value;
-	};
-
-	template <template <typename> class ... constraint_type>
-	struct require
-	{	// todo : std::conjunction ?
-		template <typename T>
-		static constexpr void on()
+		template <template <typename...> class trait_type, typename ... ts>
+		struct partial_template
 		{
-			(check_constraint<constraint_type, T>(), ...);
-		}
+			template <typename ... us>
+			using type = trait_type<ts..., us...>;
 
-		template <typename T>
-		static inline constexpr
-			std::array<bool, sizeof...(constraint_type)>
-			values_on{ std::move(constraint_type<T>::value)... };
+			template <typename ... us>
+			static constexpr bool value = trait_type<ts..., us...>::value;
+		};
 
-	private:
-		template <template <typename> class constraint_type, typename T>
-		static constexpr void check_constraint()
+		template <template <typename> class ... constraint_type>
+		struct require
+		{	// todo : std::conjunction ?
+			template <typename T>
+			static constexpr void on()
+			{
+				(check_constraint<constraint_type, T>(), ...);
+			}
+
+			template <typename T>
+			static inline constexpr
+				std::array<bool, sizeof...(constraint_type)>
+				values_on{ std::move(constraint_type<T>::value)... };
+
+		private:
+			template <template <typename> class constraint_type, typename T>
+			static constexpr void check_constraint()
+			{
+				static_assert(constraint_type<T>::value, "constraint failed to apply. see template context for more infos");
+			}
+		};
+
+		template <typename T, typename ... ts>
+		static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
+
+		template <typename to_find, typename ... ts>
+		constexpr auto get_index()
 		{
-			static_assert(constraint_type<T>::value, "constraint failed to apply. see template context for more infos");
+			return index_of<to_find, ts...>;
+			// [C++20] constexpr => std::count, std::find
+			/*static_assert(contains<to_find, ts...>);
+
+			constexpr auto result = gcl::mp::require
+			<
+				gcl::mp::partial_template<std::is_same, ts>::type
+				...
+			>::values_on<to_find>;
+
+			auto count = std::count(std::cbegin(result), std::cend(result), true);
+			if (count > 1)
+				throw std::runtime_error("get_index : duplicate type");
+			if (count == 0)
+				throw std::out_of_range("get_index : no match");
+
+			return std::distance
+			(
+				std::cbegin(result),
+				std::find(std::cbegin(result), std::cend(result), true)
+			);*/
 		}
-	};
 
-	template <typename T, typename ... ts>
-	static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
+		// C++17 constexpr index_of. Use recursion. remove when C++20 is ready. see get_index comments for more infos.
+		template <typename T, typename ...ts>
+		static constexpr inline auto index_of = index_of_impl<T, ts...>();
 
-	template <typename to_find, typename ... ts>
-	constexpr auto get_index()
-	{
-		return index_of<to_find, ts...>;
-		// [C++20] constexpr => std::count, std::find
-		/*static_assert(contains<to_find, ts...>);
-
-		constexpr auto result = gcl::mp::require
-		<
-			gcl::mp::partial_template<std::is_same, ts>::type
-			...
-		>::values_on<to_find>;
-
-		auto count = std::count(std::cbegin(result), std::cend(result), true);
-		if (count > 1)
-			throw std::runtime_error("get_index : duplicate type");
-		if (count == 0)
-			throw std::out_of_range("get_index : no match");
-
-		return std::distance
-		(
-			std::cbegin(result),
-			std::find(std::cbegin(result), std::cend(result), true)
-		);*/
-	}
-
-	// C++17 constexpr index_of. Use recursion. remove when C++20 is ready. see get_index comments for more infos.
-	template <typename T, typename ...ts>
-	static constexpr inline auto index_of = index_of_impl<T, ts...>();
-	template <typename T, typename T_it = void, typename... ts>
-	static constexpr std::size_t index_of_impl()
-	{
-		if constexpr (std::is_same_v<T, T_it>)
-			return 0;
-		if constexpr (sizeof...(ts) == 0)
-			throw 0; // "index_of : no match found";
-		return 1 + index_of_impl<T, ts...>();
-	}
-
-	struct filter
-	{	// allow filtering operation on variadic type,
-		// using gcl::mp::contains and std::bitset
-		// or_as_bitset impl is :
-		// { T0, T1, T2 } | {T4, T1, T5} => 010
-		using std_bitset_initializer_type = unsigned long long;
-		static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
-
-		template <typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
+		template <typename T, typename ... ts>
+		constexpr static bool is_unique()
 		{
-			return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, 0);
+			constexpr std::size_t remain_index = gcl::mp::index_of<T, ts...> +1;
+			return is_unique_impl<remain_index, T, ts...>(std::make_index_sequence<sizeof...(ts) - remain_index>());
 		}
-		template <typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset(type_pack<ts...>, type_pack<us...>)
-		{
-			const auto initializer = or_as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
-			return std::bitset<sizeof...(ts)>{initializer};
-		}
+		template <typename T, typename ... ts>
+		constexpr static bool inline is_unique_v = is_unique<T, ts...>();
 
-	private:
-		template <typename T_it, typename ... ts, typename ... us>
-		constexpr static auto or_as_bitset_initializer_impl(type_pack<T_it, ts...>, type_pack<us...>, std_bitset_initializer_type value = 0)
-		{	// todo : no recursion. something like :
-			// return ((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1), ...;
-			value |= gcl::mp::contains<T_it, us...>;
-			if constexpr (sizeof...(ts) == 0)
-				return value;
-			else
-				return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, value << 1);
-		}
+		struct filter
+		{	// allow filtering operation on variadic type,
+			// using gcl::mp::contains and std::bitset
+			// or_as_bitset impl is :
+			// { T0, T1, T2 } | {T4, T1, T5} => 010
+			using std_bitset_initializer_type = unsigned long long;
+			static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
+
+			template <typename ... ts, typename ... us>
+			constexpr static auto or_as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
+			{
+				return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, 0);
+			}
+			template <typename ... ts, typename ... us>
+			constexpr static auto or_as_bitset(type_pack<ts...>, type_pack<us...>)
+			{
+				const auto initializer = or_as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
+				return std::bitset<sizeof...(ts)>{initializer};
+			}
+
+		private:
+			template <typename T_it, typename ... ts, typename ... us>
+			constexpr static auto or_as_bitset_initializer_impl(type_pack<T_it, ts...>, type_pack<us...>, std_bitset_initializer_type value = 0)
+			{	// todo : no recursion. something like :
+				// return ((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1), ...;
+				value |= gcl::mp::contains<T_it, us...>;
+				if constexpr (sizeof...(ts) == 0)
+					return value;
+				else
+					return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, value << 1);
+			}
+		};
+
+		private:
+			template <typename T, typename T_it = void, typename... ts>
+			static constexpr std::size_t index_of_impl()
+			{
+				if constexpr (std::is_same_v<T, T_it>)
+					return 0;
+				if constexpr (sizeof...(ts) == 0)
+					throw 0; // "index_of : no match found";
+				return 1 + index_of_impl<T, ts...>();
+			}
+			template <std::size_t remain_index, typename T, typename ... ts, std::size_t ...indexes>
+			constexpr static bool is_unique_impl(std::index_sequence<indexes...>)
+			{
+				return not contains
+				<
+					T,
+					std::decay_t<decltype(std::get<remain_index + indexes>(std::tuple<ts...>{})) > ...
+				>;
+			}
 	};
 }
 

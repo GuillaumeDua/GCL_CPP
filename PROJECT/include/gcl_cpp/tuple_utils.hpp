@@ -5,15 +5,11 @@
 namespace gcl
 {
 	struct tuple_utils
-	{
+	{	// wrapper to access gcl::mp::<func_name>,
+		// using std::tuple<ts...> parameter for ts resolution
+
 		template <size_t N, typename ... ts>
 		using type_at = typename std::tuple_element<N, std::tuple<ts...>>::type;
-
-		template <typename ... ts>
-		static constexpr std::size_t size(const std::tuple<ts...> &)
-		{
-			return std::tuple_size_v<std::tuple<ts...>>;
-		}
 
 		template <typename to_find, typename ... Ts>
 		static constexpr std::size_t index_of(const std::tuple<Ts...> &)
@@ -21,8 +17,14 @@ namespace gcl
 			return gcl::mp::get_index<to_find, Ts...>();
 		}
 
+		template <typename ... ts>
+		static constexpr std::size_t size(const std::tuple<ts...> &)
+		{
+			return std::tuple_size_v<std::tuple<ts...>>;
+		}
+
 		template <typename T, typename ... ts>
-		static constexpr  bool contains(const std::tuple<ts...>&)
+		static constexpr bool contains(const std::tuple<ts...>&)
 		{
 			return std::disjunction<std::is_same<T, ts>...>::value;
 		}
@@ -54,7 +56,7 @@ namespace gcl
 			// args_1 = args_2;
 			// e.g std::tuple<ts_1...>::operator=(std::tuple<ts_2...>)
 
-			static_assert(sizeof...(ts_args_1) == sizeof...(ts_args_2));
+			static_assert(sizeof...(ts_args_1) == sizeof...(ts_args_2)); // cld be `<=` with warning "partial expansion use for `ts_args_2`"
 			using indexes_type = std::make_index_sequence<sizeof...(ts_args_1)>;
 			visit_impl(func, args_1, args_2, indexes_type{});
 		}
