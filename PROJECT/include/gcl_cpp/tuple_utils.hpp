@@ -44,6 +44,28 @@ namespace gcl
 			for_each_impl(func, value, indexes_type{});
 		}
 
+		template <typename t_func, typename ... ts_args_1, typename ... ts_args_2>
+		static void visit(t_func & func, std::tuple<ts_args_1...> & args_1, std::tuple<ts_args_2...> & args_2)
+		{	// sync index visit.
+			// call func `sizeof...(args_1)` times, with std::get<index>(args_1), std::get<index>(args_2);
+			// example :
+			// gcl::tuple_utils::visit([](auto & arg1, auto && arg2) {arg1 = std::move(arg2); }, values, arguments);
+			// is equal to :
+			// args_1 = args_2;
+			// e.g std::tuple<ts_1...>::operator=(std::tuple<ts_2...>)
+
+			static_assert(sizeof...(ts_args_1) == sizeof...(ts_args_2));
+			using indexes_type = std::make_index_sequence<sizeof...(ts_args_1)>;
+			visit_impl(func, args_1, args_2, indexes_type{});
+		}
+		template <typename t_func, typename ... ts_args_1, typename ... ts_args_2>
+		static void visit(const t_func & func, const std::tuple<ts_args_1...> & args_1, const std::tuple<ts_args_2...> & args_2)
+		{
+			static_assert(sizeof...(ts_args_1) == sizeof...(ts_args_2));
+			using indexes_type = std::make_index_sequence<sizeof...(ts_args_1)>;
+			visit_impl(func, args_1, args_2, indexes_type{});
+		}
+
 	private:
 		template <typename func_type, typename tuple_type, std::size_t ... indexes>
 		static void for_each_impl(func_type func, tuple_type & variadic_template, std::index_sequence<indexes...>)
@@ -54,6 +76,17 @@ namespace gcl
 		static void for_each_impl(func_type func, const tuple_type & variadic_template, std::index_sequence<indexes...>)
 		{
 			(func(std::get<indexes>(variadic_template)), ...);
+		}
+
+		template <typename t_func, typename ... ts_args_1, typename ... ts_args_2, std::size_t ... indexes>
+		static void visit_impl(t_func & func, std::tuple<ts_args_1...> & args_1, std::tuple<ts_args_2...> & args_2, std::index_sequence<indexes...>)
+		{
+			(func(std::get<indexes>(args_1), std::get<indexes>(args_2)), ...);
+		}
+		template <typename t_func, typename ... ts_args_1, typename ... ts_args_2, std::size_t ... indexes>
+		static void visit_impl(const t_func & func, const std::tuple<ts_args_1...> & args_1, const std::tuple<ts_args_2...> & args_2, std::index_sequence<indexes...>)
+		{
+			(func(std::get<indexes>(args_1), std::get<indexes>(args_2)), ...);
 		}
 	};
 }
