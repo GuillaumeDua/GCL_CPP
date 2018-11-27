@@ -41,4 +41,4 @@ Each **component** *(split by namespace)* aims to be :
 | `gcL::old`                         | shameful C++98/0x components that are not supported anymore                                 |
 
 ### About the name :
-> GCL comes from `Guss's Common Library`
+> `GCL` stands for `Guss's Common Library`
