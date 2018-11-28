@@ -85,6 +85,8 @@ namespace gcl
 		static constexpr inline auto index_of = index_of_impl<T, ts...>();
 
 		template <size_t N, typename ...ts>
+		// better than std::decay_t<decltype(std::get<index>(std::tuple<ts...>{}))>
+		// because one or more types in ts... may not be default constructible
 		using type_at = typename std::tuple_element<N, std::tuple<ts...>>::type;
 
 		template <typename T, typename ... ts>
@@ -148,7 +150,7 @@ namespace gcl
 				return not contains
 				<
 					T,
-					std::decay_t<decltype(std::get<remain_index + indexes>(std::tuple<ts...>{})) > ...
+					gcl::mp::type_at<remain_index + indexes, ts...> ...
 				>;
 			}
 			template <typename ... ts, std::size_t ... indexes>
