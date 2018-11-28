@@ -90,11 +90,14 @@ namespace gcl
 		template <typename T, typename ... ts>
 		constexpr static bool is_unique()
 		{
-			constexpr std::size_t remain_index = gcl::mp::index_of<T, ts...> +1;
+			constexpr std::size_t remain_index = gcl::mp::index_of<T, ts...> + 1;
 			return is_unique_impl<remain_index, T, ts...>(std::make_index_sequence<sizeof...(ts) - remain_index>());
 		}
 		template <typename T, typename ... ts>
 		constexpr static bool inline is_unique_v = is_unique<T, ts...>();
+
+		template <typename ... ts>
+		constexpr static inline bool are_unique = are_unique_impl<ts...>(std::make_index_sequence<sizeof...(ts)>());
 
 		struct filter
 		{	// allow filtering operation on variadic type,
@@ -147,6 +150,11 @@ namespace gcl
 					T,
 					std::decay_t<decltype(std::get<remain_index + indexes>(std::tuple<ts...>{})) > ...
 				>;
+			}
+			template <typename ... ts, std::size_t ... indexes>
+			constexpr static bool are_unique_impl(std::index_sequence<indexes...>)
+			{
+				return (gcl::mp::is_unique_v<gcl::mp::type_at<indexes, ts...>, ts...> && ...);
 			}
 	};
 }
