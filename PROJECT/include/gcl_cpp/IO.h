@@ -1,12 +1,51 @@
 #ifndef GCL_CPP_IO__
 # define GCL_CPP_IO__
 
-# include <iostream>
-# include <gcl_cpp/preprocessor.hpp>
-
-# include <sstream> // For test purpose only
+#include <gcl_cpp/preprocessor.hpp>
+#include <iostream>
+#include <type_traits>
+#include <typeinfo> // check with #if defined(__cpp_rtti)
 
 // TODO : merge with gcl::io::fd_proxy
+
+namespace gcl::io::introspection
+{
+	// has std::ostream & << declval<T>()
+	template <typename T, typename = void>
+	struct has_ostream_shift_operator : std::false_type {};
+	template <typename T>
+	struct has_ostream_shift_operator
+	<
+		T,
+		std::void_t<decltype(std::declval<std::ostream>() << std::declval<T>())>
+	> : std::true_type {};
+
+	template <typename T, typename = void>
+	struct has_istream_shift_operator : std::false_type {};
+	template <typename T>
+	struct has_istream_shift_operator
+	<
+		T,
+		std::void_t<decltype(std::declval<std::istream>() >> std::declval<T>())>
+	> : std::true_type {};
+}
+
+template
+<
+	class CharT,
+	class Traits,
+	typename T,
+	typename = std::enable_if_t<not gcl::io::introspection::has_ostream_shift_operator<T>::value>
+>
+std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits> & os,
+	const T & value)
+{
+	# pragma message ("gcl::compilation_warning : gcl::io : use of default-generated std::ostream&operator<<(T)")
+	#if defined(__cpp_rtti)
+	return os << "[gcl::io]{0x" << &value << "}(" << typeid(T).name() << ')';
+	#endif
+	return os << "[gcl::io]{0x" << &value << "}(no __cpp_rtti)";
+}
 
 namespace gcl::io::policy
 {
@@ -95,8 +134,10 @@ namespace gcl::io::policy
 	};
 }
 
+# include <sstream> // For test purpose only
+
 namespace gcl::io
-{
+{	// todo : move to test/gcl_cpp/test/io.h
 	struct Test
 	{
 		static bool Proceed(void)
