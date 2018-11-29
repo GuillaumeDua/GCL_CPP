@@ -140,7 +140,7 @@ namespace gcl::pattern::ecs
 		{
 			for (std::size_t i{ 0 }; i < size(); ++i)
 			{
-				((std::cout << '[' << std::setw(8) << get<ts_components>(i) << "] "), ...) << '\n';
+				((os << '[' << std::setw(8) << get<ts_components>(i) << "] "), ...) << '\n';
 			}
 		}
 #endif
