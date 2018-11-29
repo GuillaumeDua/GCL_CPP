@@ -109,31 +109,29 @@ namespace gcl
 			// using gcl::mp::contains and std::bitset
 			// or_as_bitset impl is :
 			// { T0, T1, T2 } | {T4, T1, T5} => 010
-			using std_bitset_initializer_type = unsigned long long;
+			using std_bitset_initializer_type = unsigned long long; // not typedef in std::bitset
 			static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
+
+			struct disjunction
+			{
+
+			};
 
 			template <typename ... ts, typename ... us>
 			constexpr static auto or_as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
 			{
-				return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, 0);
+				std_bitset_initializer_type value{ 0 };
+				return ~
+				(
+					((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1),
+					...
+				);
 			}
 			template <typename ... ts, typename ... us>
 			constexpr static auto or_as_bitset(type_pack<ts...>, type_pack<us...>)
 			{
 				const auto initializer = or_as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
 				return std::bitset<sizeof...(ts)>{initializer};
-			}
-
-		private:
-			template <typename T_it, typename ... ts, typename ... us>
-			constexpr static auto or_as_bitset_initializer_impl(type_pack<T_it, ts...>, type_pack<us...>, std_bitset_initializer_type value = 0)
-			{	// todo : no recursion. something like :
-				// return ((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1), ...;
-				value |= gcl::mp::contains<T_it, us...>;
-				if constexpr (sizeof...(ts) == 0)
-					return value;
-				else
-					return or_as_bitset_initializer_impl(type_pack<ts...>{}, type_pack<us...>{}, value << 1);
 			}
 		};
 
