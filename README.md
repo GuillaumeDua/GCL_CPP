@@ -13,6 +13,7 @@ Each **component** *(split by namespace)* aims to be :
 | `mp`                               | meta-programming functions *(partial template definition, require/constraints, ...)*       |
 | `tuple_utils`                      | functions to extend std::tuple functionalities.<br>*(type_at, index_of, for_each, ...)*    |
 | `test`                             | stand-alone test library                                                                   |
+| `pattern::ecs`                     | ECS (Entity Component System) design                                                       |
 | `container::component_aggregator`  | generic variadic CRTP + type-erasure                                                       |
 | `container::polymorphic_vector`    | contiguous container that store type-erased datas<br>allow per-type fast linear access<br>allow linear fast access as well     |
 | `container::entity_vector`         | same as container::polymorphic_vector<br>add per-properties fast linear access             |
