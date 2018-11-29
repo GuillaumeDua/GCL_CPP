@@ -108,29 +108,25 @@ namespace gcl
 		{	// allow filtering operation on variadic type,
 			// using gcl::mp::contains and std::bitset
 			// or_as_bitset impl is :
-			// { T0, T1, T2 } | {T4, T1, T5} => 010
-			using std_bitset_initializer_type = unsigned long long; // not typedef in std::bitset
+			// { T0, T1, T2 } | {T1, T4, T5} => 010
+
+			using std_bitset_initializer_type = unsigned long long; // not type-alias in std::bitset for constexpr constructor parameter
 			static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
 
-			struct disjunction
-			{
-
-			};
-
 			template <typename ... ts, typename ... us>
-			constexpr static auto or_as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
+			constexpr static auto as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
 			{
 				std_bitset_initializer_type value{ 0 };
 				return ~
 				(
-					((value |= std_bitset_initializer_type{ gcl::mp::contains<ts, us...> }) << 1),
+					((value |= gcl::mp::contains<ts, us...> ) << 1),
 					...
 				);
 			}
 			template <typename ... ts, typename ... us>
-			constexpr static auto or_as_bitset(type_pack<ts...>, type_pack<us...>)
+			constexpr static auto as_bitset(type_pack<ts...>, type_pack<us...>)
 			{
-				const auto initializer = or_as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
+				const auto initializer = as_bitset_initializer(type_pack<ts...>{}, type_pack<us...>{});
 				return std::bitset<sizeof...(ts)>{initializer};
 			}
 		};
