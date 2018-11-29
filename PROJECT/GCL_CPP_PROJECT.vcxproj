@@ -163,6 +163,7 @@
     <ClInclude Include="include\gcl_cpp\old\thread.hpp" />
     <ClInclude Include="include\gcl_cpp\IO.h" />
     <ClInclude Include="include\gcl_cpp\maths.h" />
+    <ClInclude Include="include\gcl_cpp\pattern\ecs.hpp" />
     <ClInclude Include="include\gcl_cpp\pattern\state_machine.hpp" />
     <ClInclude Include="include\gcl_cpp\pattern\type_erasure.hpp" />
     <ClInclude Include="include\gcl_cpp\preprocessor.hpp" />
@@ -180,6 +181,8 @@
     <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
     <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
     <ClInclude Include="test\gcl_cpp\test\mp.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\pattern.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\pattern\ecs.hpp" />
     <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
     <ClInclude Include="include\gcl_cpp\type_info.hpp" />
     <ClInclude Include="include\gcl_cpp\type_traits.hpp" />
