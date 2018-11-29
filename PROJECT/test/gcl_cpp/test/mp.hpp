@@ -41,6 +41,15 @@ namespace gcl::test
 
 			using dependencies_t = std::tuple<type, value>;
 		};
+		struct meet_requirement
+		{
+			static constexpr void proceed()
+			{
+				struct A { A() = delete; };
+				static_assert(not gcl::mp::meet_requirement<A, std::is_default_constructible>);
+				static_assert(gcl::mp::meet_requirement<int, std::is_pod, std::is_default_constructible>);
+			}
+		};
 		struct require
 		{
 			template <typename T>
@@ -102,6 +111,7 @@ namespace gcl::test
 		using dependencies_t = std::tuple
 		<
 			super,
+			meet_requirement,
 			partial_template,
 			require,
 			is_unique

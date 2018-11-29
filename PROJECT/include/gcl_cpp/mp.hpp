@@ -29,9 +29,12 @@ namespace gcl
 			static constexpr bool value = trait_type<ts..., us...>::value;
 		};
 
+		template <typename T, template <typename> class ... traits>
+		constexpr static bool meet_requirement = (traits<T>::value && ...);
+
 		template <template <typename> class ... constraint_type>
 		struct require
-		{	// todo : std::conjunction ?
+		{
 			template <typename T>
 			static constexpr void on()
 			{
