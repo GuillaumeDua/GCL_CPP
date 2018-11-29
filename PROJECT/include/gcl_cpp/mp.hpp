@@ -1,13 +1,38 @@
-#ifndef GCL_TMP_H_
-# define GCL_TMP_H_
+#pragma once
 
 #include <array>
 #include <bitset>
 
 namespace gcl
 {
-	struct mp
+	class mp
 	{	// C++17
+		template <typename T, typename T_it = void, typename... ts>
+		static constexpr std::size_t index_of_impl()
+		{
+			if constexpr (std::is_same_v<T, T_it>)
+				return 0;
+			if constexpr (sizeof...(ts) == 0)
+				throw 0; // "index_of : no match found";
+			return 1 + index_of_impl<T, ts...>();
+		}
+		template <std::size_t remain_index, typename T, typename ... ts, std::size_t ...indexes>
+		constexpr static bool is_unique_impl(std::index_sequence<indexes...>)
+		{
+			return not contains
+			<
+				T,
+				gcl::mp::type_at<remain_index + indexes, ts...> ...
+			>;
+		}
+		template <typename ... ts, std::size_t ... indexes>
+		constexpr static bool are_unique_impl(std::index_sequence<indexes...>)
+		{
+			return (gcl::mp::is_unique_v<gcl::mp::type_at<indexes, ts...>, ts...> && ...);
+		}
+
+	public:
+
 		template <typename ... ts>
 		struct type_pack
 		{	// constexpr type that has variadic parameter
@@ -119,7 +144,7 @@ namespace gcl
 				std_bitset_initializer_type value{ 0 };
 				return ~
 				(
-					((value |= gcl::mp::contains<ts, us...> ) << 1),
+					((value |= gcl::mp::contains<ts, us...>) << 1),
 					...
 				);
 			}
@@ -130,31 +155,6 @@ namespace gcl
 				return std::bitset<sizeof...(ts)>{initializer};
 			}
 		};
-
-		private:
-			template <typename T, typename T_it = void, typename... ts>
-			static constexpr std::size_t index_of_impl()
-			{
-				if constexpr (std::is_same_v<T, T_it>)
-					return 0;
-				if constexpr (sizeof...(ts) == 0)
-					throw 0; // "index_of : no match found";
-				return 1 + index_of_impl<T, ts...>();
-			}
-			template <std::size_t remain_index, typename T, typename ... ts, std::size_t ...indexes>
-			constexpr static bool is_unique_impl(std::index_sequence<indexes...>)
-			{
-				return not contains
-				<
-					T,
-					gcl::mp::type_at<remain_index + indexes, ts...> ...
-				>;
-			}
-			template <typename ... ts, std::size_t ... indexes>
-			constexpr static bool are_unique_impl(std::index_sequence<indexes...>)
-			{
-				return (gcl::mp::is_unique_v<gcl::mp::type_at<indexes, ts...>, ts...> && ...);
-			}
 	};
 }
 
@@ -230,19 +230,19 @@ namespace gcl::deprecated::mp
 		static void	call(void)
 		{
 			T_Functor<T0>::call();
-			for_each<T...>::call<T_Functor>();
+			for_each<T...>::template call<T_Functor>();
 		}
 		template <template <typename> class T_Functor, size_t N = 0>
 		static void	call_at(const size_t pos)
 		{
 			if (N == pos)	T_Functor<T0>::call();
-			else			for_each<T...>::call_at<T_Functor, (N + 1)>(pos);
+			else			for_each<T...>::template call_at<T_Functor, (N + 1)>(pos);
 		}
 		template <template <typename> class T_Functor, size_t N = 0>
 		static typename T_Functor<T0>::return_type	call_at_with_return_value(const size_t pos)
 		{
 			if (N == pos)	return T_Functor<T0>::call();
-			else			return for_each<T...>::call_at_with_return_value<T_Functor, (N + 1)>(pos);
+			else			return for_each<T...>::template call_at_with_return_value<T_Functor, (N + 1)>(pos);
 		}
 	};
 	template <>								struct for_each<>
@@ -270,4 +270,3 @@ namespace gcl::deprecated::mp
 	};
 }
 
-#endif // GCL_TMP_H_
