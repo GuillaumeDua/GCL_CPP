@@ -21,7 +21,7 @@
 // https://developercommunity.visualstudio.com/content/problem/331686/c-fold-expression-in-static-assert-does-not-compil.html
 // e.g : constexpr bool b = true; static_assert(b); // does not compile
 
-namespace gcl::ecs
+namespace gcl::pattern::ecs
 {
 	using id_type = std::size_t;
 

@@ -10,7 +10,7 @@ namespace gcl::test::pattern_impl
 		{
 			static void proceed()
 			{
-				using components_type = gcl::ecs::components<int, double, bool>;
+				using components_type = gcl::pattern::ecs::components<int, double, bool>;
 				static_assert(components_type::count == 3);
 				assert(components_type::index_of<double> == 1);
 				static_assert(components_type::contains<double>);
@@ -21,7 +21,7 @@ namespace gcl::test::pattern_impl
 		{
 			static void proceed()
 			{
-				using storage_type = gcl::ecs::components_storage<std::string, int, double>;
+				using storage_type = gcl::pattern::ecs::components_storage<std::string, int, double>;
 				static_assert(storage_type::count == 3);
 				static_assert(std::is_same_v<int, storage_type::components_type::type_at<1>>);
 
@@ -40,7 +40,7 @@ namespace gcl::test::pattern_impl
 		{
 			static void proceed()
 			{
-				using manager_type = gcl::ecs::manager<int, double, std::string>;
+				using manager_type = gcl::pattern::ecs::manager<int, double, std::string>;
 				manager_type manager{ 5 };
 
 				{	// 0
@@ -69,7 +69,7 @@ namespace gcl::test::pattern_impl
 				manager.reorder();
 
 				std::vector<std::reference_wrapper<manager_type::entity_type>> matched;
-				using contract_type = gcl::ecs::contract<std::string, int>;
+				using contract_type = gcl::pattern::ecs::contract<std::string, int>;
 				manager.for_each_entities
 				(
 					contract_type{},
