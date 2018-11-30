@@ -18,7 +18,6 @@ namespace gcl::test
 				GCL_TEST__EXPECT(std::is_same_v<gcl::functionnal::trait<func_with_parameter_type>::arguments_type::type_at<0>, std::string&&>);
 			}
 		};
-
 		struct combine_homogeneous
 		{
 			static void proceed()
@@ -52,7 +51,6 @@ namespace gcl::test
 				auto empty_func = gcl::functionnal::combine_homogeneous();
 			}
 		};
-
 		struct combine_heterogeneous
 		{
 			static void proceed()
@@ -69,7 +67,6 @@ namespace gcl::test
 				GCL_TEST__EXPECT_VALUE(merged(parameter_type_2{}), 2);
 			}
 		};
-
 		struct combine_heterogeneous_t
 		{
 			static void proceed()
@@ -89,7 +86,6 @@ namespace gcl::test
 				GCL_TEST__EXPECT_VALUE(merged_type{}(parameter_type_2{}), 2);
 			}
 		};
-
 		struct callable_operator_plus
 		{
 			static void proceed()
@@ -99,13 +95,28 @@ namespace gcl::test
 				GCL_TEST__EXPECT_VALUE(i, 2);
 			}
 		};
+		struct cx
+		{
+			struct function
+			{
+				constexpr static void proceed()
+				{
+					using function_type = gcl::functionnal::cx::function<int(int)>;
+					constexpr function_type add_one{ [](int i) { return i + 1; } };
+					static_assert(add_one(41) == 42);
+				}
+			};
+
+			using dependencies_t = gcl::type_info::pack<function>;
+		};
 
 		using dependencies_t = gcl::type_info::pack
 		<
 			trait,
 			combine_homogeneous,
 			combine_heterogeneous,
-			combine_heterogeneous_t
+			combine_heterogeneous_t,
+			cx
 		>;
 	};
 }

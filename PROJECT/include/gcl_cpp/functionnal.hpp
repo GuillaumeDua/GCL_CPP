@@ -122,3 +122,44 @@ static auto operator+(F1 && f1, F2 && f2)
 	return gcl::functionnal::combine_homogeneous(std::forward<F1>(f1), std::forward<F2>(f2));
 }
 
+namespace gcl::functionnal::cx
+{
+	template <class>
+	struct function;
+
+	template <class t_return, class... ts_args>
+	struct function<t_return(ts_args...)>
+	{	// wrapper to constexpr function ptr
+		// thus, lambda cannot have a storage (e.g capture)
+
+		using result_type = t_return;
+		using arguments_type = gcl::mp::type_pack<ts_args...>;
+		using raw_type = t_return(*)(ts_args...);
+
+		constexpr function() = default;
+		constexpr function(function && func) = default;
+		constexpr function(const function & func) = delete;
+
+		constexpr function(raw_type ptr)
+			: value{ ptr }
+		{}
+
+		constexpr operator bool() const
+		{
+			return value != nullptr;
+		}
+		constexpr bool operator!() const
+		{
+			return !static_cast<bool>(*this);
+		}
+		constexpr t_return operator()(ts_args ... args) const
+		{
+			if (!*this)
+				throw std::bad_function_call();
+			return (*value)(std::forward<ts_args>(args)...);
+		}
+
+	private:
+		raw_type value = nullptr;
+	};
+}
