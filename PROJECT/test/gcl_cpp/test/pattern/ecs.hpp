@@ -44,18 +44,18 @@ namespace gcl::test::pattern_impl
 				manager_type manager{ 5 };
 
 				{	// 0
-					auto &[value, comp] = manager.create_entity<>();
+					auto [value, comp] = manager.create_entity<>();
 					value.is_alive = false;
 				}
 				{	// 1
-					auto &[value, comp] = manager.create_entity<int>();
+					auto [value, comp] = manager.create_entity<int>();
 					std::get<0>(comp) = 11;
 					GCL_TEST__EXPECT_VALUE(value.id, 1);
 					auto str_component = manager.entity_add_component<std::string>(value.id, std::size_t{ 5 }, '1');
 					GCL_TEST__EXPECT_VALUE(str_component, std::string(5, '1'));
 				}
 				{	// 2
-					auto &[value, comp] = manager.create_entity<>();
+					auto [value, comp] = manager.create_entity<>();
 					manager.entity_add_component<int>(value.id, 22);
 					manager.destroy_entity(value);
 				}
@@ -63,7 +63,7 @@ namespace gcl::test::pattern_impl
 					manager.entity_add_component<int>(manager.create_index(), 33);
 				}
 				{	// 4
-					auto &[value, comp] = manager.create_entity<double, int, std::string>(444, 44, "44444");
+					auto [value, comp] = manager.create_entity<double, int, std::string>(444, 44, "44444");
 				}
 
 				manager.reorder();

@@ -45,7 +45,7 @@ namespace gcl::serialization
 				static constexpr void	write(std::ostream & os, const T & var)
 				{
 					static_assert(std::is_base_of<_InterfaceType, T>::value, "gcl::serialization::interface_is<I>::writer::write<T> : T is not child of I");
-					writer_impl<T>::write_impl<>(os, var);
+					writer_impl<T>::template write_impl<>(os, var);
 				}
 
 			private:

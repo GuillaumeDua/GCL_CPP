@@ -247,10 +247,12 @@ namespace gcl
 
 				while (first != last)
 				{
-					futures.emplace_back(std::move(std::async(std::launch::async, [&mutexes]() {
+					futures.emplace_back(std::move(std::async(std::launch::async, [&node_mutexes]()
+					{
 						for (uint32_t i = 0; i < nodes.size(); ++i)
 						{
-							std::unique_lock<std::mutex> lock(mutexes[i]);
+							std::unique_lock<std::mutex> lock(node_mutexes[i]);
+							auto & elem = nodes.at(i);
 							nodes[i](elem);
 						}
 					})));
@@ -314,7 +316,7 @@ namespace gcl
 			void process(const event_t & ev)
 			{
 				static_assert(std::is_base_of<event::interface_t, event_t>::value, "event_t do not derive from interface_t");
-				process(gcl::type_info::id<T>::value, ev);
+				process(gcl::type_info::id<event_t>::value, ev);
 			}
 			void process(gcl::type_info::id::type event_id, const interface_t & ev)
 			{
@@ -347,12 +349,12 @@ namespace gcl
 				template <typename T>
 				socket_type & on()
 				{
-					return sockets[tuple_info_t::index_of<T>];
+					return sockets[tuple_info_t::template index_of<T>];
 				}
 				template <typename T>
 				void add(socket_callback cb)
 				{
-					sockets[tuple_info_t::index_of<T>].push_back(cb);
+					sockets[tuple_info_t::template index_of<T>].push_back(cb);
 				}
 
 				template <typename T>

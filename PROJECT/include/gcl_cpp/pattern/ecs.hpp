@@ -35,12 +35,12 @@ namespace gcl::pattern::ecs
 
 		static constexpr inline auto count = mp_variadic_helper::size;
 		template <typename T>
-		static constexpr inline auto index_of = mp_variadic_helper::index_of<T>;
+		static constexpr inline auto index_of = mp_variadic_helper::template  index_of<T>;
 		template <std::size_t index>
-		using type_at = typename mp_variadic_helper::type_at<index>;
+		using type_at = typename mp_variadic_helper::template type_at<index>;
 
 		template <typename T>
-		static constexpr inline bool contains = mp_variadic_helper::contains<T>;
+		static constexpr inline bool contains = mp_variadic_helper::template contains<T>;
 
 		using mask_type = std::bitset<sizeof...(ts_components)>;
 
@@ -124,7 +124,7 @@ namespace gcl::pattern::ecs
 		}
 		void clear()
 		{
-			gcl::tuple_utils::for_each(content, [](auto & value) { value.clear(); })
+			gcl::tuple_utils::for_each(content, [](auto & value) { value.clear(); });
 		}
 
 		void swap_index(std::size_t lhs_index, std::size_t rhs_index)
@@ -285,11 +285,11 @@ namespace gcl::pattern::ecs
 		template <typename component, typename ... component_args_types>
 		auto & entity_add_component(id_type id, component_args_types && ... component_args)
 		{
-			static_assert(components_type::contains<component>);
+			static_assert(components_type::template contains<component>);
 			static_assert(std::is_constructible_v<component, decltype(component_args)...>);
 
 			auto & entity = entities.at(id);
-			entity.components_mask[components_type::index_of<component>] = true;
+			entity.components_mask[components_type::template index_of<component>] = true;
 
 			auto & component_value = components.get<component>(entity.id);
 			new (&component_value) component(std::forward<component_args_types>(component_args)...);
@@ -305,18 +305,18 @@ namespace gcl::pattern::ecs
 		template <typename component, typename ... component_args>
 		void entity_remove_component(id_type id)
 		{
-			static_assert(components_type::has_component<component>);
-			entity.components_mask[components_type::index_of<component>] = false;
+			static_assert(components_type::template has_component<component>);
+			entity_at(id).components_mask[components_type::template index_of<component>] = false;
 
-			auto & component_value = components_type::get<component>(entity.id);
+			auto & component_value = components_type::template get<component>(entity.id);
 			// clean component ?
 		}
 
 		template <typename component>
 		auto entity_has_component(id_type id) const
 		{
-			static_assert(components_type::contains<component>);
-			return entities.at(id).components_mask[components_type::index_of<component>];
+			static_assert(components_type::template contains<component>);
+			return entities.at(id).components_mask[components_type::template index_of<component>];
 		}
 		template <typename ... requiered_components>
 		bool entity_has_components(id_type id) const
@@ -341,26 +341,26 @@ namespace gcl::pattern::ecs
 		template <typename component>
 		auto & entity_get_component(id_type entity_id)
 		{
-			static_assert(components_type::contains<component>);
+			static_assert(components_type::template contains<component>);
 			if (!entity_has_component<component>(entity_id))
 				throw std::runtime_error("ecs::manager::entity_get_component : requested component does not exists");
 			return components.get<component>(entity_id);
 		}
 
 		template <typename function_type>
-		void for_each_entities(function_type & func)
+		void for_each_entities(function_type func)
 		{	// for each (alive) entities
 			for (id_type index{ 0 }; index < entity_creation_index; ++index)
 				func(entity_at(index));
 		}
 		template <typename function_type>
-		void for_each_entities(function_type & func) const
+		void for_each_entities(function_type func) const
 		{
 			for (id_type index{ 0 }; index < entity_creation_index; ++index)
 				func(entity_at(index));
 		}
 		template <typename function_type, typename ... requiered_components>
-		void for_each_entities(contract<requiered_components...>, function_type & func)
+		void for_each_entities(contract<requiered_components...>, function_type func)
 		{
 			using contract_type = contract<requiered_components...>;
 
@@ -372,7 +372,7 @@ namespace gcl::pattern::ecs
 			});
 		}
 		template <typename function_type, typename ... requiered_components>
-		void for_each_entities(contract<requiered_components...>, function_type & func) const
+		void for_each_entities(contract<requiered_components...>, function_type func) const
 		{
 			using contract_type = contract<requiered_components...>;
 
