@@ -40,7 +40,12 @@ template
 std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits> & os,
 	const T & value)
 {
-	# pragma message ("gcl::compilation_warning : gcl::io : use of default-generated std::ostream&operator<<(T)")
+	# pragma message						\
+	(										\
+		"gcl::compilation_warning : in "	\
+		__FUNCSIG__							\
+		"\ngcl::io : use of default-generated std::ostream&operator<<(T)")
+
 	#if defined(__cpp_rtti)
 	return os << "[gcl::io]{0x" << &value << "}(" << typeid(T).name() << ')';
 	#endif
