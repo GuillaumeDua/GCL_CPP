@@ -1,21 +1,80 @@
 #ifndef GCL_TYPE_INDEX_HPP__
 # define GCL_TYPE_INDEX_HPP__
 
-# include <gcl_cpp/introspection.hpp>
-# include <gcl_cpp/preprocessor.hpp>
+#include <gcl_cpp/mp.hpp>
+#include <gcl_cpp/functionnal.hpp>
+
+#include <tuple>
+#include <functional>
+#include <type_traits>
+
+namespace gcl
+{
+	template <class t_interface, class ... ts_impl>
+	struct type_indexer
+	{	// C++17
+		static_assert(std::conjunction_v<std::is_base_of<t_interface, ts_impl>...>);
+		static_assert(std::conjunction_v<std::is_default_constructible<ts_impl>...>);
+
+		using interface_type = t_interface;
+		using children_type = std::tuple<ts_impl...>;
+
+		using constructor_type = gcl::functionnal::cx::function<t_interface*()>;
+		using content_type = std::array<constructor_type, sizeof...(ts_impl)>;
+
+		auto generate(std::size_t index)
+		{
+			if (index >= sizeof...(ts_impl))
+				throw std::out_of_range("type_indexer::generate");
+			auto & generator = constructors.at(index);
+			return generator();
+		}
+		template <std::size_t index, typename ... args_type>
+		auto generate(args_type && ... args)
+			-> interface_type*
+		{
+			using type = std::decay_t<decltype(std::get<index>(std::tuple<ts_impl...>{})) > ;
+			return new type(std::forward<args_type>(args)...);
+		}
+		template <typename T, typename ... args_type>
+		auto generate(args_type && ... args)
+			-> interface_type*
+		{
+			static_assert(gcl::mp::contains<T, ts_impl...>);
+			return new T(std::forward<args_type>(args)...);
+		}
+
+		template <typename T, typename ... args_type>
+		constexpr static auto constructor()
+			-> constructor_type
+		{
+			return constructor_type
+			{
+				[](args_type ... args) -> interface_type * { return new T(args...); }
+			};
+		}
+		template <typename T>
+		constexpr static constructor_type constructor_v = constructor<T>();
+
+		constexpr static inline const content_type constructors
+		{
+			constructor<ts_impl>()...
+		};
+	};
+}
+
 # include <gcl_cpp/type_info.hpp>
 
 # include <vector>
 # include <unordered_map>
 # include <functional>
-# include <iostream>
 # include <string>
 
-namespace gcl::type_index
+namespace gcl::deprecated::type_index
 {	// static-dynamique bridge for type index
 	template <typename t_interface>
 	struct interface_is
-	{
+	{	// C++14
 		using interface_t = t_interface;
 		using index_type = size_t;
 
@@ -43,7 +102,7 @@ namespace gcl::type_index
 			{
 				static_assert(std::is_base_of<interface_t, T>::value, "gcl::type_index::interface_is<I>::of_types<...T>::element<T>");
 				element()
-					: basic_container_type::value_type{ pack_t::template index_of<T>, { std::ref(type_helper::get_default_constructor_t<T>::value) } }
+					: basic_container_type::value_type{ pack_t::template index_of<T>, { std::ref(type_helper::template get_default_constructor_t<T>::value) } }
 				{}
 			};
 

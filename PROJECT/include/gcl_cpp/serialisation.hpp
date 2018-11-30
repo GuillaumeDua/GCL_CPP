@@ -15,7 +15,7 @@
 GCL_Introspection_Generate__has_nested(not_serializable);
 
 namespace gcl::serialization
-{
+{	// todo : refactor
 	template <class T_Interface>
 	struct interface_is
 	{
@@ -74,7 +74,7 @@ namespace gcl::serialization
 			template <typename T_IO_POlicy = gcl::io::policy::binary>
 			struct reader
 			{
-				using type_manager_t = typename type_index::interface_is<_InterfaceType>::template of_types<Types...>;
+				using type_manager_t = typename deprecated::type_index::interface_is<_InterfaceType>::template of_types<Types...>;
 
 				explicit				reader(std::istream & istream)
 					: _iStream(istream)
@@ -128,6 +128,7 @@ namespace gcl::serialization
 		};
 	};
 
+	// todo : move to tests
 #define GenTestClass(name, type)																			\
 	struct name																								\
 		: TestInterface																						\
@@ -242,8 +243,8 @@ namespace gcl::deprecated::serialization
 	struct Serializer
 	{
 		using T_IOPolicy = IO_Policy;
-		using T_TypeManager = typename gcl::type_index::interface_is<T_SerializableInterface>::template of_types<T_SerializableTypes...>;
-		using _index_type = typename gcl::type_index::interface_is<T_SerializableInterface>::index_type;
+		using T_TypeManager = typename gcl::deprecated::type_index::interface_is<T_SerializableInterface>::template of_types<T_SerializableTypes...>;
+		using _index_type = typename gcl::deprecated::type_index::interface_is<T_SerializableInterface>::index_type;
 
 		// static typename T_TypeManager::Indexer _typeIndex;
 

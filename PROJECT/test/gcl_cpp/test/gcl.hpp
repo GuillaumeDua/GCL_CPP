@@ -19,6 +19,13 @@ namespace gcl
 		static void proceed()
 		{
 			::gcl::test::components
+				<	// deprecated components
+				::gcl::test::deprecated::type_info,
+				::gcl::test::deprecated::type_index,
+				::gcl::test::deprecated::container
+				>::test();
+
+			::gcl::test::components
 			<
 				::gcl::test::test,
 				::gcl::test::event,
@@ -29,12 +36,6 @@ namespace gcl
 				::gcl::test::functionnal,
 				::gcl::test::introspection,
 				::gcl::test::mp
-			>::test();
-
-			::gcl::test::components
-			<	// deprecated components
-				::gcl::test::deprecated::type_info,
-				::gcl::test::deprecated::container
 			>::test();
 		}
 	}

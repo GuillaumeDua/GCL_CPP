@@ -1,7 +1,7 @@
 // #define _GCL_DEBUG
 
 # include <gcl_cpp/type_index.hpp>
-namespace gcl::type_index
+namespace gcl::deprecated::type_index
 {	// type_index.cpp content
 	template <typename T_Interface>
 	template <class T>
