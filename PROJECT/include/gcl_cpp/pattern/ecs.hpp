@@ -169,9 +169,9 @@ namespace gcl::pattern::ecs
 		using components_type = typename ecs::components<ts_components...>;
 		using components_storage_type = typename ecs::components_storage<ts_components...>;
 
-		manager(std::size_t capacity)
+		manager(std::size_t initial_capacity)
 		{
-			reserve_capacity(std::max(capacity, 1));
+			reserve_capacity(std::max<decltype(capacity())>(initial_capacity, 1));
 		}
 
 		auto & entity_at(id_type id)
@@ -190,7 +190,7 @@ namespace gcl::pattern::ecs
 
 			assert(entity_creation_index <= size());
 			assert(capacity() >= size());
-			assert(capacity > 0);
+			assert(capacity() > 0);
 
 			if (capacity() == entity_creation_index)
 				reserve_capacity(capacity() * 2);
