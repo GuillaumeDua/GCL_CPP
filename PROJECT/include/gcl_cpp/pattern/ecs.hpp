@@ -171,7 +171,7 @@ namespace gcl::pattern::ecs
 
 		manager(std::size_t capacity)
 		{
-			reserve_capacity(capacity);
+			reserve_capacity(std::max(capacity, 1));
 		}
 
 		auto & entity_at(id_type id)
@@ -190,6 +190,7 @@ namespace gcl::pattern::ecs
 
 			assert(entity_creation_index <= size());
 			assert(capacity() >= size());
+			assert(capacity > 0);
 
 			if (capacity() == entity_creation_index)
 				reserve_capacity(capacity() * 2);
@@ -412,6 +413,7 @@ namespace gcl::pattern::ecs
 		void reserve_capacity(std::size_t new_capacity)
 		{	// extend capacity
 			// initialize entities
+
 			const auto previous_capacity = capacity();
 			assert(new_capacity >= previous_capacity); // avoid useless calls
 			assert(entities.capacity() == components.capacity());
