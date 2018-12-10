@@ -4,6 +4,7 @@
 // define preprocessor gcl_ecs_enable_output to enable std::ostream & operator<< <ecs::<type_name>>(std::ostream &, const ecs::<type_name> &)
 
 #include <gcl_cpp/type_info.hpp>
+#include <gcl_cpp/type_traits.hpp>
 #if defined (gcl_ecs_enable_output)
 # include <gcl_cpp/IO.h> // default std::ostream & operator<< <T>(std::ostream &, const T &)
 #endif
@@ -287,13 +288,29 @@ namespace gcl::pattern::ecs
 		auto & entity_add_component(id_type id, component_args_types && ... component_args)
 		{
 			static_assert(components_type::template contains<component>);
-			static_assert(std::is_constructible_v<component, decltype(component_args)...>);
+			static_assert
+			(
+				std::is_constructible_v<component, decltype(component_args)...> or
+				gcl::type_traits::is_brace_constructible_v<component, decltype(component_args)...>
+			);
 
 			auto & entity = entities.at(id);
 			entity.components_mask[components_type::template index_of<component>] = true;
 
 			auto & component_value = components.get<component>(entity.id);
-			new (&component_value) component(std::forward<component_args_types>(component_args)...);
+			if constexpr (std::is_constructible_v<component, decltype(component_args)...>)
+			{
+				new (&component_value) component( std::forward<component_args_types>(component_args)... );
+			}
+			else if constexpr (gcl::type_traits::is_brace_constructible_v<component, decltype(component_args)...>)
+			{
+				new (&component_value) component{ std::forward<component_args_types>(component_args)... };
+			}
+			else
+			{
+				static_assert(false);
+			}
+
 			// `in-place new` vs `move temporary`
 			// clang 6.0 (O3) : 1.1 times faster
 			// http://quick-bench.com/-SmOBKMORqiRQblURvp9O8vOpiU
