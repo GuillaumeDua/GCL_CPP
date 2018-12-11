@@ -30,6 +30,16 @@ namespace gcl
 		{
 			return (gcl::mp::is_unique_v<gcl::mp::type_at<indexes, ts...>, ts...> && ...);
 		}
+		template <std::size_t value, std::size_t ... indexes>
+		constexpr static auto make_reverse_index_sequence_impl(std::index_sequence<indexes...>)
+		{
+			return std::integer_sequence<std::size_t, (value - indexes)...>{};
+		}
+		template <typename ... ts, std::size_t ... indexes>
+		constexpr static auto reverse_variadic_order_impl(std::index_sequence<indexes...>)
+		{
+			return gcl::mp::type_pack<gcl::mp::type_at<indexes, ts...>...>{};
+		}
 
 	public:
 
@@ -129,24 +139,47 @@ namespace gcl
 		template <typename ... ts>
 		constexpr static inline bool are_unique = are_unique_impl<ts...>(std::make_index_sequence<sizeof...(ts)>());
 
-		struct filter
+		template <std::size_t value>
+		using make_reverse_index_sequence = decltype(make_reverse_index_sequence_impl<value - 1>(std::make_index_sequence<value>{}));
+
+		template <typename ... ts>
+		using reverse_variadic_order_t = std::decay_t<decltype(reverse_variadic_order_impl<ts...>(gcl::mp::make_reverse_index_sequence<sizeof...(ts)>{}))>;
+		template <typename ... ts>
+		constexpr static auto reverse_variadic_order(gcl::mp::type_pack<ts...>)
+		{
+			return reverse_variadic_order_t<ts...>{};
+		}
+
+		class filter
 		{	// allow filtering operation on variadic type,
 			// using gcl::mp::contains and std::bitset
 			// or_as_bitset impl is :
 			// { T0, T1, T2 } | {T1, T4, T5} => 010
 
+			template <typename ... ts, typename ... us>
+			constexpr static auto as_bitset_initializer_impl(type_pack<ts...>, type_pack<us...>)
+			{
+				static_assert(std::is_constructible_v<std::bitset<sizeof...(ts)>, std_bitset_initializer_type>);
+
+				std_bitset_initializer_type value{ 0 };
+				return
+				(
+					(value = ( value << 1 | gcl::mp::contains<ts, us...>)),
+					...
+				);
+			}
+
+		public:
+
 			using std_bitset_initializer_type = unsigned long long; // not type-alias in std::bitset for constexpr constructor parameter
-			static_assert(std::is_constructible_v<std::bitset<8>, std_bitset_initializer_type>);
 
 			template <typename ... ts, typename ... us>
 			constexpr static auto as_bitset_initializer(type_pack<ts...>, type_pack<us...>)
 			{
-				std_bitset_initializer_type value{ 0 };
-				return ~
-				(
-					((value |= gcl::mp::contains<ts, us...>) << 1),
-					...
-				);
+				static_assert(std::is_constructible_v<std::bitset<sizeof...(ts)>, std_bitset_initializer_type>);
+
+				using reverse_ordered_ts = gcl::mp::reverse_variadic_order_t<ts...>;
+				return as_bitset_initializer_impl(reverse_ordered_ts{}, gcl::mp::type_pack<us...>{});
 			}
 			template <typename ... ts, typename ... us>
 			constexpr static auto as_bitset(type_pack<ts...>, type_pack<us...>)

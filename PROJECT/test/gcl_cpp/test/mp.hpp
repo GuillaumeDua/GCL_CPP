@@ -107,6 +107,57 @@ namespace gcl::test
 				static_assert(not no);
 			}
 		};
+		struct make_reverse_index_sequence
+		{
+			constexpr static void proceed()
+			{
+				static_assert(std::is_same_v
+				<
+					gcl::mp::make_reverse_index_sequence<5>,
+					std::index_sequence<4,3,2,1,0>
+				>);
+			}
+		};
+		struct reverse_variadic_order
+		{
+			constexpr static void proceed()
+			{
+				using reverse_variadic_type = gcl::mp::reverse_variadic_order_t<int, double, char, std::string>;
+				static_assert(std::is_same_v
+				<
+					reverse_variadic_type,
+					gcl::mp::type_pack<std::string, char, double, int>
+				>);
+
+				using ordered_types = gcl::mp::type_pack<int, double, char, float, std::string>;
+				static_assert(std::is_same_v
+				<
+					ordered_types,
+					std::decay_t<decltype(gcl::mp::reverse_variadic_order(gcl::mp::reverse_variadic_order(ordered_types{})))>
+				>);
+			}
+		};
+		struct filter
+		{
+			struct as_bitset
+			{
+				static void proceed()
+				{
+					constexpr auto filter = gcl::mp::filter::as_bitset
+					(
+						gcl::mp::type_pack<int, double, float, std::string>{},
+						gcl::mp::type_pack<float, std::string>{}
+					);
+					static_assert(std::is_same_v
+					<
+						std::decay_t<decltype(filter)>,
+						std::bitset<4>
+					>);
+					GCL_TEST__EXPECT_VALUE(filter, std::decay_t<decltype(filter)>{"1100"}); // bitset are reverse bit ordered
+				}
+			};
+			using dependencies_t = gcl::mp::type_pack<as_bitset>;
+		};
 
 		using dependencies_t = std::tuple
 		<
@@ -114,7 +165,10 @@ namespace gcl::test
 			meet_requirement,
 			partial_template,
 			require,
-			is_unique
+			is_unique,
+			make_reverse_index_sequence,
+			reverse_variadic_order,
+			filter
 		>;
 	};
 }
