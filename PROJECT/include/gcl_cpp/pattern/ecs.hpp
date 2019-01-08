@@ -153,10 +153,11 @@ namespace gcl::pattern::ecs
 
 	template <typename ... ts_components>
 	struct contract
-	{	// establish a contract.e.g a requierement
+	{	// establish a contract. e.g a requierement
 
 		static_assert(gcl::mp::are_unique<ts_components...>);
 		using components_type = components<ts_components...>;
+		using parameters = std::tuple<ts_components &...>;
 	};
 
 	template <typename ... ts_components>
@@ -167,6 +168,7 @@ namespace gcl::pattern::ecs
 		static_assert(gcl::mp::are_unique<ts_components...>);
 
 		using entity_type = typename ecs::entity<ts_components...>;
+		using contract_type = typename contract<ts_components...>;
 		using components_type = typename ecs::components<ts_components...>;
 		using components_storage_type = typename ecs::components_storage<ts_components...>;
 
@@ -176,13 +178,17 @@ namespace gcl::pattern::ecs
 		}
 
 		auto & entity_at(id_type id)
-		{	// todo : throw std::out_of_range if :
-			// id < entity_creation_index || not entities.at(id).is_alive ?
-			
+		{
+			assert(id < entities_count());
+			assert(entities.at(id).is_alive);
+
 			return entities.at(id);
 		}
 		auto & entity_at(id_type id) const
 		{
+			assert(id < entities_count());
+			assert(entities.at(id).is_alive);
+
 			return entities.at(id);
 		}
 		auto create_index()
@@ -352,7 +358,6 @@ namespace gcl::pattern::ecs
 				std::decay_t<decltype(filter)>,
 				std::decay_t<decltype(std::declval<entity_type>().components_mask)>
 			>);
-
 			return (filter & entity_at(id).components_mask) == filter;
 		}
 
