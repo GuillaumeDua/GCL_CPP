@@ -6,15 +6,15 @@
 #define GCL_Introspection_Generate__has_nested(nested)							\
 namespace gcl::introspection::generated::has_nested_type{						\
 	template< class, class = std::void_t<> >									\
-	struct nested : std::false_type { };							\
+	struct nested : std::false_type { };										\
 	template< class T >															\
 	struct nested##<T, std::void_t<typename T::##nested>> : std::true_type { };	\
 }
 
-#define GCL_Introspection_Generate__has_member_function(name)							\
-namespace gcl::introspection::generated::has_member_function{										\
+#define GCL_Introspection_Generate__has_member_function(name)					\
+namespace gcl::introspection::generated::has_member_function{					\
 	template< class, class = std::void_t<> >									\
-	struct name## : std::false_type { };					\
+	struct name## : std::false_type { };										\
 	template< class T >															\
 	struct name##<T, std::void_t<decltype(&T:: name)>> : std::true_type { };	\
 }
