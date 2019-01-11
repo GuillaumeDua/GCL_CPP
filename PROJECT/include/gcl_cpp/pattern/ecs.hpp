@@ -278,6 +278,7 @@ namespace gcl::pattern::ecs
 		{
 			entity_at(id).is_alive = false;
 			// todo : invalidate persistent index
+			need_reorder = true;
 		}
 
 		auto entities_count() const
@@ -293,6 +294,10 @@ namespace gcl::pattern::ecs
 		void reorder()
 		{	// reorder (optimize) internal storage and indexes
 			// warning : all previously acquiered reference to content (entities, components) may be invalide then.
+
+			if (not need_reorder)
+				return;
+			need_reorder = false;
 
 			const auto entity_comparator = [](const entity_type & lhs_entity, const entity_type & rhs_entity)
 			{
@@ -457,6 +462,7 @@ namespace gcl::pattern::ecs
 		std::vector<id_type> persistent_indexes; // act a convertor [persistent_id_type -> id_type]
 		components_storage_type components;
 		std::size_t entity_creation_index{ 0 };
+		bool need_reorder = false; // keeps track of entity destruction, to avoid ineffective `reorder()` calls
 
 		auto size() const
 		{
