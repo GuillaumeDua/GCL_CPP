@@ -25,6 +25,7 @@
 namespace gcl::pattern::ecs
 {
 	using id_type = std::size_t;
+	using persistent_id_type = std::size_t;
 
 	template <typename ... ts_components>
 	struct components
@@ -50,7 +51,8 @@ namespace gcl::pattern::ecs
 
 	template <typename ... ts_components>
 	struct entity
-	{
+	{	// todo : private members, friendship with manager
+
 		static_assert(gcl::mp::are_unique<ts_components...>);
 		using components_type = components<ts_components...>;
 
@@ -62,11 +64,13 @@ namespace gcl::pattern::ecs
 		void reset(id_type new_id)
 		{	// create a valid entry
 			id = new_id;
+			persistent_id = new_id;
 			is_alive = false;
 			components_mask.reset();
 		}
 
 		id_type id; // unique per entity, index in the storage.
+		persistent_id_type persistent_id; // allow persistent access, even if `id` changed
 		bool is_alive = false; // !to_garbage
 		typename components_type::mask_type components_mask; // ts_components -> bools "is_active"
 	};
@@ -191,9 +195,21 @@ namespace gcl::pattern::ecs
 
 			return entities.at(id);
 		}
+		auto convert_to_index(persistent_id_type persistent_id)
+		{
+			auto entity_id{ persistent_indexes.at(persistent_id) };
+
+			assert(entity_at(entity_id).persistent_id == persistent_id);
+			// todo : check if persistent_id is still valid
+			assert(entity_at(entity_id).is_alive);
+
+			return entity_id;
+		}
+
 		auto create_index()
 		{	// create a new initialized entity
 			// like std::vector, double capacity if needed
+			// return the entity id, and its persistent id
 
 			assert(entity_creation_index <= size());
 			assert(capacity() >= size());
@@ -207,15 +223,24 @@ namespace gcl::pattern::ecs
 			assert(not entity.is_alive);
 			entity.components_mask.reset();
 			entity.is_alive = true;
-			return entity.id;
+
+			using return_type = std::tuple
+			<
+				id_type,
+				persistent_id_type
+			>;
+
+			return std::make_tuple(entity.id, entity.persistent_id);
 		}
 
 		template <typename ... requiered_components>
 		auto create_entity()
 		{	// reference may point to the wrong element after reordering
-			//static_assert((components_type::contains<requiered_components>> && ...)); // todo : fixed in MVSC 16.0
+			// static_assert((components_type::contains<requiered_components>> && ...)); // todo : fixed in MVSC 16.0
 
-			auto & entity = entities.at(create_index());
+			auto[entity_id, entity_persistent_id] = create_index();
+			auto & entity = entities.at(entity_id);
+
 			using return_type = std::tuple
 			<
 				entity_type&,
@@ -230,7 +255,9 @@ namespace gcl::pattern::ecs
 		template <typename ... requiered_components, typename ... requiered_components_args>
 		auto create_entity(requiered_components_args && ... args)
 		{
-			auto & entity = entities.at(create_index());
+			auto[entity_id, entity_persistent_id] = create_index();
+			auto & entity = entities.at(entity_id);
+
 			using return_type = std::tuple
 			<
 				entity_type&,
@@ -250,6 +277,7 @@ namespace gcl::pattern::ecs
 		void destroy_entity(id_type id)
 		{
 			entity_at(id).is_alive = false;
+			// todo : invalidate persistent index
 		}
 
 		auto entities_count() const
@@ -280,13 +308,21 @@ namespace gcl::pattern::ecs
 					entity_creation_index = entity_it;
 					break;
 				}
-				components.swap_index(entity_it, entity.id);
-				entity.id = entity_it;
+				if (entity_it != entity.id)
+				{	// update entity if needed
+					components.swap_index(entity_it, entity.id);
+					entity.id = entity_it;
+					persistent_indexes.at(entity.persistent_id) = entity_it;
+				}
 			}
 			for (std::size_t entity_it{ entity_creation_index }; entity_it < entities.size(); ++entity_it)
 			{	// reorder dead entities
 				auto & entity = entities[entity_it];
-				entity.id = entity_it;
+				if (entity_it != entity.id)
+				{	// update entity if needed
+					entity.id = entity_it;
+					persistent_indexes.at(entity.persistent_id) = entity_it;
+				}
 			}
 		}
 
@@ -418,6 +454,7 @@ namespace gcl::pattern::ecs
 
 	private:
 		std::vector<entity_type> entities;
+		std::vector<id_type> persistent_indexes; // act a convertor [persistent_id_type -> id_type]
 		components_storage_type components;
 		std::size_t entity_creation_index{ 0 };
 
@@ -430,6 +467,7 @@ namespace gcl::pattern::ecs
 		auto capacity() const
 		{
 			assert(entities.capacity() == components.capacity());
+			assert(entities.capacity() == persistent_indexes.capacity());
 			return entities.capacity();
 		}
 		void reserve_capacity(std::size_t new_capacity)
@@ -437,15 +475,20 @@ namespace gcl::pattern::ecs
 			// initialize entities
 
 			const auto previous_capacity = capacity();
+
 			assert(new_capacity >= previous_capacity); // avoid useless calls
 			assert(entities.capacity() == components.capacity());
+			assert(entities.capacity() == persistent_indexes.capacity());
+
 			entities.resize(new_capacity);
+			persistent_indexes.resize(new_capacity);
 			components.resize(new_capacity);
 
 			for (auto created_index{ previous_capacity }; created_index < new_capacity; ++created_index)
 			{
 				auto & entity{ entities[created_index] };
 				entity.reset(created_index);
+				persistent_indexes[created_index] = created_index;
 			}
 		}
 	};
