@@ -145,7 +145,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\gcl_cpp\color.h" />
-    <ClInclude Include="include\gcl_cpp\Container.h" />
     <ClInclude Include="include\gcl_cpp\container\component_aggregator.hpp" />
     <ClInclude Include="include\gcl_cpp\container\entity_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\container\linear_vector.hpp" />
@@ -169,7 +168,6 @@
     <ClInclude Include="include\gcl_cpp\maths.h" />
     <ClInclude Include="include\gcl_cpp\pattern\ecs.hpp" />
     <ClInclude Include="include\gcl_cpp\pattern\state_machine.hpp" />
-    <ClInclude Include="include\gcl_cpp\pattern\type_erasure.hpp" />
     <ClInclude Include="include\gcl_cpp\preprocessor.hpp" />
     <ClInclude Include="include\gcl_cpp\serialisation.hpp" />
     <ClInclude Include="include\gcl_cpp\template_meta_programming.hpp" />
