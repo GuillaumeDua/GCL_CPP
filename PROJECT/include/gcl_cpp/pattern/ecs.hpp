@@ -51,7 +51,7 @@ namespace gcl::pattern::ecs
 
 	template <typename ... ts_components>
 	struct entity
-	{	// todo : private members, friendship with manager
+	{	// todo : private members, friendship with manager ?
 
 		static_assert(gcl::mp::are_unique<ts_components...>);
 		using components_type = components<ts_components...>;
@@ -293,7 +293,7 @@ namespace gcl::pattern::ecs
 		}
 		void reorder()
 		{	// reorder (optimize) internal storage and indexes
-			// warning : all previously acquiered reference to content (entities, components) may be invalide then.
+			// warning : all previously acquiered reference to content (entities, components) may be invalidated then.
 
 			if (not need_reorder)
 				return;
@@ -437,7 +437,7 @@ namespace gcl::pattern::ecs
 		}
 		template <typename function_type, typename ... requiered_components>
 		void for_each_entities(contract<requiered_components...>, function_type func) const
-		{
+		{	// todo : avoid multiple `for_each_entities` calls : detect contracts collisions inclusively
 			using contract_type = contract<requiered_components...>;
 
 			for_each_entities([this, &func](auto & entity)
@@ -528,7 +528,7 @@ std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits> 
 		;
 	manager.for_each_entities([&os](const auto & entity)
 	{
-		os << entity.id << " -> " << entity.components_mask << " -> " << (entity.is_alive ? "alive" : "dead") << '\n';
+		os << entity.id << " -> " << entity.components_mask << " -> " << (entity.is_alive ? "active" : "garbage") << '\n';
 	});
 	return os;
 }
