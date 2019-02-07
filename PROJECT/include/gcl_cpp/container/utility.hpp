@@ -11,15 +11,21 @@ namespace gcl::container
 	auto make_vector(Ts && ... args)
 	{	// avoid vector elements copy-initialization
 		using array_type = std::array<element_type, sizeof...(Ts)>;
+
+		static_assert((not std::is_same_v<element_type, Ts> && ...));
+		static_assert((std::is_constructible_v<element_type, Ts&&> && ...));
+		static_assert(std::is_move_constructible_v<element_type>);
+
 		array_type values_as_array{ std::move(element_type{ std::forward<Ts>(args) })... };
 
-		static_assert(not std::is_constructible_v<element_type, std::move_iterator<array_type::iterator>>, "ambiguous constructor may lead to unexpected value");
+		// if brace-initializer :
+		// static_assert(not std::is_constructible_v<element_type, std::move_iterator<array_type::iterator>>, "gcl::container::make_vector : ambiguous constructor may lead to unexpected value");
 
 		return std::vector<element_type>
-		{
+		(
 			std::move_iterator<array_type::iterator>(std::begin(values_as_array)),
 			std::move_iterator<array_type::iterator>(std::end(values_as_array))
-		};
+		);
 	}
 
 	template <typename ... Ts>
