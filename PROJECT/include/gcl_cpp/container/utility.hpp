@@ -13,6 +13,8 @@ namespace gcl::container
 		using array_type = std::array<element_type, sizeof...(Ts)>;
 		array_type values_as_array{ std::move(element_type{ std::forward<Ts>(args) })... };
 
+		static_assert(not std::is_constructible_v<element_type, std::move_iterator<array_type::iterator>>, "ambiguous constructor may lead to unexpected value");
+
 		return std::vector<element_type>
 		{
 			std::move_iterator<array_type::iterator>(std::begin(values_as_array)),
