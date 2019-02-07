@@ -60,7 +60,8 @@ namespace gcl::test::pattern_impl
 					manager.destroy_entity(value);
 				}
 				{	// 3
-					manager.entity_add_component<int>(manager.create_index(), 33);
+					auto[entity_id, entity_persistent_id] = manager.create_index();
+					manager.entity_add_component<int>(entity_id, 33);
 				}
 				{	// 4
 					auto [value, comp] = manager.create_entity<double, int, std::string>(444, 44, "44444");
