@@ -13,8 +13,8 @@
 #include <iostream>
 #include <iomanip>
 #include <functional>
-#include <tuple>
 #include <type_traits>
+#include <tuple>
 #include <bitset>
 
 // std::conjunction_v instead of fold expression, as it is MVSC 15.9.1.
@@ -234,9 +234,10 @@ namespace gcl::pattern::ecs
 		}
 
 		template <typename ... requiered_components>
-		auto create_entity()
+		constexpr decltype(auto) create_entity()
 		{	// reference may point to the wrong element after reordering
-			// static_assert((components_type::contains<requiered_components>> && ...)); // todo : fixed in MVSC 16.0
+			static_assert((components_type::template contains<requiered_components> && ...));
+			static_assert((std::is_default_constructible_v<requiered_components> && ...));
 
 			auto[entity_id, entity_persistent_id] = create_index();
 			auto & entity = entities.at(entity_id);
@@ -252,9 +253,19 @@ namespace gcl::pattern::ecs
 				std::tuple<requiered_components &...>{entity_add_component<requiered_components>(entity.id)...}
 			};
 		}
-		template <typename ... requiered_components, typename ... requiered_components_args>
-		auto create_entity(requiered_components_args && ... args)
+
+		template
+		<
+			typename ... requiered_components,
+			typename ... requiered_components_args
+		>
+		constexpr decltype(auto) create_entity_impl(requiered_components_args && ... args)
 		{
+			static_assert(sizeof...(requiered_components) == sizeof...(requiered_components_args));
+			static_assert(sizeof...(requiered_components) != 0);
+			static_assert((components_type::template contains<requiered_components> && ...));
+			static_assert(gcl::mp::are_unique<requiered_components...>);
+
 			auto[entity_id, entity_persistent_id] = create_index();
 			auto & entity = entities.at(entity_id);
 
@@ -268,12 +279,42 @@ namespace gcl::pattern::ecs
 				entity,
 				std::tuple<requiered_components &...>{entity_add_component<requiered_components>(entity.id, std::forward<requiered_components_args>(args))...}
 			};
+
 			/*auto &[entity, comp] = create_entity<requiered_components...>();
 			comp = std::forward_as_tuple(args...);
-
 			using return_type = decltype(create_entity<requiered_components...>());
 			return return_type{ entity, comp };*/
 		}
+
+		template
+		<
+			typename ... requiered_components,
+			typename ... requiered_components_args
+		>
+		constexpr decltype(auto) create_entity(requiered_components_args && ... args)
+		{
+			return create_entity_impl<requiered_components...>(std::forward<requiered_components_args>(args)...);
+		}
+		template
+		<
+			typename ... requiered_components,
+			typename ... requiered_components_args,
+			template <typename ...> class tuple_type
+		>
+		constexpr decltype(auto) create_entity(tuple_type<requiered_components_args...> && args_as_tuple)
+		{
+			//auto caller_as_bound = std::bind(&manager::create_entity_impl<requiered_components...>, this);
+
+			return std::apply
+			(
+				[this](requiered_components_args ... args)
+				{
+					return create_entity_impl<requiered_components...>(std::forward<requiered_components_args>(args)...);
+				},
+				std::forward<tuple_type<requiered_components_args...>>(args_as_tuple)
+			);
+		}
+
 		void destroy_entity(id_type id)
 		{
 			entity_at(id).is_alive = false;
@@ -496,6 +537,12 @@ namespace gcl::pattern::ecs
 				entity.reset(created_index);
 				persistent_indexes[created_index] = created_index;
 			}
+		}
+
+		template <typename ... requiered_components, typename ... requiered_components_args, std::size_t ... indexes>
+		auto create_entity_fwd_tuple_impl(std::tuple<requiered_components_args&&...> && args_as_forwarded_tuple, std::index_sequence<indexes...>)
+		{
+			return create_entity<requiered_components...>(std::get<indexes>(args_as_forwarded_tuple)...);
 		}
 	};
 }

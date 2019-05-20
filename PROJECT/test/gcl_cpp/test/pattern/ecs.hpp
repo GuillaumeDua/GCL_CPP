@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gcl_cpp/pattern/ecs.hpp>
+#include <gcl_cpp/test.hpp>
 
 namespace gcl::test::pattern_impl
 {
@@ -21,19 +22,19 @@ namespace gcl::test::pattern_impl
 		{
 			static void proceed()
 			{
-				using storage_type = gcl::pattern::ecs::components_storage<std::string, int, double>;
-				static_assert(storage_type::count == 3);
-				static_assert(std::is_same_v<int, storage_type::components_type::type_at<1>>);
+				//using storage_type = gcl::pattern::ecs::components_storage<std::string, int, double>;
+				//static_assert(storage_type::count == 3);
+				//static_assert(std::is_same_v<int, storage_type::components_type::type_at<1>>);
 
-				storage_type storage;
+				//storage_type storage;
 
-				storage.resize(42);
-				assert(storage.size() == 42);
+				//storage.resize(42);
+				//assert(storage.size() == 42);
 
-				storage.get<int>(1) = 13;
-				storage.get<int>(2) = 42;
-				storage.swap_index(1, 2);
-				assert(storage.get<int>(1) == 42);
+				//storage.get<int>(1) = 13;
+				//storage.get<int>(2) = 42;
+				//storage.swap_index(1, 2);
+				//assert(storage.get<int>(1) == 42);
 			}
 		};
 		struct manager
@@ -93,6 +94,40 @@ namespace gcl::test::pattern_impl
 					GCL_TEST__EXPECT_VALUE(manager.entity_get_component<std::string>(entity_matched), "44444");
 				}
 			}
+
+			struct construct_from_variadic_args
+			{
+				static void proceed()
+				{
+					using manager_type = gcl::pattern::ecs::manager<int, double, std::string>;
+					manager_type manager{1};
+
+					auto [entity, components] = manager.create_entity<int, std::string>(int{ 42 }, std::string{ "hello, world" });
+
+					GCL_TEST__EXPECT_VALUE(std::get<int&>(components), 42);
+					GCL_TEST__EXPECT_VALUE(std::get<std::string&>(components), "hello, world");
+				}
+			};
+
+			struct construct_from_tuple_arg
+			{
+				static void proceed()
+				{
+					using manager_type = gcl::pattern::ecs::manager<int, double, std::string>;
+					manager_type manager{ 1 };
+
+					auto [entity, components] = manager.create_entity<int, std::string>(std::forward_as_tuple(int{ 42 }, "hello, world"));
+
+					GCL_TEST__EXPECT_VALUE(std::get<int&>(components), 42);
+					GCL_TEST__EXPECT_VALUE(std::get<std::string&>(components), "hello, world");
+				}
+			};
+
+			using dependencies_t = gcl::mp::type_pack
+			<
+				construct_from_variadic_args,
+				construct_from_tuple_arg
+			>;
 		};
 
 		using dependencies_t = gcl::mp::type_pack
