@@ -34,9 +34,6 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	struct variadic_template
 	{	// wrapper to gcl::mp::<function_name>
-
-		using std_type = std::tuple<Ts...>;
-
 		inline static constexpr auto size = sizeof...(Ts); // or std::tuple_size_v<tuple_type>
 
 		template <size_t N>
@@ -48,6 +45,7 @@ namespace gcl::type_info
 		template <typename T>
 		static constexpr inline bool contains = gcl::mp::contains<T, Ts...>;
 
+		using std_type = std::tuple<Ts...>;
 		auto to_std()
 		{
 			return std_type{};
@@ -56,11 +54,13 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	using pack = variadic_template<Ts...>;
 
-	namespace experimental
-	{
+	namespace cx
+	{	// benchmark : http://quick-bench.com/o8tu3fXAg6cYLFV7sls9xIaO9ug
+
 		template <typename T>
 		constexpr std::string_view type_name(/*no parameters allowed*/)
-		{
+		{	// warning : costly if not executed in a constexpr context.
+			// pref dyn::type_name for dynamic context
 #ifdef _MSC_VER
 			std::string_view str_view = __FUNCSIG__;
 
@@ -78,7 +78,27 @@ namespace gcl::type_info
 #endif
 			return str_view;
 		}
+		template <typename T>
+		constexpr uintptr_t type_id()
+		{
+			constexpr auto cx_typename = type_name<T>();
+			return reinterpret_cast<uintptr_t>(cx_typename.data());
+		}
+	}
+	namespace dyn
+	{
+		template <typename T>
+		const auto & type_name()
+		{	// prive a static storage for cx::type_name<T>
+			// 150 times faster that repeated calls to cx::type_name<T> in a dynamic context [with T=std::string]
+			static const std::string_view name = cx::type_name<T>();
+			return name;
+		}
+	}
 
+
+	namespace experimental
+	{
 		struct holder final
 		{	// hold a value anonymously
 			// /!\ cost much more than std::any

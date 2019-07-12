@@ -82,7 +82,7 @@ namespace gcl::test
 				template <typename T>
 				static constexpr void compare_with_typeid()
 				{
-					auto gcl_type_name = gcl::type_info::experimental::type_name<T>(); // not constexpr since VS 15.8.9
+					auto gcl_type_name = gcl::type_info::cx::type_name<T>(); // not constexpr since VS 15.8.9
 					GCL_TEST__EXPECT_VALUE(typeid(T).name(), gcl_type_name, std::string{ gcl_type_name.data(), gcl_type_name.size() });
 				}
 
