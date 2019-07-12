@@ -6,7 +6,7 @@
 #include <gcl_cpp/test/type_index.hpp>
 #include <gcl_cpp/test/container.hpp>
 #include <gcl_cpp/test/pattern.hpp>
-#include <gcl_cpp/test/functionnal.hpp>
+#include <gcl_cpp/test/functional.hpp>
 #include <gcl_cpp/test/introspection.hpp>
 #include <gcl_cpp/test/mp.hpp>
 
@@ -33,7 +33,7 @@ namespace gcl
 				::gcl::test::type_index,
 				::gcl::test::container,
 				::gcl::test::pattern,
-				::gcl::test::functionnal,
+				::gcl::test::functional,
 				::gcl::test::introspection,
 				::gcl::test::mp
 			>::test();

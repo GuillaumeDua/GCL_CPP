@@ -3,7 +3,7 @@
 #include <functional>
 #include <gcl_cpp/type_info.hpp>
 
-namespace gcl::functionnal
+namespace gcl::functional
 {
 	template <class... Ts>
 	struct overload : Ts...
@@ -126,10 +126,10 @@ template
 >
 static auto operator+(F1 && f1, F2 && f2)
 {
-	return gcl::functionnal::combine_homogeneous(std::forward<F1>(f1), std::forward<F2>(f2));
+	return gcl::functional::combine_homogeneous(std::forward<F1>(f1), std::forward<F2>(f2));
 }
 
-namespace gcl::functionnal::cx
+namespace gcl::functional::cx
 {
 	template <class>
 	struct function;

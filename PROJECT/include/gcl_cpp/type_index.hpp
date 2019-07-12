@@ -2,7 +2,7 @@
 # define GCL_TYPE_INDEX_HPP__
 
 #include <gcl_cpp/mp.hpp>
-#include <gcl_cpp/functionnal.hpp>
+#include <gcl_cpp/functional.hpp>
 
 #include <tuple>
 #include <functional>
@@ -19,7 +19,7 @@ namespace gcl
 		using interface_type = t_interface;
 		using children_type = std::tuple<ts_impl...>;
 
-		using constructor_type = gcl::functionnal::cx::function<t_interface*()>;
+		using constructor_type = gcl::functional::cx::function<t_interface*()>;
 		using content_type = std::array<constructor_type, sizeof...(ts_impl)>;
 
 		auto generate(std::size_t index)

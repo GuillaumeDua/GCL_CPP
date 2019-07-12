@@ -11,7 +11,7 @@
 
 # include <gcl_cpp/old/EventHandler.h>
 # include <gcl_cpp/preprocessor.hpp>
-# include <gcl_cpp/functionnal.hpp>
+# include <gcl_cpp/functional.hpp>
 
 namespace gcl::old
 {
@@ -43,7 +43,7 @@ namespace gcl::old
 					std::cerr << "[Warning] : Attempt to register an existing element" << std::endl;
 
 				// Note : elem is **(ret.first)
-				elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::finally([this, &elem]()
+				elem.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functional::finally([this, &elem]()
 				{
 					this->remove(elem);
 				})));
@@ -88,7 +88,7 @@ namespace gcl::old
 					{
 						gcl::old::events::EventHandler<> eventHandler;
 						{
-							eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functionnal::finally([&was_cb_called]() { was_cb_called = true; })));
+							eventHandler.on(Event::DTOR_EVENT_NAME).emplace_back(std::move(gcl::functional::finally([&was_cb_called]() { was_cb_called = true; })));
 						}
 						if (was_cb_called)
 							return false;

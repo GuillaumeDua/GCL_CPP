@@ -152,7 +152,7 @@
     <ClInclude Include="include\gcl_cpp\container\polymorphic_vector.hpp" />
     <ClInclude Include="include\gcl_cpp\event.hpp" />
     <ClInclude Include="include\gcl_cpp\exception.hpp" />
-    <ClInclude Include="include\gcl_cpp\functionnal.hpp" />
+    <ClInclude Include="include\gcl_cpp\functional.hpp" />
     <ClInclude Include="include\gcl_cpp\old\control_center.hpp" />
     <ClInclude Include="include\gcl_cpp\old\EventHandler.h" />
     <ClInclude Include="include\gcl_cpp\old\Experimental.h" />
@@ -179,7 +179,7 @@
     <ClInclude Include="test\gcl_cpp\test\container\polymorphic_reference.hpp" />
     <ClInclude Include="test\gcl_cpp\test\container\polymorphic_vector.hpp" />
     <ClInclude Include="test\gcl_cpp\test\event.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\functionnal.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\functional.hpp" />
     <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
     <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
     <ClInclude Include="test\gcl_cpp\test\mp.hpp" />

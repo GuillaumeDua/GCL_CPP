@@ -11,7 +11,7 @@
 #include <thread>
 #include <mutex>
 
-#include <gcl_cpp/functionnal.hpp>
+#include <gcl_cpp/functional.hpp>
 
 namespace gcl::experimental::test_utils::Inline
 {
@@ -119,7 +119,7 @@ namespace gcl::experimental::test_utils::Inline
 														gcl::experimental::test_utils::Inline::RT_scope_controler::mapped_type hook_active = RT_scope_controler::IsActive() && gcl::experimental::test_utils::Inline::RT_scope_controler::Get<true>(key);	\
 														if (hook_active)																																															\
 														{																																																			\
-															gcl::functionnal::deprecated::finally onDestroyExecute([](){ gcl::experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
+															gcl::functional::deprecated::finally onDestroyExecute([](){ gcl::experimental::test_utils::Inline::RT_scope_controler::Desactivate(key); });															\
 															expr																																																	\
 														}																																																			\
 													}
