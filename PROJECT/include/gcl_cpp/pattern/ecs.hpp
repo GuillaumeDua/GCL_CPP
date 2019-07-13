@@ -303,8 +303,6 @@ namespace gcl::pattern::ecs
 		>
 		constexpr decltype(auto) create_entity(tuple_type<requiered_components_args...> && args_as_tuple)
 		{
-			//auto caller_as_bound = std::bind(&manager::create_entity_impl<requiered_components...>, this);
-
 			return std::apply
 			(
 				[this](requiered_components_args ... args)
