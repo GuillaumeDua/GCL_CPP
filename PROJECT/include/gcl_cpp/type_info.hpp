@@ -54,11 +54,14 @@ namespace gcl::type_info
 	template <typename ... Ts>
 	using pack = variadic_template<Ts...>;
 
-	namespace cx
-	{	// benchmark : http://quick-bench.com/o8tu3fXAg6cYLFV7sls9xIaO9ug
+	struct cx
+	{	// struct-as-namespace
+		// benchmark : http://quick-bench.com/o8tu3fXAg6cYLFV7sls9xIaO9ug
 
 		template <typename T>
-		constexpr std::string_view type_name(/*no parameters allowed*/)
+		static constexpr std::string_view type_name(/*no parameters allowed*/)
+			// P1073R1 [constexpr!]. Use dyn::type_name<T> for non-constant-expression context
+			//
 		{	// warning : costly if not executed in a constexpr context.
 			// pref dyn::type_name for dynamic context
 #ifdef _MSC_VER
@@ -78,23 +81,38 @@ namespace gcl::type_info
 #endif
 			return str_view;
 		}
-		template <typename T>
+
+		/*template <typename T>
 		constexpr uintptr_t type_id()
-		{
+		{	// not P1073R1 [constexpr!]
 			constexpr auto cx_typename = type_name<T>();
 			return reinterpret_cast<uintptr_t>(cx_typename.data());
+		}*/
+
+		template <typename T>
+		static constexpr auto type_id()
+		{	//P1073R1[constexpr!]
+			// disclaimer : value may change across compilation units
+			return &type_identifier<T>;
 		}
-	}
-	namespace dyn
-	{
+
+	private:
+		template <typename T>
+		static void type_identifier() noexcept
+		{	// function pointers are valid constant-expression / template-argument
+		}
+	};
+	struct dyn
+	{	// struct-as-namespace
+
 		template <typename T>
 		const auto & type_name()
-		{	// prive a static storage for cx::type_name<T>
+		{	// provide a static storage for cx::type_name<T>
 			// 150 times faster that repeated calls to cx::type_name<T> in a dynamic context [with T=std::string]
 			static const std::string_view name = cx::type_name<T>();
 			return name;
 		}
-	}
+	};
 
 
 	namespace experimental
