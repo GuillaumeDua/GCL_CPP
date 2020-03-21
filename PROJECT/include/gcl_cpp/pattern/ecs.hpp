@@ -80,8 +80,8 @@ namespace gcl::pattern::ecs
 	{	// per-component contiguous storage
 
 		static_assert(gcl::mp::are_unique<ts_components...>);
-		//static_assert((gcl::mp::meet_requirement<ts_components, std::is_default_constructible> && ...)); // msvc 16.0
-		//static_assert((std::is_default_constructible_v<ts_components> && ...));
+		static_assert((gcl::mp::meet_requirement<ts_components, std::is_default_constructible> && ...)); // msvc 16.0
+		static_assert((std::is_default_constructible_v<ts_components> && ...));
 		static_assert(std::conjunction_v<std::is_default_constructible<ts_components>...>);
 		static_assert(not std::disjunction_v<std::is_reference<ts_components>...>); // refs are not default-constructible
 
