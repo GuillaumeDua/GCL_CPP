@@ -1,0 +1,21 @@
+---
+BasedOnStyle: Microsoft
+Language: Cpp
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveDeclarations: 'true'
+AlignTrailingComments: 'true'
+AllowShortFunctionsOnASingleLine: InlineOnly
+AlwaysBreakBeforeMultilineStrings: 'true'
+AlwaysBreakTemplateDeclarations: 'Yes'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Allman
+BreakBeforeTernaryOperators: 'true'
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+Cpp11BracedListStyle: 'true'
+NamespaceIndentation: All
+FixNamespaceComments: 'false'
+PointerAlignment: "Left"
+IndentWidth: 4
+TabWidth: 4
