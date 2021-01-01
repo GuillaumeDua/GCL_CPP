@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gcl_cpp/mp.hpp>
+#include <gcl/mp.hpp>
 
 namespace gcl
 {
