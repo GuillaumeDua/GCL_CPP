@@ -1,12 +1,13 @@
 # GCL_CPP
 
-This library is a stack of useful and convinient components that makes my projects and everyday jobs way easier
+This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier
 
 Each **component** *(split by namespace)* aims to be :
 - **easy-to-use**
 - **easy-to-maintain**
 - **powerful**.
 
+> **NB :**  
 > This library is a never-ending WIP, as it matches needs according to the C++ standards and compilers implementations.  
 > Thus, many components only exists to fill STL holes, and so are likely to disappear when standard features are implemented *-and released-* in the standard and by compilers.  
 > *If at some point, a compiler does not support a specific feature, this information will be register as a limitation in-code comment*  
@@ -14,10 +15,10 @@ Each **component** *(split by namespace)* aims to be :
 
 ## Versions
 
+- **`v2`** is a WIP with C++17/2a implementations
 - **`v1`** is a legacy tag that still exists for retro-compatibility  
   *Offers C++11/14/17 implementations in `gcl` namespace,  
   as well as C++98/03 implementations in `gcl::deprecated` namespace
-- **`v2`** is a WIP with C++17/2a implementations
 
 ## Features
 
