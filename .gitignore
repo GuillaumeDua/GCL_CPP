@@ -23,6 +23,8 @@ out
 *.a
 *.lib
 
+x64
+x86
 *.exe
 *.out
 *.app
