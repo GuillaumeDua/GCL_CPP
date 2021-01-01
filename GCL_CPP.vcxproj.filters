@@ -33,30 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\gcl\pattern\ecs.hpp">
-      <Filter>Header Files\gcl\pattern</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\mp\function_traits.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\mp\tuple_utils.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\mp\type_traits.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\mp\typeinfo.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\cx\crc32_hash.hpp">
-      <Filter>Header Files\gcl\cx</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\functional.hpp">
-      <Filter>Header Files\gcl</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gcl\serialization.hpp">
-      <Filter>Header Files\gcl</Filter>
-    </ClInclude>
     <ClInclude Include="test\gcl\test\container\component_aggregator.hpp">
       <Filter>Header Files\test</Filter>
     </ClInclude>
@@ -98,6 +74,30 @@
     </ClInclude>
     <ClInclude Include="test\gcl\test\type_info.hpp">
       <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\functional.hpp">
+      <Filter>Header Files\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\serialization.hpp">
+      <Filter>Header Files\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\pattern\ecs.hpp">
+      <Filter>Header Files\gcl\pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\mp\function_traits.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\mp\tuple_utils.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\mp\type_traits.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\mp\typeinfo.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\cx\crc32_hash.hpp">
+      <Filter>Header Files\gcl\cx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,8 +13,10 @@ namespace gcl::functional
     overload(Ts...) -> overload<Ts...>;
 
     template <typename T>
-    decltype(auto) wrap(T && func)
-    {   // wrap any functor into a deductible type/value
-        return [func](auto &&... args) -> decltype(auto) { return std::invoke(func, std::forward<decltype(args)>(args)...); };
+    decltype(auto) wrap(T&& func)
+    { // wrap any functor into a deductible type/value
+        return [func](auto&&... args) -> decltype(auto) {
+            return std::invoke(func, std::forward<decltype(args)>(args)...);
+        };
     }
 }
