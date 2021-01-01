@@ -18,6 +18,86 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\gcl\color.h" />
+    <ClInclude Include="include\gcl\container\component_aggregator.hpp" />
+    <ClInclude Include="include\gcl\container\entity_vector.hpp" />
+    <ClInclude Include="include\gcl\container\linear_vector.hpp" />
+    <ClInclude Include="include\gcl\container\polymorphic_reference.hpp" />
+    <ClInclude Include="include\gcl\container\polymorphic_vector.hpp" />
+    <ClInclude Include="include\gcl\container\utility.hpp" />
+    <ClInclude Include="include\gcl\cx\crc32_hash.hpp" />
+    <ClInclude Include="include\gcl\cx\tuple_utils.hpp" />
+    <ClInclude Include="include\gcl\cx\typeinfo.hpp" />
+    <ClInclude Include="include\gcl\event.hpp" />
+    <ClInclude Include="include\gcl\exception.hpp" />
+    <ClInclude Include="include\gcl\functional.hpp" />
+    <ClInclude Include="include\gcl\introspection.hpp" />
+    <ClInclude Include="include\gcl\IO.h" />
+    <ClInclude Include="include\gcl\maths.h" />
+    <ClInclude Include="include\gcl\mp\function_traits.hpp" />
+    <ClInclude Include="include\gcl\mp\mp.hpp" />
+    <ClInclude Include="include\gcl\pattern\ecs.hpp" />
+    <ClInclude Include="include\gcl\pattern\state_machine.hpp" />
+    <ClInclude Include="include\gcl\preprocessor.hpp" />
+    <ClInclude Include="include\gcl\serialization.hpp" />
+    <ClInclude Include="include\gcl\signals.hpp" />
+    <ClInclude Include="include\gcl\test.hpp" />
+    <ClInclude Include="include\gcl\tuple_utils.hpp" />
+    <ClInclude Include="include\gcl\type_traits.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\color.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\component_aggregator.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\entity_vector.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\linear_vector.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\polymorphic_reference.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\polymorphic_vector.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\container\utility.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\event.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\exception.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\functional.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\introspection.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\IO.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\maths.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\mp.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\control_center.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\EventHandler.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\Experimental.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\filesystem.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\log.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\Monitoring.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\ownership.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\SelfUpdate.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\task.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\TestUtils.h" />
+    <ClInclude Include="include\gcl_cpp_deprecated\old\thread.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\pattern\ecs.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\pattern\state_machine.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\preprocessor.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\serialisation.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\signals.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\test.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\tuple_utils.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\type_index.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\type_info.hpp" />
+    <ClInclude Include="include\gcl_cpp_deprecated\type_traits.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\component_aggregator.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\entity_vector.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\polymorphic_reference.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\container\polymorphic_vector.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\event.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\mp.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\pattern.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\pattern\ecs.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\test.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\type_index.hpp" />
+    <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2C07C35-CCAD-4BC1-8BE5-DA2D92E794FB}</ProjectGuid>
     <RootNamespace>GCL_CPP</RootNamespace>
@@ -143,56 +223,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="include\gcl_cpp\color.h" />
-    <ClInclude Include="include\gcl_cpp\container\component_aggregator.hpp" />
-    <ClInclude Include="include\gcl_cpp\container\entity_vector.hpp" />
-    <ClInclude Include="include\gcl_cpp\container\linear_vector.hpp" />
-    <ClInclude Include="include\gcl_cpp\container\polymorphic_reference.hpp" />
-    <ClInclude Include="include\gcl_cpp\container\polymorphic_vector.hpp" />
-    <ClInclude Include="include\gcl_cpp\event.hpp" />
-    <ClInclude Include="include\gcl_cpp\exception.hpp" />
-    <ClInclude Include="include\gcl_cpp\functional.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\control_center.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\EventHandler.h" />
-    <ClInclude Include="include\gcl_cpp\old\Experimental.h" />
-    <ClInclude Include="include\gcl_cpp\old\filesystem.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\log.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\Monitoring.h" />
-    <ClInclude Include="include\gcl_cpp\old\ownership.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\SelfUpdate.h" />
-    <ClInclude Include="include\gcl_cpp\old\task.hpp" />
-    <ClInclude Include="include\gcl_cpp\old\TestUtils.h" />
-    <ClInclude Include="include\gcl_cpp\old\thread.hpp" />
-    <ClInclude Include="include\gcl_cpp\IO.h" />
-    <ClInclude Include="include\gcl_cpp\maths.h" />
-    <ClInclude Include="include\gcl_cpp\pattern\ecs.hpp" />
-    <ClInclude Include="include\gcl_cpp\pattern\state_machine.hpp" />
-    <ClInclude Include="include\gcl_cpp\preprocessor.hpp" />
-    <ClInclude Include="include\gcl_cpp\serialisation.hpp" />
-    <ClInclude Include="include\gcl_cpp\template_meta_programming.hpp" />
-    <ClInclude Include="include\gcl_cpp\test.hpp" />
-    <ClInclude Include="include\gcl_cpp\tuple_utils.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\container.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\container\component_aggregator.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\container\entity_vector.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\container\polymorphic_reference.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\container\polymorphic_vector.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\event.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\functional.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\gcl.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\introspection.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\mp.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\pattern.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\pattern\ecs.hpp" />
-    <ClInclude Include="test\gcl_cpp\test\type_info.hpp" />
-    <ClInclude Include="include\gcl_cpp\type_info.hpp" />
-    <ClInclude Include="include\gcl_cpp\type_traits.hpp" />
-    <ClInclude Include="include\gcl_cpp\introspection.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
