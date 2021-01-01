@@ -6,7 +6,7 @@
 #include <utility>
 #include <gcl/cx/crc32_hash.hpp>
 
-namespace gcl::typeinfo
+namespace gcl::mp::typeinfo
 {   // constexpr typeinfo that does not relies on __cpp_rtti
     //
     // Known limitations :
@@ -37,7 +37,7 @@ namespace gcl::typeinfo
             str_view.remove_prefix(enum_token_pos + sizeof("enum ") - 1);
         str_view.remove_suffix(str_view.length() - str_view.rfind(">(void)"));
 #else
-        static_assert(false, "gcl::typeinfo : unhandled plateform");
+        static_assert(false, "gcl::mp::typeinfo : unhandled plateform");
 #endif
         return str_view;
     }
@@ -65,7 +65,7 @@ namespace gcl::typeinfo
             str_view.remove_prefix(enum_token_pos + sizeof("enum ") - 1);
         str_view.remove_suffix(str_view.length() - str_view.rfind(">(void)"));
 #else
-        static_assert(false, "gcl::typeinfo : unhandled plateform");
+        static_assert(false, "gcl::mp::typeinfo : unhandled plateform");
 #endif
         return str_view;
     }
@@ -75,16 +75,16 @@ namespace gcl::typeinfo
     template <typename T>
     static constexpr auto hashcode()
     {   // as template<> struct hash<std::string_view>; is not consteval
-        constexpr auto type_name = gcl::typeinfo::type_name<T>();
-        return gcl::crc_32::hash(type_name);
+        constexpr auto type_name = gcl::mp::typeinfo::type_name<T>();
+        return gcl::cx::crc_32::hash(type_name);
     }
     template <typename T>
     static constexpr inline auto hashcode_v = hashcode<T>();
 }
 
-#include <gcl/tuple_utils.hpp>
+#include <gcl/mp/tuple_utils.hpp>
 #include <array>
-namespace gcl::typeinfo
+namespace gcl::mp::typeinfo
 {
     template <typename Type>
     constexpr auto to_hashcode_array()
@@ -97,23 +97,23 @@ namespace gcl::typeinfo
         {
             static_assert(sizeof...(Index) == std::tuple_size_v<TupleType>);
 
-            using hash_type = decltype(gcl::typeinfo::hashcode_v<std::tuple_element_t<0, TupleType>>);
+            using hash_type = decltype(gcl::mp::typeinfo::hashcode_v<std::tuple_element_t<0, TupleType>>);
             using mapping_type = std::array<hash_type, sizeof...(Index)>;
 
-            return mapping_type{gcl::typeinfo::hashcode_v<std::tuple_element_t<Index, TupleType>>...};
+            return mapping_type{gcl::mp::typeinfo::hashcode_v<std::tuple_element_t<Index, TupleType>>...};
         };
         return generate_mapping_impl(type_arguments_as_tuple{}, index_type{});
     }
 }
 
-namespace gcl::typeinfo::test
+namespace gcl::mp::typeinfo::test
 {
      // basic type
-     static_assert(gcl::typeinfo::type_name<int(42)>() == "int");
+     static_assert(gcl::mp::typeinfo::type_name<int(42)>() == "int");
 #if defined(_MSC_VER)
-     static_assert(gcl::typeinfo::value_name<int(42)>() == "0x2a");
+     static_assert(gcl::mp::typeinfo::value_name<int(42)>() == "0x2a");
 #else
-     static_assert(gcl::typeinfo::value_name<int(42)>() == "42");
+     static_assert(gcl::mp::typeinfo::value_name<int(42)>() == "42");
 #endif
      
      // namespace, scoped
@@ -126,8 +126,8 @@ namespace gcl::typeinfo::test
          green,
          purple
      };
-     static_assert(gcl::typeinfo::type_name<global_ns_colors::red>() == "gcl::typeinfo::test::global_ns_colors");
-     static_assert(gcl::typeinfo::value_name<global_ns_colors::red>() == "gcl::typeinfo::test::red");
+     static_assert(gcl::mp::typeinfo::type_name<global_ns_colors::red>() == "gcl::mp::typeinfo::test::global_ns_colors");
+     static_assert(gcl::mp::typeinfo::value_name<global_ns_colors::red>() == "gcl::mp::typeinfo::test::red");
 
      // to_hashcode_array
      template <typename ... Ts>
@@ -135,7 +135,7 @@ namespace gcl::typeinfo::test
      using type = type_with_variadic_type_parameters<int, bool, float>;
 
      constexpr auto mapping = to_hashcode_array<type>();
-     static_assert(mapping[0] == gcl::typeinfo::hashcode_v<int>);
-     static_assert(mapping[1] == gcl::typeinfo::hashcode_v<bool>);
-     static_assert(mapping[2] == gcl::typeinfo::hashcode_v<float>);
+     static_assert(mapping[0] == gcl::mp::typeinfo::hashcode_v<int>);
+     static_assert(mapping[1] == gcl::mp::typeinfo::hashcode_v<bool>);
+     static_assert(mapping[2] == gcl::mp::typeinfo::hashcode_v<float>);
 }

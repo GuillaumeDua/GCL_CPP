@@ -1,7 +1,8 @@
 #pragma once
 
 #include <gcl/functional.hpp>
-#include <gcl/cx/typeinfo.hpp>
+#include <gcl/mp/typeinfo.hpp>
+#include <gcl/mp/function_traits.hpp>
 
 #include <functional>
 #include <istream>
@@ -61,7 +62,7 @@ namespace gcl::serialization
         {std::is_standard_layout_v<T>};
         {std::is_default_constructible_v<T>};
         {
-            gcl::typeinfo::hashcode_v<T>
+            gcl::mp::typeinfo::hashcode_v<T>
         }
         ->std::convertible_to<std::size_t>;
         // {detect::has_custom_serialization_v<T> or (std::declval<std::ostream&>() << std::declval<T>())};
@@ -85,7 +86,7 @@ namespace gcl::serialization
             return static_cast<const char*>(static_cast<const void*>(&arg));
         }
         template <typename T>
-        static inline auto type_id_v = gcl::typeinfo::template hashcode_v<T>;
+        static inline auto type_id_v = gcl::mp::typeinfo::template hashcode_v<T>;
 
         using type_id_t = decltype(type_id_v<int>);
         using size_t = decltype(sizeof(int));
@@ -194,7 +195,7 @@ namespace gcl::serialization
                     // todo : ref or copies only -> remove ref for deduction
 
                     using operator_parenthesis_type = decltype(&functor_type::operator());
-                    using functor_trait = typename gcl::functional::function_traits_t<operator_parenthesis_type>;
+                    using functor_trait = typename gcl::mp::function_traits_t<operator_parenthesis_type>;
                     using arguments = functor_trait::template arguments;
 
                     static_assert(std::tuple_size_v<arguments> == 1);
@@ -231,64 +232,85 @@ namespace gcl::serialization
     }
 }
 
+#include <sstream>
+#include <iostream>
+
+namespace gcl::serialization::p1
+{
+    static void test()
+    {
+        std::cout << "Testing : serialization (p1) ...\n";
+        std::stringstream ss;
+        std::cout << "- serializing ...\n";
+        gcl::serialization::p1::serializer{ss}.serialize(42, 'a', true);
+
+        auto deserializer = gcl::serialization::p1::deserializer{gcl::functional::overload{
+            [](int i) { std::cout << "int : " << i << '\n'; },
+            [](char c) { std::cout << "char : " << c << '\n'; },
+            [](bool b) { std::cout << "bool : " << b << '\n'; },
+            [](float f) { std::cout << "float : " << f << '\n'; },
+        }};
+
+        std::cout << "- deserializing ...\n";
+        deserializer.deserialize_all(ss);
+    }
+}
+
 // --- WIP ---
 
-#include <gcl/tuple_utils.hpp>
+#include <gcl/mp/tuple_utils.hpp>
 #include <variant>
 #include <array>
-#include <gcl/typeinfo.hpp>
+#include <gcl/mp/typeinfo.hpp>
 
-namespace gcl::serialization
+namespace gcl::serialization::p5
 {
-    namespace p5
+    //using serializer = p1::serializer;
+
+    //template <typename variant_type>
+    //struct deserializer
+    //{
+    //    using element_type = variant_type;
+
+    //    auto get()
+    //    {
+    //        const auto type_id = [this, &input]() {
+    //            binary_data::type_id_t value;
+    //            input.read(binary_data::cast(value), sizeof(decltype(value)));
+    //            if (not input)
+    //                throw std::runtime_error{"deserializer<Ts...>::deserialize : cannot extract element infos"};
+    //            return value;
+    //        }();
+
+    //        
+    //    }
+    //    auto get_all()
+    //    {
+    //        using storage_type = std::vector<variant_type>;
+    //    }
+    //};
+
+    //static void test()
+    //{
+    //    std::cout << "Testing : serialization (p5) ...\n";
+    //    std::stringstream ss;
+    //    std::cout << "- serializing ...\n";
+    //    serializer{ss}.serialize(42, 'a', true);
+
+    //    using element_type = std::variant<int, double, char, float, bool>;
+
+    //    auto deserializer = p5::deserializer<element_type>{};
+
+    //    std::cout << "- deserializing ...\n";
+    //    //deserializer.deserialize_all(ss);
+    //}
+
+    static void test()
     {
-        //using serializer = p1::serializer;
-
-        //template <typename variant_type>
-        //struct deserializer
-        //{
-        //    using element_type = variant_type;
-
-        //    auto get()
-        //    {
-        //        const auto type_id = [this, &input]() {
-        //            binary_data::type_id_t value;
-        //            input.read(binary_data::cast(value), sizeof(decltype(value)));
-        //            if (not input)
-        //                throw std::runtime_error{"deserializer<Ts...>::deserialize : cannot extract element infos"};
-        //            return value;
-        //        }();
-
-        //        
-        //    }
-        //    auto get_all()
-        //    {
-        //        using storage_type = std::vector<variant_type>;
-        //    }
-        //};
-
-        //static void test()
-        //{
-        //    std::cout << "Testing : serialization (p5) ...\n";
-        //    std::stringstream ss;
-        //    std::cout << "- serializing ...\n";
-        //    serializer{ss}.serialize(42, 'a', true);
-
-        //    using element_type = std::variant<int, double, char, float, bool>;
-
-        //    auto deserializer = p5::deserializer<element_type>{};
-
-        //    std::cout << "- deserializing ...\n";
-        //    //deserializer.deserialize_all(ss);
-        //}
-
-        static void test()
-        {
-            using type = std::variant<int, bool, float>;
+        using type = std::variant<int, bool, float>;
             
-            constexpr auto mapping = gcl::typeinfo::to_hashcode_array<type>();
+        constexpr auto mapping = gcl::mp::typeinfo::to_hashcode_array<type>();
 
-            static_assert(mapping[0] == gcl::typeinfo::hashcode_v<int>);
-        }
+        static_assert(mapping[0] == gcl::mp::typeinfo::hashcode_v<int>);
     }
 }

@@ -1,11 +1,12 @@
 // #define _GCL_DEBUG
 
-// #include <gcl/maths.h>
-// #include <gcl/mp/mp.hpp>
-// #include <gcl/serialization.hpp>
-// 
-// #include <gcl/test/gcl.hpp>
-// #include <gcl/signals.hpp>
+#include <gcl/serialization.hpp>
+
+void tmp()
+{	// only for gcl_v2 WIP
+    gcl::serialization::p1::test();
+    gcl::serialization::p5::test();
+}
 
 #include <stdexcept>
 #include <iostream>
@@ -14,6 +15,7 @@ auto main(int, char const * []) -> int
 {
 	try
 	{
+        tmp();
 		//gcl::signals::initialize();
 		// gcl::test::proceed();
 	}

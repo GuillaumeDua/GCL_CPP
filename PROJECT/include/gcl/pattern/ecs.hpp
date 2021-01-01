@@ -3,8 +3,8 @@
 // info :
 // define preprocessor gcl_ecs_enable_output to enable std::ostream & operator<< <ecs::<type_name>>(std::ostream &, const ecs::<type_name> &)
 
-#include <gcl_cpp/type_info.hpp>
-#include <gcl_cpp/type_traits.hpp>
+#include <gcl/mp/type_info.hpp>
+#include <gcl/mp/type_traits.hpp>
 #if defined (gcl_ecs_enable_output)
 # include <gcl_cpp/IO.h> // default std::ostream & operator<< <T>(std::ostream &, const T &)
 #endif

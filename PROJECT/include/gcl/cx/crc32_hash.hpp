@@ -3,7 +3,7 @@
 #include <numeric>
 #include <string_view>
 
-namespace gcl
+namespace gcl::cx
 {
     struct crc_32
     {

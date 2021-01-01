@@ -1,11 +1,11 @@
 #pragma once
 
-#include <gcl_cpp/functional.hpp>
+#include <gcl/functional.hpp>
 
 #include <tuple>
 #include <type_traits>
 
-namespace gcl::functional
+namespace gcl::mp
 {
     template <typename Function>
     class function_traits
@@ -54,7 +54,7 @@ namespace gcl::functional
     // using function_traits = member_function_traits_impl<decltype(&Function::operator())>;
 }
 
-namespace gcl::functional::test
+namespace gcl::mp::test
 {
     struct toto
     {
