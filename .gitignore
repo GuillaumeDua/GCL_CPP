@@ -1,0 +1,33 @@
+# MSVC
+*.vs
+bin
+out
+*.vcxproj.user
+*.idb
+*.pdb
+
+# Outputs
+*.o
+*.obj
+*.elf
+*.lo
+*.slo
+*.gch
+*.pch
+*.so
+*.so.*
+*.dylib
+*.dll
+*.lai
+*.la
+*.a
+*.lib
+
+x64
+x86
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex

@@ -191,6 +191,7 @@ namespace gcl
 	};
 }
 
+#include <stdexcept>
 namespace gcl::deprecated::mp
 {	// C++98
 	template <class T, class ... T_Classes>
