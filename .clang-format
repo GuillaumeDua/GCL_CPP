@@ -9,7 +9,20 @@ AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'Yes'
 BinPackArguments: 'false'
 BinPackParameters: 'false'
-BreakBeforeBraces: Allman
+# BreakBeforeConceptDeclarations: 'true'
+# IndentRequires: 'true'
+SpaceAfterTemplateKeyword: 'true'
+SpacesInAngles: 'false'
+# BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterEnum: true
+  AfterClass: false
+  AfterStruct: false
+  #BeforeLambdaBody: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+
 BreakBeforeTernaryOperators: 'true'
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
