@@ -82,14 +82,14 @@ namespace gcl::mp::typeinfo
     static constexpr inline auto hashcode_v = hashcode<T>();
 }
 
-#include <gcl/mp/tuple_utils.hpp>
+#include <gcl/mp/pack_traits.hpp>
 #include <array>
 namespace gcl::mp::typeinfo
 {
     template <typename Type>
     constexpr auto to_hashcode_array()
     {
-        using type_arguments_as_tuple = gcl::tuple_utils::type_parameters_as_tuple_t<Type>;
+        using type_arguments_as_tuple = typename gcl::mp::pack_traits<Type>::arguments;
         using index_type = std::make_index_sequence<std::tuple_size_v<type_arguments_as_tuple>>;
 
         constexpr auto generate_mapping_impl =
