@@ -17,14 +17,17 @@ namespace gcl::mp
     };
 }
 
-namespace gcl::mp::test
+namespace gcl::mp::tests::pack_traits
 {
-    using base_type = gcl::mp::type_traits::tests::pack<int, char, float>;
-    using pack_traits_type = pack_traits<base_type>;
+    template <typename... Ts>
+    struct pack_type {};
+
+    using base_type = pack_type<int, char, float>;
+    using pack_traits_type = gcl::mp::pack_traits<base_type>;
 
     static_assert(std::is_same_v<pack_traits_type::type, base_type>);
     static_assert(pack_traits_type::size == 3);
     static_assert(pack_traits_type::size == std::tuple_size_v<pack_traits_type::arguments>);
     static_assert(std::is_same_v<pack_traits_type::arguments, std::tuple<int, char, float>>);
-    static_assert(std::is_same_v<base_type, pack_traits_type::unpack_as<gcl::mp::type_traits::tests::pack>>);
+    static_assert(std::is_same_v<base_type, pack_traits_type::unpack_as<pack_type>>);
 }
