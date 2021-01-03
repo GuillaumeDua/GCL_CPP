@@ -87,9 +87,6 @@
     <ClInclude Include="includes\gcl\mp\function_traits.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
-    <ClInclude Include="includes\gcl\mp\tuple_utils.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
     <ClInclude Include="includes\gcl\mp\type_traits.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
@@ -98,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="includes\gcl\cx\crc32_hash.hpp">
       <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\mp\pack_traits.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
