@@ -95,8 +95,8 @@ namespace gcl::mp
         template <template <typename> typename trait>
         constexpr static inline bool satisfy_trait_v = satisfy_trait_t<trait>::value; //(trait<Ts>::value && ...)
 
-        // template <template <typename> typename trait>
-        // using filters = pack_traits<typename gcl::mp::type_traits::filters_t<trait, Ts...>>::unpack_as<T>;
+        template <template <typename> typename trait>
+        using filters = type_traits::filters_t<T<Ts...>, trait>;
     };
     template <typename... Ts>
     struct pack_type { // empty type that has variadic template-type parameters
@@ -113,18 +113,6 @@ namespace gcl::mp
     };
 }
 
-namespace gcl::mp::type_traits::tests::pack_arguments
-{
-    template <typename... Ts>
-    struct pack_type {};
-
-    using toto = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>, std::tuple>;
-    using titi = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>>;
-    static_assert(std::is_same_v<titi, toto>);
-    static_assert(std::is_same_v<titi, std::tuple<int, double, float>>);
-    static_assert(
-        std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_t<titi, pack_type>>);
-}
 namespace gcl::mp::type_traits::tests
 {
     static_assert(std::is_same_v<gcl::mp::type_traits::type_at_t<2, char, bool, int, float>, int>);
@@ -133,6 +121,18 @@ namespace gcl::mp::type_traits::tests
     static_assert(gcl::mp::partial<std::is_same, int>::type<int>::value);
     static_assert(gcl::mp::partial<std::is_same>::type<int, int>::value);
 
+    namespace pack_arguments
+    {
+        template <typename... Ts>
+        struct pack_type {};
+
+        using toto = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>, std::tuple>;
+        using titi = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>>;
+        static_assert(std::is_same_v<titi, toto>);
+        static_assert(std::is_same_v<titi, std::tuple<int, double, float>>);
+        static_assert(
+            std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_t<titi, pack_type>>);
+    }
     namespace concatenate
     {
         template <typename... Ts>
@@ -170,13 +170,11 @@ namespace gcl::mp::tests::pack_traits
 
     static_assert(pack_traits_type::satisfy_trait_v<std::is_standard_layout>);
     static_assert(not pack_traits_type::satisfy_trait_v<std::is_pointer>);
-}
-namespace gcl::mp::tests::filters
-{
-    template <typename... Ts>
-    struct pack_type {};
 
-    using pack_with_some_ptrs = pack_type<int, char*, char, int*>;
-    // using only_pointers = gcl::mp::pack_traits<pack_with_some_ptrs>::filters<std::is_pointer>;
-    // static_assert(std::is_same_v<pack_type<char*, int*>, only_pointers>)
+    namespace filters
+    {
+        using T1 = pack_type<int, int*, char, char*, float>;
+        using T1_pack_trait = gcl::mp::pack_traits<T1>;
+        static_assert(std::is_same_v<pack_type<int*, char*>, T1_pack_trait::filters<std::is_pointer>>);
+    }
 }
