@@ -58,16 +58,18 @@ namespace gcl::mp::type_traits
     template <typename T, typename... Ts>
     static constexpr inline auto contains_v = contains<T, Ts...>::value;
 
-    template <template <typename> typename trait, typename... Ts>
-    class filters {
-        template <typename T>
-        using impl = std::conditional_t<trait<T>::value, std::tuple<T>, std::tuple<>>;
+    template <typename T, template <typename> typename trait>
+    struct filters;
+    template <template <typename...> typename T, template <typename> typename trait, typename... Ts>
+    struct filters<T<Ts...>, trait> {
+        template <typename Type>
+        using impl = std::conditional_t<trait<Type>::value, std::tuple<Type>, std::tuple<>>;
 
       public:
-        using type = decltype(std::tuple_cat(impl<Ts>{}...));
+        using type = pack_arguments_t<decltype(std::tuple_cat(impl<Ts>{}...)), T>;
     };
-    template <template <typename> typename trait, typename... Ts>
-    using filters_t = typename filters<trait, Ts...>::type;
+    template <typename T, template <typename> typename trait>
+    using filters_t = typename filters<T, trait>::type;
 }
 namespace gcl::mp
 {
@@ -138,6 +140,13 @@ namespace gcl::mp::type_traits::tests
         using T1 = pack<int, double>;
         using T2 = pack<char, float>;
         static_assert(std::is_same_v<concatenate_t<T1, T2>, pack<int, double, char, float>>);
+    }
+    namespace filters
+    {
+        template <typename... Ts>
+        struct pack {};
+        using T1 = pack<int, int*,char, char*, float>;
+        static_assert(std::is_same_v<filters_t<T1, std::is_pointer>, pack<int*, char*>>);
     }
 }
 namespace gcl::mp::tests::pack_traits
