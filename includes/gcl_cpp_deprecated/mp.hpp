@@ -70,9 +70,6 @@ namespace gcl
 			}
 		};
 
-		template <typename T, typename ... ts>
-		static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
-
 		template <typename to_find, typename ... ts>
 		constexpr auto get_index()
 		{

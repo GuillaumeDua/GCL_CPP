@@ -32,52 +32,6 @@ namespace gcl::mp::type_traits
     constexpr static inline bool is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
 }
 
-#include <tuple>
-namespace gcl::mp::type_traits
-{
-    // Limitations
-    //  Clang   11.0.0  : does not support "Lambdas in unevaluated contexts" (P0315R4)
-    //  MsVC    19.28   : "error C2057: expected constant expression" in consteval context
-    //  (static_assert<std::is_same_v<>>) GCC     10.2    : OK
-    // template <
-    //     typename T,
-    //     template <typename...> class PackType = std::tuple,
-    //     typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    // using pack_arguments = std::remove_reference_t<decltype([]<template <typename...> typename Type, typename... Ts>(
-    //     Type<Ts...>) constexpr { return PackType<Ts...>{}; }(std::declval<T>()))>;
-    template <
-        typename T,
-        template <typename...> class PackType = std::tuple,
-        typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    class pack_arguments {
-        template <template <typename...> typename Type, typename... Ts>
-        static auto impl(Type<Ts...>)
-        {   // type deducer
-            return PackType<Ts...>{};
-        }
-
-      public:
-        using type = decltype(impl(std::declval<T>()));
-    };
-    template <
-        typename T,
-        template <typename...> class PackType = std::tuple,
-        typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    using pack_arguments_t = typename pack_arguments<T, PackType>::type;
-}
-
-namespace gcl::mp::type_traits::tests::pack
-{
-    template <typename... Ts>
-    struct pack_type {};
-
-    using toto = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>, std::tuple>;
-    using titi = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>>;
-    static_assert(std::is_same_v<titi, toto>);
-    static_assert(std::is_same_v<titi, std::tuple<int, double, float>>);
-    static_assert(
-        std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_t<titi, pack_type>>);
-}
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
 {
     struct toto {
