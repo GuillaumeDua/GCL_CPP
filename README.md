@@ -1,11 +1,29 @@
-# GCL_CPP
+# **GCL C++**
 
-This library is a stack of useful and convinient components that makes my projects and everyday jobs way easier
+**WIP** : v1 -> v2
+
+---
+
+This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier.
 
 Each **component** *(split by namespace)* aims to be :
 - **easy-to-use**
 - **easy-to-maintain**
-- **powerful**.
+- **powerful**
+
+> **NB :** This library is a never-ending WIP, as it matches needs according to the C++ standards and compilers implementations.  
+> Thus, many components only exists to fill STL holes, and so are likely to disappear when standard features are implemented *-and released-* in the standard and by compilers.  
+> *If at some point, a compiler does not support a specific feature, this information will be register as a limitation in-code comment*  
+> - Example : Clang 11.0.0 does not implement `"Lambdas in unevaluated contexts" (P0315R4)`
+
+## Versions
+
+| Name | Description |
+| ---- | ----------- |
+| **`v2`** | **WIP** with C++17/2a implementations |
+| **`v1`** | **Legacy** tag that still exists for projects that depends on, but no longer maintain<br>Offers C++11/14/17 implementations in `gcl` namespace<br>as well as C++98/03 implementations in `gcl::deprecated` namespace |
+
+## Features
 
 ### table-of-content :
 | **component** name                 | description                                                                                |
@@ -39,7 +57,7 @@ Each **component** *(split by namespace)* aims to be :
 | `gcl::<component_name>::experimental` | features that are still in development and may or may not work properly.<br>*(not fully tested, may rely on a language bug/hack, ...)* |
 | `gcl::test`                        | use for both `gcl::test` component, and all tests<br>*(e.g `gcl::test::<component_name>`)* |
 | `gcl::deprecated`                  | deprecated components implementation<br>*(c++0x, c++11)*<br>interface may change between a component like `gcl::deprecated::<component_name>` and `gcl::<component_name>` |
-| `gcL::old`                         | shameful C++98/0x components that are not supported anymore                                 |
+| `gcl::old`                         | shameful C++98/0x components that are not supported anymore                                 |
 
 ### About the name :
 > `GCL` stands for `Guss's Common Library`

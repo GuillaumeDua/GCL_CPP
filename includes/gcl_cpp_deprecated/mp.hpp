@@ -43,26 +43,7 @@ namespace gcl
 
 	public:
 
-		template <typename ... ts>
-		struct type_pack
-		{	// constexpr type that has variadic parameter
-			// use this instead of std::tuple for viariadic-as-std-tuple-parameter,
-			// if your optimization level does not skip unused variables
-		};
 
-		template <typename ... ts>
-		struct super : ts...
-		{};
-
-		template <template <typename...> class trait_type, typename ... ts>
-		struct partial_template
-		{
-			template <typename ... us>
-			using type = trait_type<ts..., us...>;
-
-			template <typename ... us>
-			static constexpr bool value = trait_type<ts..., us...>::value;
-		};
 
 		template <typename T, template <typename> class ... traits>
 		constexpr static bool meet_requirement = (traits<T>::value && ...);
@@ -88,9 +69,6 @@ namespace gcl
 				static_assert(constraint_type<T>::value, "constraint failed to apply. see template context for more infos");
 			}
 		};
-
-		template <typename T, typename ... ts>
-		static constexpr inline bool contains = std::disjunction<std::is_same<T, ts>...>::value;
 
 		template <typename to_find, typename ... ts>
 		constexpr auto get_index()
@@ -121,11 +99,6 @@ namespace gcl
 		// C++17 constexpr index_of. Use recursion. remove when C++20 is ready. see get_index comments for more infos.
 		template <typename T, typename ...ts>
 		static constexpr inline auto index_of = index_of_impl<T, ts...>();
-
-		template <size_t N, typename ...ts>
-		// better than std::decay_t<decltype(std::get<index>(std::tuple<ts...>{}))>
-		// because one or more types in ts... may not be default constructible
-		using type_at = typename std::tuple_element<N, std::tuple<ts...>>::type;
 
 		template <typename T, typename ... ts>
 		constexpr static bool is_unique()
@@ -191,6 +164,7 @@ namespace gcl
 	};
 }
 
+#include <stdexcept>
 namespace gcl::deprecated::mp
 {	// C++98
 	template <class T, class ... T_Classes>

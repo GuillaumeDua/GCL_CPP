@@ -7,6 +7,7 @@
 #include <typeinfo> // check with #if defined(__cpp_rtti)
 
 // TODO : merge with gcl::io::fd_proxy
+// TODO : should rely on gcl::typeinfo::hashcode/typename if no __cpp_rtti
 
 namespace gcl::io::introspection
 {
@@ -40,6 +41,9 @@ template
 std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits> & os,
 	const T & value)
 {
+	// todo :
+	//	if __cpp_rtti, std::string_view typeid(func_sig : CharT == `template-type-parameter-1`)
+	//	then do not display the message below
 	# pragma message						\
 	(										\
 		"gcl::compilation_warning : in "	\
