@@ -1,24 +1,27 @@
-# GCL_CPP
+# **GCL C++**
 
-This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier
+**WIP** : v1 -> v2
+
+---
+
+This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier.
 
 Each **component** *(split by namespace)* aims to be :
 - **easy-to-use**
 - **easy-to-maintain**
-- **powerful**.
+- **powerful**
 
-> **NB :**  
-> This library is a never-ending WIP, as it matches needs according to the C++ standards and compilers implementations.  
+> **NB :** This library is a never-ending WIP, as it matches needs according to the C++ standards and compilers implementations.  
 > Thus, many components only exists to fill STL holes, and so are likely to disappear when standard features are implemented *-and released-* in the standard and by compilers.  
 > *If at some point, a compiler does not support a specific feature, this information will be register as a limitation in-code comment*  
 > - Example : Clang 11.0.0 does not implement `"Lambdas in unevaluated contexts" (P0315R4)`
 
 ## Versions
 
-- **`v2`** is a WIP with C++17/2a implementations
-- **`v1`** is a legacy tag that still exists for retro-compatibility  
-  *Offers C++11/14/17 implementations in `gcl` namespace,  
-  as well as C++98/03 implementations in `gcl::deprecated` namespace
+| Name | Description |
+| ---- | ----------- |
+| **`v2`** | **WIP** with C++17/2a implementations |
+| **`v1`** | **Legacy** tag that still exists for projects that depends on, but no longer maintain<br>Offers C++11/14/17 implementations in `gcl` namespace<br>as well as C++98/03 implementations in `gcl::deprecated` namespace |
 
 ## Features
 
