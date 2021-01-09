@@ -27,23 +27,23 @@
     <ClInclude Include="includes\gcl\mp\type_traits.hpp" />
     <ClInclude Include="includes\gcl\pattern\ecs.hpp" />
     <ClInclude Include="includes\gcl\serialization.hpp" />
-    <ClInclude Include="test\gcl\test\container.hpp" />
-    <ClInclude Include="test\gcl\test\container\component_aggregator.hpp" />
-    <ClInclude Include="test\gcl\test\container\entity_vector.hpp" />
-    <ClInclude Include="test\gcl\test\container\polymorphic_reference.hpp" />
-    <ClInclude Include="test\gcl\test\container\polymorphic_vector.hpp" />
-    <ClInclude Include="test\gcl\test\event.hpp" />
-    <ClInclude Include="test\gcl\test\gcl.hpp" />
-    <ClInclude Include="test\gcl\test\introspection.hpp" />
-    <ClInclude Include="test\gcl\test\mp.hpp" />
-    <ClInclude Include="test\gcl\test\pattern.hpp" />
-    <ClInclude Include="test\gcl\test\pattern\ecs.hpp" />
-    <ClInclude Include="test\gcl\test\test.hpp" />
-    <ClInclude Include="test\gcl\test\type_index.hpp" />
-    <ClInclude Include="test\gcl\test\type_info.hpp" />
+    <ClInclude Include="tests\gcl\test\container.hpp" />
+    <ClInclude Include="tests\gcl\test\container\component_aggregator.hpp" />
+    <ClInclude Include="tests\gcl\test\container\entity_vector.hpp" />
+    <ClInclude Include="tests\gcl\test\container\polymorphic_reference.hpp" />
+    <ClInclude Include="tests\gcl\test\container\polymorphic_vector.hpp" />
+    <ClInclude Include="tests\gcl\test\event.hpp" />
+    <ClInclude Include="tests\gcl\test\gcl.hpp" />
+    <ClInclude Include="tests\gcl\test\introspection.hpp" />
+    <ClInclude Include="tests\gcl\test\mp.hpp" />
+    <ClInclude Include="tests\gcl\test\pattern.hpp" />
+    <ClInclude Include="tests\gcl\test\pattern\ecs.hpp" />
+    <ClInclude Include="tests\gcl\test\test.hpp" />
+    <ClInclude Include="tests\gcl\test\type_index.hpp" />
+    <ClInclude Include="tests\gcl\test\type_info.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test\Main.cpp" />
+    <ClCompile Include="tests\Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -28,53 +28,14 @@
     <Filter Include="Header Files\gcl\container">
       <UniqueIdentifier>{f43f6203-2b39-47c4-a3bc-f047dab7c352}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\test">
+    <Filter Include="Header Files\tests">
       <UniqueIdentifier>{84fcf8d2-576b-4935-88e1-da69a7d1cb70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tests\gcl">
+      <UniqueIdentifier>{0d835a11-0bfb-4050-b640-652b60223f7e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="test\gcl\test\container\component_aggregator.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\container\entity_vector.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\container\polymorphic_reference.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\container\polymorphic_vector.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\pattern\ecs.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\container.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\event.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\gcl.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\introspection.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\mp.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\pattern.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\test.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\type_index.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
-    <ClInclude Include="test\gcl\test\type_info.hpp">
-      <Filter>Header Files\test</Filter>
-    </ClInclude>
     <ClInclude Include="includes\gcl\functional.hpp">
       <Filter>Header Files\gcl</Filter>
     </ClInclude>
@@ -99,10 +60,52 @@
     <ClInclude Include="includes\gcl\mp\pack_traits.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
+    <ClInclude Include="tests\gcl\test\container\component_aggregator.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\container.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\pattern\ecs.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\container\entity_vector.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\event.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\gcl.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\introspection.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\mp.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\pattern.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\container\polymorphic_reference.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\container\polymorphic_vector.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\test.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\type_index.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\gcl\test\type_info.hpp">
+      <Filter>Header Files\tests\gcl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test\Main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Main.cpp">
+      <Filter>Header Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
