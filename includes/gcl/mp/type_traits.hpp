@@ -14,7 +14,6 @@ namespace gcl::mp::type_traits
     struct is_instance_of : std::false_type {};
     template <template <class...> class T, class... T_args>
     struct is_instance_of<T<T_args...>, T> : std::true_type {};
-
     template <class T_concrete, template <class...> class T>
     static inline constexpr auto is_instance_of_v = is_instance_of<T_concrete, T>::value;
 
@@ -29,7 +28,12 @@ namespace gcl::mp::type_traits
         constexpr inline static auto value = impl<std::void_t<>, T, Args...>::value;
     };
     template <class T, typename... Args>
-    constexpr static inline bool is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
+    constexpr static inline auto is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
+
+    template <bool evaluation>
+    using if_t = std::conditional_t<evaluation, std::true_type, std::false_type>;
+    template <bool evaluation>
+    constexpr static inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
 }
 
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
@@ -50,3 +54,30 @@ namespace gcl::mp::type_traits::tests::is_brace_constructible_v
     static_assert(type_traits::is_brace_constructible_v<titi, char>);
     static_assert(not type_traits::is_brace_constructible_v<titi, char*>);
 }
+namespace gcl::mp::type_traits::tests::if_t
+{
+    static_assert(std::is_same_v<type_traits::if_t<true>, std::true_type>);
+    static_assert(std::is_same_v<type_traits::if_t<false>, std::false_type>);
+    static_assert(type_traits::if_v<true> == true);
+    static_assert(type_traits::if_v<false> == false);
+}
+#if __cpp_concepts
+#include <concepts>
+namespace gcl::mp::type_traits::tests::if_t
+{
+    // clang-format off
+    template <typename T>
+    concept is_red_colored = requires(T)
+    {
+        { T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
+        { type_traits::if_t<T::color == decltype(T::color)::red>{}} -> std::same_as<std::true_type>;
+    };
+    enum colors { red, blue, green };
+    struct smthg_blue { constexpr static auto color = colors::blue; };
+    struct smthg_red { constexpr static auto color = colors::red; };
+    // clang-format on
+
+    static_assert(not is_red_colored<smthg_blue>);
+    static_assert(is_red_colored<smthg_red>);
+}
+#endif
