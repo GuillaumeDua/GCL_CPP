@@ -2,6 +2,7 @@
 
 #include <gcl/mp/type_traits.hpp>
 #include <tuple>
+#include <array>
 
 namespace gcl::mp::type_traits
 {
@@ -53,26 +54,46 @@ namespace gcl::mp::type_traits
 
     template <typename to_find, typename pack_type>
     class index_of {
-        template <template <typename...> class PackType, typename... PackArgs>
+        template <auto distance_algorithm, template <typename...> class PackType, typename... PackArgs>
         consteval static auto impl(PackType<PackArgs...>)
         {
             constexpr auto index =
                 []<typename TupleType, std::size_t... I>(TupleType, std::index_sequence<I...>) consteval
             {
-                constexpr bool matches[] = {std::is_same_v<to_find, std::tuple_element_t<I, TupleType>>...};
+                constexpr std::array<bool, sizeof...(I)> matches = {
+                    std::is_same_v<to_find, std::tuple_element_t<I, TupleType>>...};
                 static_assert(std::size(matches) == sizeof...(I));
-                return std::distance(matches, std::find(matches, matches + sizeof...(I), true));
+                using matches_iterator_type = decltype(std::cbegin(matches));
+                return distance_algorithm(matches);
             }
             (std::tuple<PackArgs...>{}, std::make_index_sequence<sizeof...(PackArgs)>{});
             static_assert(index != sizeof...(PackArgs), "index_of : no match");
             return index;
         }
 
+        constexpr static auto from_begin = []<class ContainerType>(ContainerType container) consteval
+        {
+            return std::distance(std::cbegin(container), std::find(std::cbegin(container), std::cend(container), true));
+        };
+        constexpr static auto from_end = []<class ContainerType>(ContainerType container) consteval
+        {
+            return std::size(container) - 1 -
+                   std::distance(
+                       std::crbegin(container), std::find(std::crbegin(container), std::crend(container), true));
+        };
+
       public:
-        constexpr static auto value = impl(pack_type{});
+        constexpr static auto value = impl<from_begin>(pack_type{});
+        constexpr static auto first_value = value;
+        constexpr static auto last_value = impl<from_end>(pack_type{});
     };
+
     template <typename to_find, typename pack_type>
     constexpr static auto index_of_v = index_of<to_find, pack_type>::value;
+    template <typename to_find, typename pack_type>
+    constexpr static auto first_index_of_v = index_of<to_find, pack_type>::first_value;
+    template <typename to_find, typename pack_type>
+    constexpr static auto last_index_of_v = index_of<to_find, pack_type>::last_value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
@@ -107,6 +128,10 @@ namespace gcl::mp
 
         template <typename U>
         static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments>;
+        template <typename U>
+        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, arguments>;
+        template <typename U>
+        static constexpr inline auto last_index_of_v = gcl::mp::type_traits::last_index_of_v<U, arguments>;
 
         static constexpr inline auto size = std::tuple_size_v<arguments>;
         template <typename U>
@@ -203,7 +228,12 @@ namespace gcl::mp::tests::pack_traits
     static_assert(pack_traits_type::satisfy_trait_v<std::is_standard_layout>);
     static_assert(not pack_traits_type::satisfy_trait_v<std::is_pointer>);
 
-    static_assert(pack_traits_type::index_of_v<char> == 1);
+    using pack_type_with_repetitions = pack_type<int, char, double, int, char>;
+    using pack_type_with_repetitions_trait = gcl::mp::pack_traits<pack_type_with_repetitions>;
+
+    static_assert(pack_type_with_repetitions_trait::index_of_v<char> == 1);
+    static_assert(pack_type_with_repetitions_trait::first_index_of_v<char> == 1);
+    static_assert(pack_type_with_repetitions_trait::last_index_of_v<char> == 4);
 
     namespace filters
     {
