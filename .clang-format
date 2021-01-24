@@ -4,7 +4,9 @@ Language: Cpp
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveDeclarations: 'true'
 AlignTrailingComments: 'true'
+# AllowShortEnumsOnASingleLine : 'true'
 AllowShortFunctionsOnASingleLine: InlineOnly
+# AllowShortLambdasOnASingleLine: SLS_Inline
 AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'Yes'
 BinPackArguments: 'false'
