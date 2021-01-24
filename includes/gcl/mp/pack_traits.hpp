@@ -51,7 +51,28 @@ namespace gcl::mp::type_traits
     template <std::size_t N, typename... Ts>
     using type_at_t = typename type_at<N, Ts...>::type;
 
-    // todo : index_of
+    template <typename to_find, typename pack_type>
+    class index_of {
+        template <template <typename...> class PackType, typename... PackArgs>
+        consteval static auto impl(PackType<PackArgs...>)
+        {
+            constexpr auto index =
+                []<typename TupleType, std::size_t... I>(TupleType, std::index_sequence<I...>) consteval
+            {
+                constexpr bool matches[] = {std::is_same_v<to_find, std::tuple_element_t<I, TupleType>>...};
+                static_assert(std::size(matches) == sizeof...(I));
+                return std::distance(matches, std::find(matches, matches + sizeof...(I), true));
+            }
+            (std::tuple<PackArgs...>{}, std::make_index_sequence<sizeof...(PackArgs)>{});
+            static_assert(index != sizeof...(PackArgs), "index_of : no match");
+            return index;
+        }
+
+      public:
+        constexpr static auto value = impl(pack_type{});
+    };
+    template <typename to_find, typename pack_type>
+    constexpr static auto index_of_v = index_of<to_find, pack_type>::value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
@@ -83,6 +104,9 @@ namespace gcl::mp
         using unpack_as = type_traits::pack_arguments_t<type, template_type>;
         template <size_t N>
         using type_at = type_traits::type_at_t<N, Ts...>; // typename std::tuple_element<N, arguments>::type;
+
+        template <typename U>
+        static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments>;
 
         static constexpr inline auto size = std::tuple_size_v<arguments>;
         template <typename U>
@@ -148,6 +172,14 @@ namespace gcl::mp::type_traits::tests
         using T1 = pack<int, int*,char, char*, float>;
         static_assert(std::is_same_v<filters_t<T1, std::is_pointer>, pack<int*, char*>>);
     }
+    namespace index_of
+    {
+        template <typename... Ts>
+        struct pack {};
+
+        using type_pack = pack<int, double, char, float>;
+        static_assert(gcl::mp::type_traits::index_of_v<char, type_pack> == 2);
+    }
 }
 namespace gcl::mp::tests::pack_traits
 {
@@ -170,6 +202,8 @@ namespace gcl::mp::tests::pack_traits
 
     static_assert(pack_traits_type::satisfy_trait_v<std::is_standard_layout>);
     static_assert(not pack_traits_type::satisfy_trait_v<std::is_pointer>);
+
+    static_assert(pack_traits_type::index_of_v<char> == 1);
 
     namespace filters
     {
