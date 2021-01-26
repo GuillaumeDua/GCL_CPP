@@ -89,7 +89,7 @@ namespace gcl::mp::typeinfo
     template <typename Type>
     constexpr auto to_hashcode_array()
     {
-        using type_arguments_as_tuple = typename gcl::mp::pack_traits<Type>::arguments;
+        using type_arguments_as_tuple = typename gcl::mp::pack_traits<Type>::template arguments_as<std::tuple>;
         using index_type = std::make_index_sequence<std::tuple_size_v<type_arguments_as_tuple>>;
 
         constexpr auto generate_mapping_impl =

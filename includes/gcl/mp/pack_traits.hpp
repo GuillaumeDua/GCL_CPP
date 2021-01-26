@@ -3,39 +3,27 @@
 #include <gcl/mp/type_traits.hpp>
 #include <tuple>
 #include <array>
+#include <algorithm>
 
 namespace gcl::mp::type_traits
 {
-    // Limitations : compilers support
-    //  Clang   11.0.0  : does not support "Lambdas in unevaluated contexts" (P0315R4)
-    //  MsVC    19.28   : "error C2057: expected constant expression" in consteval context
-    //                    (like static_assert<std::is_same_v<>>)
-    //  GCC     10.2    : OK
-    // template <
-    //     typename T,
-    //     template <typename...> class PackType = std::tuple,
-    //     typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    // using pack_arguments = std::remove_reference_t<decltype([]<template <typename...> typename Type, typename... Ts>(
-    //     Type<Ts...>) constexpr { return PackType<Ts...>{}; }(std::declval<T>()))>;
-    template <
-        typename T,
-        template <typename...> class PackType = std::tuple,
-        typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    class pack_arguments {
-        template <template <typename...> typename Type, typename... Ts>
-        static auto impl(Type<Ts...>)
-        {   // type deducer
-            return PackType<Ts...>{};
+    template <template <typename ...> class T, typename ... Ts>
+    class pack_arguments_as {
+        template <template <typename...> class PackType, typename... PackArgs>
+        constexpr static auto impl(PackType<PackArgs...>)
+        {
+            return T<PackArgs...>{};
         }
-
+        template <typename... PackArgs>
+        constexpr static auto impl(PackArgs...)
+        {
+            return T<PackArgs...>{};
+        }
       public:
-        using type = decltype(impl(std::declval<T>()));
+        using type = decltype(impl(std::declval<Ts>()...));
     };
-    template <
-        typename T,
-        template <typename...> class PackType = std::tuple,
-        typename = std::enable_if_t<type_traits::is_template_v<T>>>
-    using pack_arguments_t = typename pack_arguments<T, PackType>::type;
+    template <template <typename ...> class T, typename ... Ts>
+    using pack_arguments_as_t = typename pack_arguments_as<T, Ts...>::type;
 
     template <typename T, typename U>
     struct concatenate;
@@ -108,7 +96,7 @@ namespace gcl::mp::type_traits
         using impl = std::conditional_t<trait<Type>::value, std::tuple<Type>, std::tuple<>>;
 
       public:
-        using type = pack_arguments_t<decltype(std::tuple_cat(impl<Ts>{}...)), T>;
+        using type = pack_arguments_as_t<T, decltype(std::tuple_cat(impl<Ts>{}...))>;
     };
     template <typename T, template <typename> typename trait>
     using filters_t = typename filters<T, trait>::type;
@@ -120,20 +108,19 @@ namespace gcl::mp
     template <template <typename...> typename T, typename... Ts>
     struct pack_traits<T<Ts...>> {
         using type = T<Ts...>;
-        using arguments = type_traits::pack_arguments_t<type>;
-        template <template <class...> class template_type>
-        using unpack_as = type_traits::pack_arguments_t<type, template_type>;
+        template <template <class...> class template_type = std::tuple>
+        using arguments_as = type_traits::pack_arguments_as_t<template_type, type>;
         template <size_t N>
         using type_at = type_traits::type_at_t<N, Ts...>; // typename std::tuple_element<N, arguments>::type;
 
         template <typename U>
-        static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments>;
+        static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments_as<>>;
         template <typename U>
-        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, arguments>;
+        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, arguments_as<>>;
         template <typename U>
-        static constexpr inline auto last_index_of_v = gcl::mp::type_traits::last_index_of_v<U, arguments>;
+        static constexpr inline auto last_index_of_v = gcl::mp::type_traits::last_index_of_v<U, arguments_as<>>;
 
-        static constexpr inline auto size = std::tuple_size_v<arguments>;
+        static constexpr inline auto size = std::tuple_size_v<arguments_as<std::tuple>>;
         template <typename U>
         static constexpr inline auto contains = type_traits::contains_v<U, Ts...>;
         template <template <class...> class template_type>
@@ -175,12 +162,10 @@ namespace gcl::mp::type_traits::tests
         template <typename... Ts>
         struct pack_type {};
 
-        using toto = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>, std::tuple>;
-        using titi = typename gcl::mp::type_traits::pack_arguments_t<pack_type<int, double, float>>;
-        static_assert(std::is_same_v<titi, toto>);
-        static_assert(std::is_same_v<titi, std::tuple<int, double, float>>);
+        using toto = typename gcl::mp::type_traits::pack_arguments_as_t<std::tuple, pack_type<int, double, float>>;
+        static_assert(std::is_same_v<toto, std::tuple<int, double, float>>);
         static_assert(
-            std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_t<titi, pack_type>>);
+            std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_as_t<pack_type, toto>>);
     }
     namespace concatenate
     {
@@ -216,9 +201,9 @@ namespace gcl::mp::tests::pack_traits
 
     static_assert(std::is_same_v<pack_traits_type::type, base_type>);
     static_assert(pack_traits_type::size == 3);
-    static_assert(pack_traits_type::size == std::tuple_size_v<pack_traits_type::arguments>);
-    static_assert(std::is_same_v<pack_traits_type::arguments, std::tuple<int, char, float>>);
-    static_assert(std::is_same_v<base_type, pack_traits_type::unpack_as<pack_type>>);
+    static_assert(pack_traits_type::size == std::tuple_size_v<pack_traits_type::arguments_as<>>);
+    static_assert(std::is_same_v<pack_traits_type::arguments_as<>, std::tuple<int, char, float>>);
+    static_assert(std::is_same_v<base_type, pack_traits_type::arguments_as<pack_type>>);
 
     static_assert(pack_traits_type::is_instance_of_v<pack_type>);
 
