@@ -24,7 +24,7 @@ namespace gcl::mp::type_traits
     };
     template <template <typename ...> class T, typename ... Ts>
     using pack_arguments_as_t = typename pack_arguments_as<T, Ts...>::type;
-    template <template <typename ...> class T, typename ... Ts>
+    template <typename ... Ts>
     using arguments_index_sequence_t = decltype(std::make_index_sequence<std::tuple_size_v<pack_arguments_as_t<std::tuple, Ts...>>>{});
 
     template <typename T, typename U>
@@ -54,7 +54,7 @@ namespace gcl::mp::type_traits
             }
             (std::make_index_sequence<sizeof...(PackArgs)>{});
         }
-        (arguments_as_t<std::tuple, Ts...>{});
+        (pack_arguments_as_t<std::tuple, Ts...>{});
     };
     template <template <typename...> class T, typename... Ts>
     constexpr static auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
@@ -185,6 +185,15 @@ namespace gcl::mp::type_traits::tests
         static_assert(std::is_same_v<toto, std::tuple<int, double, float>>);
         static_assert(
             std::is_same_v<pack_type<int, double, float>, gcl::mp::type_traits::pack_arguments_as_t<pack_type, toto>>);
+    }
+    namespace arguments_index_sequence
+    {
+        using args_index_sequence_result_t = gcl::mp::type_traits::arguments_index_sequence_t<int, double, float>;
+        using expected_result_t = decltype(std::make_index_sequence<3>());
+        static_assert(std::is_same_v<args_index_sequence_result_t, expected_result_t>);
+
+        using args_as_pack_sequence_result_t = gcl::mp::type_traits::arguments_index_sequence_t<std::tuple<int, double, float>>;
+        static_assert(std::is_same_v<args_as_pack_sequence_result_t, expected_result_t>);
     }
     namespace concatenate
     {
