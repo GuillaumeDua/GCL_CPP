@@ -24,6 +24,8 @@ namespace gcl::mp::type_traits
     };
     template <template <typename ...> class T, typename ... Ts>
     using pack_arguments_as_t = typename pack_arguments_as<T, Ts...>::type;
+    template <template <typename ...> class T, typename ... Ts>
+    using arguments_index_sequence_t = decltype(std::make_index_sequence<std::tuple_size_v<pack_arguments_as_t<std::tuple, Ts...>>>{});
 
     template <typename T, typename U>
     struct concatenate;
@@ -39,6 +41,23 @@ namespace gcl::mp::type_traits
     using type_at = typename std::tuple_element<N, std::tuple<Ts...>>;
     template <std::size_t N, typename... Ts>
     using type_at_t = typename type_at<N, Ts...>::type;
+
+    template <template <typename...> class T, typename... Ts>
+    struct trait_as_mask {
+
+        constexpr static auto value = []<typename... PackArgs>(std::tuple<PackArgs...>) consteval
+        {
+            using TupleType = std::tuple<PackArgs...>;
+            return []<std::size_t... I>(std::index_sequence<I...>) consteval
+            {
+                return std::array<bool, sizeof...(I)>{T<std::tuple_element_t<I, TupleType>>::value...};
+            }
+            (std::make_index_sequence<sizeof...(PackArgs)>{});
+        }
+        (arguments_as_t<std::tuple, Ts...>{});
+    };
+    template <template <typename...> class T, typename... Ts>
+    constexpr static auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
 
     template <typename to_find, typename pack_type>
     class index_of {
