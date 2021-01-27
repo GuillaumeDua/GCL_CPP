@@ -195,6 +195,18 @@ namespace gcl::mp::type_traits::tests
         using args_as_pack_sequence_result_t = gcl::mp::type_traits::arguments_index_sequence_t<std::tuple<int, double, float>>;
         static_assert(std::is_same_v<args_as_pack_sequence_result_t, expected_result_t>);
     }
+    namespace trait_as_mask
+    {
+        template <typename T>
+        using is_int = std::is_same<int, T>;
+
+        constexpr auto result = gcl::mp::type_traits::trait_as_mask_v<is_int, bool, int, char>;
+        constexpr auto expected_result = std::array{false, true, false};
+        static_assert(result == expected_result);
+
+        constexpr auto result_of_pack = gcl::mp::type_traits::trait_as_mask_v<is_int, std::tuple<bool, int, char>>;
+        static_assert(result_of_pack == expected_result);
+    }
     namespace concatenate
     {
         template <typename... Ts>
