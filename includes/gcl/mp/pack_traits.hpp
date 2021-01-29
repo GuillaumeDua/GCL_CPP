@@ -59,22 +59,23 @@ namespace gcl::mp::type_traits
     template <template <typename...> class T, typename... Ts>
     constexpr static auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
 
-    template <typename to_find, typename pack_type>
+    template <typename to_find, typename ... Ts>
     class index_of {
-        template <auto distance_algorithm, template <typename...> class PackType, typename... PackArgs>
-        consteval static auto impl(PackType<PackArgs...>)
+        template <auto distance_algorithm>
+        consteval static auto impl()
         {
+            using ArgsAsTuple = pack_arguments_as_t<std::tuple, Ts...>;
             constexpr auto index =
-                []<typename TupleType, std::size_t... I>(TupleType, std::index_sequence<I...>) consteval
+                []<std::size_t... I>(std::index_sequence<I...>) consteval
             {
                 constexpr std::array<bool, sizeof...(I)> matches = {
-                    std::is_same_v<to_find, std::tuple_element_t<I, TupleType>>...};
+                    std::is_same_v<to_find, std::tuple_element_t<I, ArgsAsTuple>>...};
                 static_assert(std::size(matches) == sizeof...(I));
                 using matches_iterator_type = decltype(std::cbegin(matches));
                 return distance_algorithm(matches);
             }
-            (std::tuple<PackArgs...>{}, std::make_index_sequence<sizeof...(PackArgs)>{});
-            static_assert(index != sizeof...(PackArgs), "index_of : no match");
+            (arguments_index_sequence_t<Ts...>{});
+            static_assert(index != std::tuple_size_v<ArgsAsTuple>, "index_of : no match");
             return index;
         }
 
@@ -90,17 +91,17 @@ namespace gcl::mp::type_traits
         };
 
       public:
-        constexpr static auto value = impl<from_begin>(pack_type{});
+        constexpr static auto value = impl<from_begin>();
         constexpr static auto first_value = value;
-        constexpr static auto last_value = impl<from_end>(pack_type{});
+        constexpr static auto last_value = impl<from_end>();
     };
 
-    template <typename to_find, typename pack_type>
-    constexpr static auto index_of_v = index_of<to_find, pack_type>::value;
-    template <typename to_find, typename pack_type>
-    constexpr static auto first_index_of_v = index_of<to_find, pack_type>::first_value;
-    template <typename to_find, typename pack_type>
-    constexpr static auto last_index_of_v = index_of<to_find, pack_type>::last_value;
+    template <typename to_find, typename ... Ts>
+    constexpr static auto index_of_v = index_of<to_find, Ts...>::value;
+    template <typename to_find, typename ... Ts>
+    constexpr static auto first_index_of_v = index_of<to_find, Ts...>::first_value;
+    template <typename to_find, typename ... Ts>
+    constexpr static auto last_index_of_v = index_of<to_find, Ts...>::last_value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
@@ -229,6 +230,8 @@ namespace gcl::mp::type_traits::tests
 
         using type_pack = pack<int, double, char, float>;
         static_assert(gcl::mp::type_traits::index_of_v<char, type_pack> == 2);
+        static_assert(gcl::mp::type_traits::index_of_v<char, 
+            int, double, char, float> == 2);
     }
 }
 namespace gcl::mp::tests::pack_traits
