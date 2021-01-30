@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gcl/mp/type_traits.hpp>
+#include <gcl/mp/value_traits.hpp>
 #include <tuple>
 #include <array>
 #include <algorithm>
@@ -63,15 +64,13 @@ namespace gcl::mp::type_traits
     class index_of {
         template <auto distance_algorithm>
         consteval static auto impl()
-        {
+        {   
             using ArgsAsTuple = pack_arguments_as_t<std::tuple, Ts...>;
-            constexpr auto index =
-                []<std::size_t... I>(std::index_sequence<I...>) consteval
+            constexpr auto index = []<std::size_t... I>(std::index_sequence<I...>) consteval
             {
-                constexpr std::array<bool, sizeof...(I)> matches = {
-                    std::is_same_v<to_find, std::tuple_element_t<I, ArgsAsTuple>>...};
-                static_assert(std::size(matches) == sizeof...(I));
-                using matches_iterator_type = decltype(std::cbegin(matches));
+                constexpr auto matches = std::array{std::is_same_v<to_find, std::tuple_element_t<I, ArgsAsTuple>>...};
+                static_assert(
+                    gcl::mp::value_traits::equal_v<std::size(matches), sizeof...(I), std::tuple_size_v<ArgsAsTuple>>);
                 return distance_algorithm(matches);
             }
             (arguments_index_sequence_t<Ts...>{});
