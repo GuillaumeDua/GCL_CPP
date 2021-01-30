@@ -5,6 +5,7 @@ namespace gcl::mp::value_traits
     template <auto... values>
     constexpr static auto equal_v = []() consteval
     {
+        static_assert(sizeof...(values) > 0, "gcl::mp::value_traits::equal_v : no arguments");
         constexpr auto first_value = std::get<0>(std::tuple{values...});
         return ((values == first_value) && ...);
     }
