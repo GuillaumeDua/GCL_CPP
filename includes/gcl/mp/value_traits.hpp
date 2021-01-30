@@ -1,18 +1,15 @@
 #pragma once
 
-#include <concepts>
+#include <gcl/mp/concepts.hpp>
 
 namespace gcl::mp::value_traits
 {
     template <auto... values>
-    constexpr static auto equal_v = []() consteval
+    requires(std::equality_comparable_with<
+             decltype(std::get<0>(std::tuple{values...})),
+             decltype(values)>&&...) constexpr static auto equal_v = []() consteval
     {
-        static_assert(sizeof...(values) > 0, "gcl::mp::value_traits::equal_v : no arguments");
-        constexpr auto first_value = std::get<0>(std::tuple{values...});
-        static_assert(
-            (std::equality_comparable_with<decltype(values), decltype(first_value)> && ...),
-            "gcl::mp::value_traits::equal_v : cannot compare values");
-        return ((values == first_value) && ...);
+        return ((values == std::get<0>(std::tuple{values...})) && ...);
     }
     ();
     template <auto... values>
@@ -21,6 +18,7 @@ namespace gcl::mp::value_traits
 
 namespace gcl::mp::value_traits::tests::equal
 {
+    static_assert(equal_v<>);
     static_assert(equal_v<true>);
     static_assert(equal_v<true, true>);
     static_assert(equal_v<true, true, true>);
