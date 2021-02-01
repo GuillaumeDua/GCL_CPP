@@ -13,7 +13,7 @@ namespace gcl::mp::value_traits
     }
     ();
     // Only works for Clang yet, since 11.0.0 
-    // template <auto first_value, std::equality_comparable_with<decltype(first_value)> auto... values>
+    // template <auto first_value = int{}, std::equality_comparable_with<decltype(first_value)> auto... values>
     // constexpr static auto equal_v = []() consteval
     // {
     //     return ((values == first_value) && ...);
@@ -25,6 +25,7 @@ namespace gcl::mp::value_traits
 
 namespace gcl::mp::value_traits::tests::equal
 {
+    static_assert(equal_v<>);
     static_assert(equal_v<true>);
     static_assert(equal_v<true, true>);
     static_assert(equal_v<true, true, true>);
