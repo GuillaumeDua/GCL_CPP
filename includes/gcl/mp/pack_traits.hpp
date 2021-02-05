@@ -110,13 +110,16 @@ namespace gcl::mp::type_traits
     template <class T>
     class reverse
     {
+        // static_assert(gcl::mp::type_traits::is_template_v<T>); todo : expand to values-parameter-pack
+
         template <template <typename...> class Type, typename ... Ts>
         constexpr static auto impl(Type<Ts...>) 
         {
             return []<std::size_t ... indexes>(std::index_sequence<indexes...>) constexpr {
                 // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
                 using Ts_as_tuple = std::tuple<Ts...>;
-                return Type { std::tuple_element_t<sizeof...(indexes) - 1 - indexes, Ts_as_tuple>{}... };
+                using return_type = Type<std::tuple_element_t<sizeof...(indexes) - 1 - indexes, Ts_as_tuple>...>;
+                return std::declval<return_type>();
             }(std::make_index_sequence<sizeof...(Ts)>{});
         }
         template <template <auto...> class Type, auto... values>
@@ -125,7 +128,8 @@ namespace gcl::mp::type_traits
             return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr {
                 // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
                 constexpr auto Ts_as_tuple = std::tuple{values...};
-                return Type<std::get<sizeof...(indexes) - 1 - indexes>(Ts_as_tuple)...>{};
+                using return_type = Type<std::get<sizeof...(indexes) - 1 - indexes>(Ts_as_tuple)...>;
+                return std::declval<return_type>();
             }
             (std::make_index_sequence<sizeof...(values)>{});
         }
@@ -156,6 +160,7 @@ namespace gcl::mp
     template <template <typename...> typename T, typename... Ts>
     struct pack_traits<T<Ts...>> {
         using type = T<Ts...>;
+        using reverse_type = typename gcl::mp::type_traits::reverse_t<type>;
         template <template <class...> class template_type = std::tuple>
         using arguments_as = type_traits::pack_arguments_as_t<template_type, type>;
         template <size_t N>
@@ -292,6 +297,9 @@ namespace gcl::mp::tests::pack_traits
     using pack_traits_type = gcl::mp::pack_traits<base_type>;
 
     static_assert(std::is_same_v<pack_traits_type::type, base_type>);
+    static_assert(std::is_same_v<pack_traits_type::reverse_type, pack_type<float, char, int>>);
+    static_assert(std::is_same_v<pack_traits_type::type, gcl::mp::type_traits::reverse_t<pack_traits_type::reverse_type>>);
+
     static_assert(pack_traits_type::size == 3);
     static_assert(pack_traits_type::size == std::tuple_size_v<pack_traits_type::arguments_as<>>);
     static_assert(std::is_same_v<pack_traits_type::arguments_as<>, std::tuple<int, char, float>>);
