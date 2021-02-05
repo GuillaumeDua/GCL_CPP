@@ -113,11 +113,21 @@ namespace gcl::mp::type_traits
         template <template <typename...> class Type, typename ... Ts>
         constexpr static auto impl(Type<Ts...>) 
         {
-            using Ts_as_tuple = std::tuple<Ts...>;
             return []<std::size_t ... indexes>(std::index_sequence<indexes...>) constexpr {
                 // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
+                using Ts_as_tuple = std::tuple<Ts...>;
                 return Type { std::tuple_element_t<sizeof...(indexes) - 1 - indexes, Ts_as_tuple>{}... };
             }(std::make_index_sequence<sizeof...(Ts)>{});
+        }
+        template <template <auto...> class Type, auto... values>
+        constexpr static auto impl(Type<values...>)
+        {
+            return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr {
+                // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
+                constexpr auto Ts_as_tuple = std::tuple{values...};
+                return Type<std::get<sizeof...(indexes) - 1 - indexes>(Ts_as_tuple)...>{};
+            }
+            (std::make_index_sequence<sizeof...(values)>{});
         }
 
         public:
@@ -253,10 +263,24 @@ namespace gcl::mp::type_traits::tests
     }
     namespace reverse
     {
-        using type = std::tuple<int, double, float, char>;
-        using reversed_type = gcl::mp::type_traits::reverse_t<type>;
-        static_assert(std::is_same_v<type, gcl::mp::type_traits::reverse_t<gcl::mp::type_traits::reverse_t<type>>>);
-        static_assert(std::is_same_v<reversed_type, std::tuple<char, float, double, int>>);
+        namespace parameter_pack_of_type
+        {
+            using type = std::tuple<int, double, float, char>;
+            using reversed_type = gcl::mp::type_traits::reverse_t<type>;
+
+            static_assert(std::is_same_v<type, gcl::mp::type_traits::reverse_t<gcl::mp::type_traits::reverse_t<type>>>);
+            static_assert(std::is_same_v<reversed_type, std::tuple<char, float, double, int>>);
+        }
+        namespace parameter_pack_of_values
+        {
+            template <auto... values>
+            struct values_container {};
+            using type = values_container<123, 'a', 42U, 55LL>;
+            using reversed_type = gcl::mp::type_traits::reverse_t<type>;
+
+            static_assert(std::is_same_v<type, gcl::mp::type_traits::reverse_t<gcl::mp::type_traits::reverse_t<type>>>);
+            static_assert(std::is_same_v<reversed_type, values_container<55LL, 42U, 'a', 123>>);
+        }
     }
 }
 namespace gcl::mp::tests::pack_traits
