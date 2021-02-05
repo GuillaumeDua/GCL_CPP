@@ -110,7 +110,7 @@ namespace gcl::mp::type_traits
     template <class T>
     class reverse
     {
-        // static_assert(gcl::mp::type_traits::is_template_v<T>); todo : expand to values-parameter-pack
+        static_assert(gcl::mp::type_traits::is_template_v<T>);
 
         template <template <typename...> class Type, typename ... Ts>
         constexpr static auto impl(Type<Ts...>) 

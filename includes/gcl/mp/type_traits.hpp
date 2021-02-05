@@ -7,6 +7,8 @@ namespace gcl::mp::type_traits
     struct is_template : std::false_type {};
     template <class... T_args, template <class...> class T>
     struct is_template<T<T_args...>> : std::true_type {};
+    template <auto... values, template <auto...> class T>
+    struct is_template<T<values...>> : std::true_type {};
     template <class T>
     static inline constexpr auto is_template_v = is_template<T>::value;
 
