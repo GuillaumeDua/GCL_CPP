@@ -107,6 +107,25 @@ namespace gcl::mp::type_traits
     template <typename T, typename... Ts>
     static constexpr inline auto contains_v = contains<T, Ts...>::value;
 
+    template <class T>
+    class reverse
+    {
+        template <template <typename...> class Type, typename ... Ts>
+        constexpr static auto impl(Type<Ts...>) 
+        {
+            using Ts_as_tuple = std::tuple<Ts...>;
+            return []<std::size_t ... indexes>(std::index_sequence<indexes...>) constexpr {
+                // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
+                return Type { std::tuple_element_t<sizeof...(indexes) - 1 - indexes, Ts_as_tuple>{}... };
+            }(std::make_index_sequence<sizeof...(Ts)>{});
+        }
+
+        public:
+            using type = decltype(impl(std::declval<T>()));
+    };
+    template <class T>
+    using reverse_t = typename reverse<T>::type;
+
     template <typename T, template <typename> typename trait>
     struct filters;
     template <template <typename...> typename T, template <typename> typename trait, typename... Ts>
@@ -231,6 +250,13 @@ namespace gcl::mp::type_traits::tests
         static_assert(gcl::mp::type_traits::index_of_v<char, type_pack> == 2);
         static_assert(gcl::mp::type_traits::index_of_v<char, 
             int, double, char, float> == 2);
+    }
+    namespace reverse
+    {
+        using type = std::tuple<int, double, float, char>;
+        using reversed_type = gcl::mp::type_traits::reverse_t<type>;
+        static_assert(std::is_same_v<type, gcl::mp::type_traits::reverse_t<gcl::mp::type_traits::reverse_t<type>>>);
+        static_assert(std::is_same_v<reversed_type, std::tuple<char, float, double, int>>);
     }
 }
 namespace gcl::mp::tests::pack_traits
