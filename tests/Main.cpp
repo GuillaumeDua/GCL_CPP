@@ -1,5 +1,11 @@
 // #define _GCL_DEBUG
 
+// static tests
+
+#include <gcl/mp/mp.hpp>
+
+// dynamic tests
+
 #include <gcl/serialization.hpp>
 
 void tmp()

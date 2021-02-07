@@ -35,7 +35,6 @@ namespace gcl::mp::utility::tests
         make_reverse_index_sequence<3>,
         std::index_sequence<2, 1, 0>>
     );
-
     static_assert(std::is_same_v<
         reverse_index_sequence<11, 22, 33>,
         std::index_sequence<33, 22, 11>
