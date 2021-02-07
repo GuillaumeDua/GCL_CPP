@@ -12,8 +12,8 @@ namespace gcl::mp::utility
         return std::integer_sequence<T, (value - 1 - indexes)...>{};
     }(std::make_integer_sequence<T, value>{});
 
-    template <typename T, T value>
-    using make_reverse_integer_sequence = decltype(reverse_integer_sequence_v<T, value>);
+    template <typename T, T value> // std::make_integer_sequence does not use auto-value
+    using make_reverse_integer_sequence = std::decay_t<decltype(reverse_integer_sequence_v<T, value>)>;
     template <std::size_t N>
     using make_reverse_index_sequence = make_reverse_integer_sequence<std::size_t, N>;
     template <class ... Ts>
@@ -31,6 +31,11 @@ namespace gcl::mp::utility
 
 namespace gcl::mp::utility::tests
 {
+    static_assert(std::is_same_v<
+        make_reverse_index_sequence<3>,
+        std::index_sequence<2, 1, 0>>
+    );
+
     static_assert(std::is_same_v<
         reverse_index_sequence<11, 22, 33>,
         std::index_sequence<33, 22, 11>
