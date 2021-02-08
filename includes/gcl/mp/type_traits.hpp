@@ -37,6 +37,38 @@ namespace gcl::mp::type_traits
     template <bool evaluation>
     constexpr static inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
 }
+#include <bitset>
+#include <tuple>
+#include <array>
+namespace gcl::mp::type_traits
+{
+    template <template <typename> class trait, typename... Ts>
+    struct trait_result {
+        constexpr static auto as_bitset_v = []() consteval
+        {
+            using bitset_type = std::bitset<sizeof...(Ts)>;
+            using bitset_initializer_t = unsigned long long;
+            bitset_initializer_t value{0};
+            return bitset_type{((value = (value << 1 | trait<Ts>::value)), ...)};
+        }
+        ();
+
+        template <template <typename...> class T>
+        using as_t = T<typename trait<Ts>::type...>;
+        template <template <typename...> class T>
+        constexpr static auto as_v = T{trait<Ts>::value...};
+
+        using as_tuple_t = as_t<std::tuple>;
+        constexpr static auto as_tuple_v = std::tuple{trait<Ts>::value...};
+
+        template <class Int = int>
+        using as_integer_sequence = std::integer_sequence<Int, trait<Ts>::value...>;
+
+        // constexpr static auto as_array_v = std::array{trait<Ts>::value...}; // OK with GCC 10.2
+        using as_array_t = std::array<std::tuple_element_t<0, decltype(std::tuple{trait<Ts>::value...})>, sizeof...(Ts)>;
+        constexpr static auto as_array_v = as_array_t{trait<Ts>::value...};
+    };
+}
 
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
 {
@@ -83,3 +115,16 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(is_red_colored<smthg_red>);
 }
 #endif
+namespace gcl::mp::type_traits::tests::trait_results
+{
+    template <typename T>
+    using is_int = std::is_same<int, T>;
+    using results = trait_result<is_int, char, int, bool>;
+    using results_as_tuple = results::as_t<std::tuple>;
+    using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
+
+    static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>);
+
+
+    // WIP
+}
