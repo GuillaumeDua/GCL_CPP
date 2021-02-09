@@ -120,11 +120,25 @@ namespace gcl::mp::type_traits::tests::trait_results
     template <typename T>
     using is_int = std::is_same<int, T>;
     using results = trait_result<is_int, char, int, bool>;
+
+    // static_assert(decltype(results::as_bitset_v){2UL} == results::as_bitset_v); // std::bitset::operator== is not cx
+    constexpr auto expected_result_as_bitset = decltype(results::as_bitset_v){2UL};
+    static_assert(expected_result_as_bitset[0] == results::as_bitset_v[0]);
+    static_assert(expected_result_as_bitset[1] == results::as_bitset_v[1]);
+    static_assert(expected_result_as_bitset[2] == results::as_bitset_v[2]);
+
     using results_as_tuple = results::as_t<std::tuple>;
     using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
-
     static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>);
 
+    using expected_result_as_tuple = std::tuple<std::false_type, std::true_type, std::false_type>;
+    static_assert(std::is_same_v<results::as_t<std::tuple>, expected_result_as_tuple>);
+    static_assert(std::is_same_v<results::as_integer_sequence<int>, std::integer_sequence<int, 0, 1, 0>>);
+    static_assert(results::as_array_v == std::array{false, true, false});
 
-    // WIP
+    template <typename... Ts>
+    struct type_pack {};
+    using results_as_type_pack = results::as_t<type_pack>;
+    using expected_result_as_type_pack = type_pack<std::false_type, std::true_type, std::false_type>;
+    static_assert(std::is_same_v<results_as_type_pack, expected_result_as_type_pack>);
 }
