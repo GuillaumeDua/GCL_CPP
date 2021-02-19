@@ -114,6 +114,12 @@
     <ClInclude Include="includes\gcl\mp\mp.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\cx\map.hpp">
+      <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\cx\cx.hpp">
+      <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">

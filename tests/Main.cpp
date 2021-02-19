@@ -3,6 +3,7 @@
 // static tests
 
 #include <gcl/mp/mp.hpp>
+#include <gcl/cx/cx.hpp>
 
 // dynamic tests
 
