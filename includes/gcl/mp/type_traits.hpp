@@ -69,6 +69,17 @@ namespace gcl::mp::type_traits
         constexpr static auto as_array_v = as_array_t{trait<Ts>::value...};
     };
 }
+namespace gcl::mp::type_trait
+{   // detection not covered by `is_instance_of`
+    template <typename T>
+    struct is_std_array : std::false_type {};
+    template <typename T, std::size_t N>
+    struct is_std_array<std::array<T, N>> : std::true_type {};
+    template <typename T>
+    using is_std_array_t = is_std_array<T>::type;
+    template <typename T>
+    constexpr static auto is_std_array_v = is_std_array_t<T>::value;
+}
 
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
 {
