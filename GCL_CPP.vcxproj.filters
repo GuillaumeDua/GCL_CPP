@@ -120,6 +120,9 @@
     <ClInclude Include="includes\gcl\cx\cx.hpp">
       <Filter>Header Files\gcl\cx</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\cx\array.hpp">
+      <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">

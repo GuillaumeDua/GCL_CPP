@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\gcl\cx\array.hpp" />
     <ClInclude Include="includes\gcl\cx\crc32_hash.hpp" />
     <ClInclude Include="includes\gcl\cx\cx.hpp" />
     <ClInclude Include="includes\gcl\cx\map.hpp" />
