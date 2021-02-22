@@ -12,7 +12,6 @@ namespace gcl::cx::concepts
     template <typename T>
     concept array_value = gcl::mp::type_traits::is_std_array_v<T> or std::is_array_v<T>;
 }
-
 namespace gcl::cx::array
 {
     template <concepts::array_value auto arg>
@@ -20,6 +19,7 @@ namespace gcl::cx::array
     {
         using argument_type = decltype(arg);
         using value_type = typename argument_type::value_type;
+
         constexpr auto size = []() consteval
         {
             auto copy = arg;
@@ -41,6 +41,30 @@ namespace gcl::cx::array
     constexpr static auto remove_duplicates_v = remove_duplicates<arg>();
     template <concepts::array_value auto arg>
     using remove_duplicates_t = typename std::decay_t<decltype(remove_duplicates_v<arg>)>;
+
+    template <typename... Ts>
+    consteval auto to_array(Ts&&... values)
+    {
+        using element_type = std::common_type_t<Ts...>;
+        using array_type = std::array<element_type, sizeof...(values)>;
+        return array_type{std::forward<decltype(values)>(values)...};
+    }
+    template <auto... values>
+    consteval auto to_array()
+    {
+        using element_type = std::common_type_t<decltype(values)...>;
+        using array_type = std::array<element_type, sizeof...(values)>;
+        return array_type{std::forward<decltype(values)>(values)...};
+    }
+    template <typename T, std::size_t N, typename FunctionType>
+    consteval auto to_parameter_pack(std::array<T, N> values, FunctionType&& function)
+    {
+        return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
+        {
+            return function(values.at(indexes)...);
+        }
+        (std::make_index_sequence<N>{});
+    }
 }
 
 namespace gcl::cx::tests::array
@@ -48,4 +72,6 @@ namespace gcl::cx::tests::array
     constexpr auto datas = std::array{'a', 'b', 'a', 'c', 'a'};
     static_assert(std::is_same_v<std::array<char, 3>, gcl::cx::array::remove_duplicates_t<datas>>);
     static_assert(gcl::cx::array::remove_duplicates_v<datas> == std::array{'a', 'b', 'c'});
+    static_assert(gcl::cx::array::to_array('a', 'b', 'c') == std::array{'a', 'b', 'c'});
+    static_assert(gcl::cx::array::to_array<'a', 'b', 'c'>() == std::array{'a', 'b', 'c'});
 }
