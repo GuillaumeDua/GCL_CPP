@@ -53,17 +53,15 @@ namespace gcl::mp::type_traits
         }
         ();
 
+        // see gcl::mp::pack_traits::pack_arguments_as for other expansion/conversions
         template <template <typename...> class T>
         using as_t = T<typename trait<Ts>::type...>;
         template <template <typename...> class T>
         constexpr static auto as_v = T{trait<Ts>::value...};
-
         using as_tuple_t = as_t<std::tuple>;
         constexpr static auto as_tuple_v = std::tuple{trait<Ts>::value...};
-
         template <class Int = int>
         using as_integer_sequence = std::integer_sequence<Int, trait<Ts>::value...>;
-
         // constexpr static auto as_array_v = std::array{trait<Ts>::value...}; // OK with GCC 10.2
         using as_array_t = std::array<std::tuple_element_t<0, decltype(std::tuple{trait<Ts>::value...})>, sizeof...(Ts)>;
         constexpr static auto as_array_v = as_array_t{trait<Ts>::value...};
