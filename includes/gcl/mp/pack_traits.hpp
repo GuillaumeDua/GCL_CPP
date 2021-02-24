@@ -2,6 +2,7 @@
 
 #include <gcl/mp/type_traits.hpp>
 #include <gcl/mp/value_traits.hpp>
+#include <gcl/mp/utility.hpp>
 #include <tuple>
 #include <array>
 #include <algorithm>
@@ -114,7 +115,7 @@ namespace gcl::mp::type_traits
 
         template <template <typename...> class Type, typename ... Ts>
         constexpr static auto impl(Type<Ts...>) 
-        {
+        {   // todo : gcl::mp::utility::reverse_index_sequence / gcl::mp::utility::make_reverse_index_sequence
             return []<std::size_t ... indexes>(std::index_sequence<indexes...>) constexpr {
                 // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
                 using Ts_as_tuple = std::tuple<Ts...>;
@@ -149,6 +150,9 @@ namespace gcl::mp::type_traits
 
       public:
         using type = pack_arguments_as_t<T, decltype(std::tuple_cat(impl<Ts>{}...))>;
+
+        // todo : index_sequence -> { true, false, true } -> { 1, 3 }
+        // WIP : https://godbolt.org/z/PrxdWf
     };
     template <typename T, template <typename> typename trait>
     using filters_t = typename filters<T, trait>::type;

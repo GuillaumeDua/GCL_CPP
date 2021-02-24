@@ -34,6 +34,9 @@
     <Filter Include="Header Files\tests\gcl">
       <UniqueIdentifier>{0d835a11-0bfb-4050-b640-652b60223f7e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gcl\compile_time_constant">
+      <UniqueIdentifier>{08e11716-eabe-4cae-9488-a7b0d986723e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\gcl\functional.hpp">
@@ -122,6 +125,12 @@
     </ClInclude>
     <ClInclude Include="includes\gcl\cx\array.hpp">
       <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\compile_time_constant\algorithms.hpp">
+      <Filter>Header Files\gcl\compile_time_constant</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\compile_time_constant\ctc.hpp">
+      <Filter>Header Files\gcl\compile_time_constant</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
