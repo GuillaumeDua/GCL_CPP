@@ -56,15 +56,18 @@ namespace gcl::cx::array
         using array_type = std::array<element_type, sizeof...(values)>;
         return array_type{std::forward<decltype(values)>(values)...};
     }
-    template <typename T, std::size_t N, typename FunctionType>
-    consteval auto to_parameter_pack(std::array<T, N> values, FunctionType&& function)
-    {
-        return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
-        {
-            return function(values.at(indexes)...);
-        }
-        (std::make_index_sequence<N>{});
-    }
+
+    // WIP
+    // template <typename T, std::size_t N, typename FunctionType>
+    // requires(std::invocable<FunctionType, )
+    // consteval auto to_parameter_pack(std::array<T, N> values, FunctionType&& function)
+    // {
+    //     return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
+    //     {
+    //         return function(values.at(indexes)...);
+    //     }
+    //     (std::make_index_sequence<N>{});
+    // }
 }
 
 namespace gcl::cx::tests::array
