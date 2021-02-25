@@ -56,9 +56,12 @@ namespace gcl::ctc
         return return_value;
     }
     template <typename... Ts>
+        requires concepts::have_common_type<Ts...> 
     consteval auto deduplicate(const Ts... values_arg)
     {
-        auto values = std::array{values_arg...};
+            using element_type = std::common_type_t<Ts...>;
+        auto values = std::array<element_type, sizeof...(Ts)>{static_cast<element_type>(values_arg)...
+    };
 
         // deduplication
         std::sort(std::begin(values), std::end(values));
@@ -71,16 +74,16 @@ namespace gcl::ctc
             std::copy(end, std::end(values), std::next(it));
         }
         // std::unique()
-        auto sort_end = [&values]() consteval
+        auto unique_end = [&values]() consteval
         {
             std::size_t i{1};
-            for (; i < std::size(values) and values.at(i - 1) < values.at(i); ++i)
-                ;
+            while (i < std::size(values) and values.at(i - 1) < values.at(i))
+                i++;
             return i;
         }
         ();
 
-        return std::pair{values, sort_end};
+        return std::pair{values, unique_end};
     }
     template <std::size_t end_index, typename T, std::size_t N>
     consteval auto shrink(std::array<T, N> value)
@@ -108,7 +111,25 @@ namespace gcl::ctc::tests::deduplicate
            return gcl::ctc::shrink<last_unique>(deduplicated_values);
         }
         ();
-        static_assert(std::is_same_v<decltype(values), const decltype(std::array{1, 2, 3, 4, 5})>);
-        static_assert(values == std::array{1, 2, 3, 4, 5});
+        constexpr auto expected_result = std::array{1, 2, 3, 4, 5};
+        static_assert(std::is_same_v<decltype(values), decltype(expected_result)>);
+        static_assert(values == expected_result);
+    }
+    static void by_values_heterogenous()
+    {
+
+        constexpr auto values = []() consteval
+        {
+            constexpr auto deduplicate_result = gcl::ctc::deduplicate(
+                1, 2.0f, 1.0f, 2, 3, 4, 4e0, 0x4, char{1}, 5, 1, 2, 3);
+            constexpr auto deduplicated_values =
+                std::get<0>(deduplicate_result); // structure-binding not allowed in constant-expression
+            constexpr auto last_unique = std::get<1>(deduplicate_result);
+            return gcl::ctc::shrink<last_unique>(deduplicated_values);
+        }
+        ();
+        constexpr auto expected_result = std::array<double, 5>{1, 2, 3, 4, 5};
+        static_assert(std::is_same_v<decltype(values), decltype(expected_result)>);
+        static_assert(values == expected_result);
     }
 }
