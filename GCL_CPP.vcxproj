@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms.hpp" />
+    <ClInclude Include="includes\gcl\compile_time_constant\algorithms\array.hpp" />
+    <ClInclude Include="includes\gcl\compile_time_constant\algorithms\tuple.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\ctc.hpp" />
     <ClInclude Include="includes\gcl\cx\array.hpp" />
     <ClInclude Include="includes\gcl\cx\crc32_hash.hpp" />
