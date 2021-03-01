@@ -98,6 +98,7 @@ namespace gcl::ctc::algorithms::tuple
         }
         (std::make_index_sequence<std::tuple_size_v<TupleType>>{});
     }
+
     template <std::size_t N, template <typename...> typename TupleType, typename... TupleElementsTypes>
     constexpr auto tuple_shrink(TupleType<TupleElementsTypes...> tuple_value)
     {
@@ -109,7 +110,6 @@ namespace gcl::ctc::algorithms::tuple
         }
         (std::make_index_sequence<N>{});
     }
-
     template <std::size_t N, typename ElementType, auto size>
     constexpr auto tuple_shrink(std::array<ElementType, size> tuple_value)
     {
@@ -122,6 +122,26 @@ namespace gcl::ctc::algorithms::tuple
         (std::make_index_sequence<N>{});
     }
 
+    template <std::size_t N, typename TupleType>
+    constexpr auto tuple_remove_suffix(TupleType tuple_value)
+    {
+        static_assert((std::tuple_size_v<TupleType> - N) >= 0);
+        return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
+        {
+            return std::tuple{std::get<N + indexes>(tuple_value)...};
+        }
+        (std::make_index_sequence<std::tuple_size_v<TupleType> - N>{});
+    }
+    template <std::size_t N, typename ElementType, auto size>
+    constexpr auto tuple_remove_suffix(std::array<ElementType, size> tuple_value)
+    {
+        static_assert((size - N) >= 0);
+        return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
+        {
+            return std::array{std::get<N + indexes>(tuple_value)...};
+        }
+        (std::make_index_sequence<size - N>{});
+    }
 }
 
 namespace gcl::ctc::tests::algorithms::tuple
@@ -140,4 +160,7 @@ namespace gcl::ctc::tests::algorithms::tuple
 
     static_assert(ctc_tuple_algorithms::tuple_shrink<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'a', 42});
     static_assert(ctc_tuple_algorithms::tuple_shrink<2>(std::array{'a', 'b', 'c'}) == std::array{'a', 'b'});
+
+    static_assert(ctc_tuple_algorithms::tuple_remove_suffix<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'b', 43});
+    static_assert(ctc_tuple_algorithms::tuple_remove_suffix<2>(std::array{'a', 'b', 'c'}) == std::array{'c'});
 }
