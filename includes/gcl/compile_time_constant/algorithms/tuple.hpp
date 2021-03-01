@@ -100,7 +100,7 @@ namespace gcl::ctc::algorithms::tuple
     }
 
     template <std::size_t N, template <typename...> typename TupleType, typename... TupleElementsTypes>
-    constexpr auto tuple_shrink(TupleType<TupleElementsTypes...> tuple_value)
+    constexpr auto tuple_remove_prefix(TupleType<TupleElementsTypes...> tuple_value)
     {
         using tuple_t = TupleType<TupleElementsTypes...>;
         static_assert(std::tuple_size_v<tuple_t> >= N);
@@ -111,7 +111,7 @@ namespace gcl::ctc::algorithms::tuple
         (std::make_index_sequence<N>{});
     }
     template <std::size_t N, typename ElementType, auto size>
-    constexpr auto tuple_shrink(std::array<ElementType, size> tuple_value)
+    constexpr auto tuple_remove_prefix(std::array<ElementType, size> tuple_value)
     {
         using tuple_t = std::array<ElementType, size>;
         static_assert(std::tuple_size_v<tuple_t> >= N);
@@ -158,8 +158,8 @@ namespace gcl::ctc::tests::algorithms::tuple
 
     static_assert(ctc_tuple_algorithms::tuple_to_std_array(std::tuple{'a', 98, 'c'}) == std::array<int, 3>{'a', 'b', 'c'});
 
-    static_assert(ctc_tuple_algorithms::tuple_shrink<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'a', 42});
-    static_assert(ctc_tuple_algorithms::tuple_shrink<2>(std::array{'a', 'b', 'c'}) == std::array{'a', 'b'});
+    static_assert(ctc_tuple_algorithms::tuple_remove_prefix<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'a', 42});
+    static_assert(ctc_tuple_algorithms::tuple_remove_prefix<2>(std::array{'a', 'b', 'c'}) == std::array{'a', 'b'});
 
     static_assert(ctc_tuple_algorithms::tuple_remove_suffix<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'b', 43});
     static_assert(ctc_tuple_algorithms::tuple_remove_suffix<2>(std::array{'a', 'b', 'c'}) == std::array{'c'});
