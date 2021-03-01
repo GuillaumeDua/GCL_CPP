@@ -87,6 +87,17 @@ namespace gcl::ctc::algorithms::tuple
     template <auto... values>
     using tuple_erase_duplicate_types_t = std::decay_t<decltype(tuple_erase_duplicate_types<values...>())>;
 #endif
+
+    template <typename TupleType>
+    constexpr auto tuple_to_std_array(TupleType tuple_value)
+    {
+        return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
+        {
+            using element_type = std::common_type_t<decltype(std::get<indexes>(tuple_value))...>;
+            return std::array<element_type, sizeof...(indexes)>{std::get<indexes>(tuple_value)...};
+        }
+        (std::make_index_sequence<std::tuple_size_v<TupleType>>{});
+    }
 }
 
 namespace gcl::ctc::tests::algorithms::tuple
@@ -100,4 +111,6 @@ namespace gcl::ctc::tests::algorithms::tuple
                   std::tuple<char, int>,
                   ctc_tuple_algorithms::tuple_erase_duplicate_types_t<'a', 'a', 'b', 42, 'c', 13>>);
 #endif
+
+    static_assert(ctc_tuple_algorithms::tuple_to_std_array(std::tuple{'a', 98, 'c'}) == std::array<int, 3>{'a', 'b', 'c'});
 }
