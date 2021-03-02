@@ -18,7 +18,7 @@ namespace gcl::ctc::algorithms::tuple
     template <typename PredicateType, auto... arguments>
     constexpr auto tuple_erase_if(const PredicateType predicate)
     {
-        constexpr auto element_if_predicate = [predicate]<auto argument>() consteval
+        [[maybe_unused]] constexpr auto element_if_predicate = [predicate]<auto argument>() consteval
         {
             if constexpr (predicate(argument))
                 return std::tuple<>{};
