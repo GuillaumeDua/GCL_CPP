@@ -36,21 +36,16 @@ namespace gcl::ctc::algorithms::tuple
 
         constexpr auto element_if_predicate = [arguments]<auto argument, std::size_t argument_index>() consteval
         {
-            if constexpr (argument_index == 0)
-                return std::tuple{argument};
-            else
+            constexpr auto has_previous_position =
+                [&arguments]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
             {
-                constexpr auto has_previous_position =
-                    [&arguments]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
-                {
-                    return (((std::get<indexes>(arguments) == argument) || ...));
-                }
-                (std::make_index_sequence<argument_index>{});
-                if constexpr (has_previous_position)
-                    return std::tuple{};
-                else
-                    return std::tuple{argument};
+                return (((std::get<indexes>(arguments) == argument) || ...));
             }
+            (std::make_index_sequence<argument_index>{});
+            if constexpr (has_previous_position)
+                return std::tuple{};
+            else
+                return std::tuple{argument};
         };
 
         return [&arguments, element_if_predicate ]<std::size_t... indexes>(std::index_sequence<indexes...>) consteval
