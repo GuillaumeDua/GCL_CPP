@@ -84,6 +84,7 @@ namespace gcl::ctc::algorithms::tuple
 #endif
 
     template <typename TupleType>
+        requires(std::tuple_size_v<TupleType> not_eq 0)
     constexpr auto tuple_to_std_array(TupleType tuple_value)
     {
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
@@ -106,10 +107,10 @@ namespace gcl::ctc::algorithms::tuple
         (std::make_index_sequence<N>{});
     }
     template <std::size_t N, typename ElementType, auto size>
+        requires(size >= N)
     constexpr auto tuple_remove_suffix(std::array<ElementType, size> tuple_value)
     {
         using tuple_t = std::array<ElementType, size>;
-        static_assert(std::tuple_size_v<tuple_t> >= N);
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
         {
             return std::array{std::get<indexes>(tuple_value)...};
@@ -118,9 +119,9 @@ namespace gcl::ctc::algorithms::tuple
     }
 
     template <std::size_t N, typename TupleType>
+        requires(std::tuple_size_v<TupleType> >= N)
     constexpr auto tuple_remove_prefix(TupleType tuple_value)
     {
-        static_assert((std::tuple_size_v<TupleType> - N) >= 0);
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
         {
             return std::tuple{std::get<N + indexes>(tuple_value)...};
@@ -128,12 +129,12 @@ namespace gcl::ctc::algorithms::tuple
         (std::make_index_sequence<std::tuple_size_v<TupleType> - N>{});
     }
     template <std::size_t N, typename ElementType, auto size>
+        requires(size >= N)
     constexpr auto tuple_remove_prefix(std::array<ElementType, size> tuple_value)
     {
-        static_assert((size - N) >= 0);
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
         {
-            return std::array{std::get<N + indexes>(tuple_value)...};
+            return std::array<ElementType, size - N>{std::get<N + indexes>(tuple_value)...};
         }
         (std::make_index_sequence<size - N>{});
     }
