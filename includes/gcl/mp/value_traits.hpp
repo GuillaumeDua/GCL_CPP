@@ -5,6 +5,11 @@
 namespace gcl::mp::value_traits
 {
     template <auto... values>
+    struct sequence {
+        constexpr static auto size = sizeof...(values);
+    };
+
+    template <auto... values>
     requires(std::equality_comparable_with<
              decltype(std::get<0>(std::tuple{values...})),
              decltype(values)>&&...) constexpr static auto equal_v = []() consteval
