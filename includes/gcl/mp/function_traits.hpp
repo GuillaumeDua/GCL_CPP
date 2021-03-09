@@ -45,6 +45,9 @@ namespace gcl::mp
             template <std::size_t N>
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
         };
+        template <typename ReturnType, typename... Arguments>
+        struct function_traits_impl<ReturnType (*)(Arguments...) noexcept>
+            : function_traits_impl<ReturnType (*)(Arguments...)> {};
 
       public:
         using type = std::conditional_t<
@@ -69,6 +72,11 @@ namespace gcl::mp::test
     };
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::const_member)>::result_type>);
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::not_const_member)>::result_type>);
-    int qwe(char) { return 42; };
-    static_assert(std::is_same_v<char, function_traits_t<decltype(&qwe)>::argument<0>>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_const_member)>::result_type>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_not_const_member)>::result_type>);
+
+    int some_function(char) { return 42; };
+    int noexcept_function(char) noexcept { return 42; };
+    static_assert(std::is_same_v<char, function_traits_t<decltype(&some_function)>::argument<0>>);
+    static_assert(std::is_same_v<char, function_traits_t<decltype(&noexcept_function)>::argument<0>>);
 }
