@@ -8,13 +8,18 @@
 namespace gcl::mp
 {
     template <typename Function>
-    class function_traits
-    {
+    class function_traits {
+        struct informations {
+            const bool is_const_v;
+            const bool is_member_function_v;
+            const bool is_no_except;
+            // is constexpr
+        };
+
         template <typename>
         struct member_function_traits_impl;
         template <typename ClassType, typename ReturnType, typename... Arguments>
-        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)>
-        {
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {
             using result_type = ReturnType;
             using class_type = ClassType;
             using arguments = std::tuple<Arguments...>;
@@ -22,20 +27,19 @@ namespace gcl::mp
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
         };
         template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) noexcept>
+            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const>
-        {
-            using result_type = ReturnType;
-            using class_type = const ClassType;
-            using arguments = std::tuple<Arguments...>;
-            template <std::size_t N>
-            using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
-        };
+            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const noexcept>
+            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
 
         template <typename>
         struct function_traits_impl;
         template <typename ReturnType, typename... Arguments>
-        struct function_traits_impl<ReturnType (*)(Arguments...)>
-        {
+        struct function_traits_impl<ReturnType (*)(Arguments...)> {
             using result_type = ReturnType;
             using arguments = std::tuple<Arguments...>;
             template <std::size_t N>
@@ -60,6 +64,8 @@ namespace gcl::mp::test
     {
         int const_member(char) const { return 42; }
         int not_const_member(char) { return 42; }
+        int noexcept_const_member(char) const noexcept { return 42; }
+        int noexcept_not_const_member(char) noexcept { return 42; }
     };
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::const_member)>::result_type>);
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::not_const_member)>::result_type>);
