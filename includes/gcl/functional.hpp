@@ -5,12 +5,10 @@
 namespace gcl::functional
 {
     template <class... Ts>
-    struct overload : Ts...
-    {
+    struct overload : Ts... {
         using Ts::operator()...;
+        using bases_types = std::tuple<Ts...>; // allow operator() function_traits
     };
-    template <class... Ts>
-    overload(Ts...) -> overload<Ts...>;
 
     template <typename T>
     decltype(auto) wrap(T&& func)
