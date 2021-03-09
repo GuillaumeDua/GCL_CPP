@@ -9,6 +9,8 @@ namespace gcl::functional
         using Ts::operator()...;
         using bases_types = std::tuple<Ts...>; // allow operator() function_traits
     };
+    template <class... Ts>
+    overload(Ts...) -> overload<Ts...>; // not required in C++20, but Msvc need this deduction guide for some reasons ...
 
     template <typename T>
     decltype(auto) wrap(T&& func)
