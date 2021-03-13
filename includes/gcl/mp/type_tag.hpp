@@ -46,6 +46,8 @@ namespace gcl::mp::type_tag
 
 namespace gcl::mp::tests::type_tag
 {
+    using not_tagged = gcl::mp::type_tag::add_tags_t<>;
+
     using tagged = gcl::mp::type_tag::add_tags_t<std::integral_constant<char, 'a'>, std::integral_constant<int, 42>>;
     static_assert(tagged::value<char> == 'a');
     static_assert(tagged::value<int> == 42);
