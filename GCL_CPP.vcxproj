@@ -33,6 +33,7 @@
     <ClInclude Include="includes\gcl\mp\mp.hpp" />
     <ClInclude Include="includes\gcl\mp\pack_traits.hpp" />
     <ClInclude Include="includes\gcl\mp\typeinfo.hpp" />
+    <ClInclude Include="includes\gcl\mp\type_tag.hpp" />
     <ClInclude Include="includes\gcl\mp\type_traits.hpp" />
     <ClInclude Include="includes\gcl\mp\utility.hpp" />
     <ClInclude Include="includes\gcl\mp\value_traits.hpp" />

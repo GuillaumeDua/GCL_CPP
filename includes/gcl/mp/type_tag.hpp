@@ -3,7 +3,7 @@
 #include <utility>
 #include <concepts>
 
-namespace gcl::type_tag
+namespace gcl::mp::type_tag
 {
     template <typename tag_t>
     concept tag_type = requires(tag_t)
@@ -28,4 +28,11 @@ namespace gcl::type_tag
         template <typename T>
         constexpr static T value = get_value(T{});
     };
+}
+
+namespace gcl::mp::tests::type_tag
+{
+    using tagged = gcl::mp::type_tag::add_tags<std::integral_constant<char, 'a'>, std::integral_constant<int, 42>>;
+    static_assert(tagged::value<char> == 'a');
+    static_assert(tagged::value<int> == 42);
 }

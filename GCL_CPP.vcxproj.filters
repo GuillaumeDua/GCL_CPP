@@ -141,6 +141,9 @@
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms\tuple.hpp">
       <Filter>Header Files\gcl\compile_time_constant\algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\mp\type_tag.hpp">
+      <Filter>Header Files\gcl\mp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
