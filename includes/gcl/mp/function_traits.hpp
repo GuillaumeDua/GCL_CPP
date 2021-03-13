@@ -35,6 +35,12 @@ namespace gcl::mp
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const noexcept>
             : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) volatile>
+            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) volatile noexcept>
+            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...)> {};
 
         template <typename>
         struct function_traits_impl;
@@ -65,15 +71,19 @@ namespace gcl::mp::test
 {
     struct toto
     {
-        int const_member(char) const { return 42; }
         int not_const_member(char) { return 42; }
-        int noexcept_const_member(char) const noexcept { return 42; }
         int noexcept_not_const_member(char) noexcept { return 42; }
+        int const_member(char) const { return 42; }
+        int noexcept_const_member(char) const noexcept { return 42; }
+        int volatile_member(char) volatile { return 42; }
+        int noexcept_volatile_member(char) volatile noexcept { return 42; }
     };
-    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::const_member)>::result_type>);
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::not_const_member)>::result_type>);
-    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_const_member)>::result_type>);
     static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_not_const_member)>::result_type>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::const_member)>::result_type>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_const_member)>::result_type>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::volatile_member)>::result_type>);
+    static_assert(std::is_same_v<int, function_traits_t<decltype(&toto::noexcept_volatile_member)>::result_type>);
 
     int some_function(char) { return 42; };
     int noexcept_function(char) noexcept { return 42; };
