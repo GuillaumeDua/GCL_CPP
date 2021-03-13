@@ -64,7 +64,7 @@ namespace gcl::mp
 
     template <typename Function>
     using function_traits_t = typename function_traits<Function>::type;
-    // using function_traits = member_function_traits_impl<decltype(&Function::operator())>;
+    // using function_traits = member_function_traits_impl<decltype(&Function::operator()...)>;
 }
 
 namespace gcl::mp::test

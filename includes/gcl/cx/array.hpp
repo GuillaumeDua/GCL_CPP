@@ -16,7 +16,7 @@ namespace gcl::mp::type_traits
     template <typename T>
     constexpr static auto is_std_array_v = is_std_array_t<T>::value;
 }
-namespace gcl::cx::concepts
+namespace gcl::concepts
 {
     template <typename T>
     concept StdArray = gcl::mp::type_traits::is_std_array_v<T>;
