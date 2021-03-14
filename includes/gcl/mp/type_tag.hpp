@@ -2,6 +2,20 @@
 
 #include <utility>
 #include <concepts>
+#include <type_traits>
+
+namespace gcl::mp::type_tag
+{
+    template <typename... Ts>
+    class container {
+        template <typename T>
+        static constexpr bool contains_impl = ((std::is_same_v<T, Ts> or ...));
+
+      public:
+        template <typename... Tags>
+        static constexpr bool contains = ((contains_impl<Tags> and ...));
+    };
+}
 
 namespace gcl::concepts
 {
@@ -44,7 +58,19 @@ namespace gcl::mp::type_tag
     using add_tags_t = typename add_tags<tag_arguments...>::type;
 }
 
-namespace gcl::mp::tests::type_tag
+namespace gcl::mp::tests::type_tag::container
+{
+    struct tag_1 {};
+    struct tag_2 {};
+    using holder = gcl::mp::type_tag::container<tag_1, tag_2>;
+
+    static_assert(holder::contains<>);
+    static_assert(holder::contains<tag_1>);
+    static_assert(holder::contains<tag_2>);
+    static_assert(holder::contains<tag_1, tag_2>);
+    static_assert(not holder::contains<int, tag_1, tag_2>);
+}
+namespace gcl::mp::tests::type_tag::add_tags
 {
     using not_tagged = gcl::mp::type_tag::add_tags_t<>;
 
