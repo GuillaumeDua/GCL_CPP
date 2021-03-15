@@ -12,9 +12,11 @@ namespace gcl::mp
         struct is_const {};
         struct is_volatile {};
         struct is_no_except {};
-        struct is_member_function {};
-        // constexpr
-        // lambda
+
+        /*struct is_lvalue_reference {};
+        struct is_rvalue_reference {};
+        struct is_constexpr {};
+        struct is_lambda {};*/
     };
 
     template <typename Function>
@@ -33,16 +35,22 @@ namespace gcl::mp
             template <std::size_t N>
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
 
+            constexpr static bool is_member_function_v = true;
             constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
             constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
             constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
         };
+
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) noexcept>
-            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...), type_tag::container<tags::is_no_except>> {};
+            : member_function_traits_impl<
+                  ReturnType (ClassType::*)(Arguments...),
+                  type_tag::container<tags::is_no_except>> {};
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const>
-            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...), type_tag::container<tags::is_const>> {};
+            : member_function_traits_impl<
+                  ReturnType (ClassType::*)(Arguments...),
+                  type_tag::container<tags::is_const>> {};
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const noexcept>
             : member_function_traits_impl<
@@ -50,29 +58,48 @@ namespace gcl::mp
                   type_tag::container<tags::is_const, tags::is_no_except>> {};
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) volatile>
-            : member_function_traits_impl<ReturnType (ClassType::*)(Arguments...), type_tag::container<tags::is_volatile>> {};
+            : member_function_traits_impl<
+                  ReturnType (ClassType::*)(Arguments...),
+                  type_tag::container<tags::is_volatile>> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const volatile>
+            : member_function_traits_impl<
+                  ReturnType (ClassType::*)(Arguments...),
+                  type_tag::container<tags::is_const, tags::is_volatile>> {};
         template <typename ClassType, typename ReturnType, typename... Arguments>
         struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) volatile noexcept>
             : member_function_traits_impl<
                   ReturnType (ClassType::*)(Arguments...),
                   type_tag::container<tags::is_volatile, tags::is_no_except>> {};
+        template <typename ClassType, typename ReturnType, typename... Arguments>
+        struct member_function_traits_impl<ReturnType (ClassType::*)(Arguments...) const volatile noexcept>
+            : member_function_traits_impl<
+                  ReturnType (ClassType::*)(Arguments...),
+                  type_tag::container<tags::is_const, tags::is_volatile, tags::is_no_except>> {};
 
-#ifdef _MSC_VER
-#pragma warning(default : 4348)
-#endif
-
-        template <typename>
+        template <typename, class function_attr = type_tag::container<>>
         struct function_traits_impl;
-        template <typename ReturnType, typename... Arguments>
-        struct function_traits_impl<ReturnType (*)(Arguments...)> {
+        template <typename ReturnType, typename... Arguments, class function_attr>
+        struct function_traits_impl<ReturnType (*)(Arguments...), function_attr> {
             using result_type = ReturnType;
             using arguments = std::tuple<Arguments...>;
             template <std::size_t N>
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
+
+            constexpr static bool is_member_function_v = false;
+            constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
+            constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
+            constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
         };
         template <typename ReturnType, typename... Arguments>
         struct function_traits_impl<ReturnType (*)(Arguments...) noexcept>
-            : function_traits_impl<ReturnType (*)(Arguments...)> {};
+            : function_traits_impl<
+                  ReturnType (*)(Arguments...),
+                  type_tag::container<tags::is_no_except>> {};
+
+#ifdef _MSC_VER
+#pragma warning(default : 4348)
+#endif
 
       public:
         using type = std::conditional_t<
@@ -80,6 +107,7 @@ namespace gcl::mp
             member_function_traits_impl<Function>,
             function_traits_impl<Function>>;
     };
+
     // is type -> functor object (including lambdas)
     //    -> [0..N] multiple parenthesis operators
     //    -> maybe overload pattern
@@ -87,7 +115,7 @@ namespace gcl::mp
 
     template <typename Function>
     using function_traits_t = typename function_traits<Function>::type;
-    // using function_traits = member_function_traits_impl<decltype(&Function::operator())>;
+    // using function_traits = member_function_traits_impl<decltype(&Function::operator()...)>;
 }
 
 #include <array>
@@ -113,8 +141,6 @@ namespace gcl::mp::test
     static_assert(std::is_same_v<char, function_traits_t<decltype(&some_function)>::argument<0>>);
     static_assert(std::is_same_v<char, function_traits_t<decltype(&noexcept_function)>::argument<0>>);
 
-    // attr
-
     void check_function_attributes()
     {
         constexpr auto check_attr = []<typename T, std::array<bool, 3> attr_expectations>() consteval
@@ -122,7 +148,7 @@ namespace gcl::mp::test
             static_assert(std::get<0>(attr_expectations) == function_traits_t<T>::is_const_v);
             static_assert(std::get<1>(attr_expectations) == function_traits_t<T>::is_noexcept_v);
             static_assert(std::get<2>(attr_expectations) == function_traits_t<T>::is_volatile_v);
-            return true;
+            return true; // symbol deduction
         };
         constexpr static auto _ = std::array{
             // ensure consteval context
