@@ -45,6 +45,7 @@ namespace gcl::mp::type_traits
     template <bool evaluation>
     constexpr static inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
 }
+
 #include <bitset>
 #include <tuple>
 #include <array>
@@ -79,6 +80,9 @@ namespace gcl::mp::type_traits
 //  tests
 namespace gcl::mp::type_traits::tests::is_template
 {
+    static_assert(gcl::mp::type_traits::is_template_v<std::tuple<int, char>>);
+    static_assert(gcl::mp::type_traits::is_template_v<std::string>); // std::basic_string<charT, allocator>
+    static_assert(not gcl::mp::type_traits::is_template_v<int>);
 }
 namespace gcl::mp::type_traits::tests::is_complete
 {
