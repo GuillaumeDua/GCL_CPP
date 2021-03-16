@@ -36,6 +36,7 @@ namespace gcl::mp
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
 
             constexpr static bool is_member_function_v = true;
+            constexpr static bool is_class_v = std::is_class_v<Function>; 
             constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
             constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
             constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
@@ -87,6 +88,7 @@ namespace gcl::mp
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
 
             constexpr static bool is_member_function_v = false;
+            constexpr static bool is_class_v = std::is_class_v<Function>; 
             constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
             constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
             constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
