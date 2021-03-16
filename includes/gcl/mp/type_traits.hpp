@@ -12,6 +12,14 @@ namespace gcl::mp::type_traits
     template <class T>
     static inline constexpr auto is_template_v = is_template<T>::value;
 
+    template <typename T, typename = void>
+    struct is_complete : std::false_type {};
+    template <typename T>
+    struct is_complete<T, std::void_t<decltype(sizeof(T))>>
+        : std::true_type {};
+    template <typename T>
+    constexpr static inline auto is_complete_v = is_complete<T>::value;
+
     template <class T_concrete, template <class...> class T>
     struct is_instance_of : std::false_type {};
     template <template <class...> class T, class... T_args>
@@ -68,6 +76,19 @@ namespace gcl::mp::type_traits
     };
 }
 
+//  tests
+namespace gcl::mp::type_traits::tests::is_template
+{
+}
+namespace gcl::mp::type_traits::tests::is_complete
+{
+    struct complete_type {};
+    struct incomplete_type;
+
+    static_assert(gcl::mp::type_traits::is_complete_v<complete_type>);
+    static_assert(gcl::mp::type_traits::is_complete_v<int>);
+    static_assert(not gcl::mp::type_traits::is_complete_v<incomplete_type>);
+}
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
 {
     struct toto {
