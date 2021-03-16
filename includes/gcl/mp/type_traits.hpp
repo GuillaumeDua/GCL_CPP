@@ -93,6 +93,11 @@ namespace gcl::mp::type_traits::tests::is_complete
     static_assert(gcl::mp::type_traits::is_complete_v<int>);
     static_assert(not gcl::mp::type_traits::is_complete_v<incomplete_type>);
 }
+namespace gcl::mp::type_traits::tests::is_instance_of
+{
+    static_assert(gcl::mp::type_traits::is_instance_of_v<std::tuple<int, char>, std::tuple>);
+    static_assert(not gcl::mp::type_traits::is_instance_of_v<std::tuple<int, char>, std::pair>);
+}
 namespace gcl::mp::type_traits::tests::is_brace_constructible_v
 {
     struct toto {
