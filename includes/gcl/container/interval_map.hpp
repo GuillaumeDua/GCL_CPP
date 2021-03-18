@@ -67,7 +67,55 @@ namespace gcl::container
     using interval_map = range_map<Key, T, Compare, Allocator>;
 }
 
+#include <stdexcept>
 namespace gcl::container::test::interval_map
 {
+    void test()
+    {
+        auto value = gcl::container::range_map<unsigned int, char>('a');
+        {
+            const auto expected =
+                decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}};
 
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : default constructed"};
+
+            value.assign({3U, 5U}, 'a');
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : no-op assign"};
+
+            value.assign({std::numeric_limits<unsigned int>::max(), std::numeric_limits<unsigned int>::min()}, '.');
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : no-op assign [max, min) "};
+        }
+        value.assign({5U, 10U}, 'X');
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {5U, 'X'}, {10U, 'a'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : split range"};
+        }
+        value.assign({4U, 9U}, 'X');
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {4U, 'X'}, {10U, 'a'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : extend middle range, bottom"};
+        }
+        value.assign({5U, 11U}, 'X');
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {4U, 'X'}, {11U, 'a'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : extend middle range, top"};
+        }
+
+        value.assign({std::numeric_limits<unsigned int>::min(), std::numeric_limits<unsigned int>::max()}, '_');
+        {
+            const auto expected =
+                decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), '_'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : [min, max) override"};
+        }
+    }
 }
