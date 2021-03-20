@@ -19,18 +19,34 @@ namespace gcl::container
       private:
         storage_type _storage;
 
+        void ensure_is_valid()
+        {
+            if (std::size(storage) == 0 or std::begin(storage).first != std::numeric_limits<key_type>::lowest())
+                throw std::runtime_error{"gcl::container::range_map::ensure_is_valid"};
+            for (auto it = std::next(std::cbegin()); it != std::cend(); ++it)
+            {
+                if (std::prev(it)->first == it->first)
+                    throw std::runtime_error{"gcl::container::range_map::ensure_is_valid"};
+            }
+        }
+
       public:
         using key_type = storage_type::key_type;
         using mapped_type = storage_type::mapped_type;
 
-        range_map(const key_type& value)
+        range_map(mapped_type&& value)
         {
-            _storage.insert(std::end(_storage), std::pair{std::numeric_limits<key_type>::lowest(), value});
+            _storage.insert(
+                std::end(_storage),
+                std::pair{std::numeric_limits<key_type>::lowest(), std::forward<mapped_type>(value)});
         }
+        range_map(const mapped_type& value)
+            : range_map(mapped_type{value})
+        {}
 
         using key_range_t = std::pair<key_type, key_type>;
         void assign(key_range_t&& key_range, mapped_type&& value)
-        {
+        {   // there should be some extract()  here in some cases
             const auto& [keyBegin, keyEnd] = key_range;
             if (keyBegin >= keyEnd)
             {
@@ -113,7 +129,10 @@ namespace gcl::container::test::interval_map
         value.assign({std::numeric_limits<unsigned int>::min(), std::numeric_limits<unsigned int>::max()}, '_');
         {
             const auto expected =
-                decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), '_'}};
+                decltype(value)::storage_type{
+                    {std::numeric_limits<decltype(value)::key_type>::lowest(), '_'},
+                    {std::numeric_limits<unsigned int>::max(), 'a'}
+            };
             if (value.storage() not_eq expected)
                 throw std::runtime_error{"test::interval_map : [min, max) override"};
         }
