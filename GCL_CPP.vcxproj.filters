@@ -144,6 +144,9 @@
     <ClInclude Include="includes\gcl\mp\type_tag.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\container\interval_map.hpp">
+      <Filter>Header Files\gcl\container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
