@@ -40,6 +40,9 @@
     <Filter Include="Header Files\gcl\compile_time_constant\algorithms">
       <UniqueIdentifier>{cf1372f7-f883-4de8-8004-8afbdacc26f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gcl\algorithms">
+      <UniqueIdentifier>{114f2c29-2773-4906-b614-02bdf3860a50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\gcl\functional.hpp">
@@ -146,6 +149,12 @@
     </ClInclude>
     <ClInclude Include="includes\gcl\container\interval_map.hpp">
       <Filter>Header Files\gcl\container</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\algorithms\ranges.hpp">
+      <Filter>Header Files\gcl\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\algorithms\algorithms.hpp">
+      <Filter>Header Files\gcl\algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

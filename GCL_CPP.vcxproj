@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\gcl\algorithms\algorithms.hpp" />
+    <ClInclude Include="includes\gcl\algorithms\ranges.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms\array.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms\tuple.hpp" />
