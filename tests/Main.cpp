@@ -28,6 +28,8 @@ auto main(int, char const*[]) -> int
         // gcl::signals::initialize();
         // gcl::test::proceed();
         gcl::container::test::interval_map::test();
+
+        std::cout << "gcl : all runtime tests succeed\n";
     }
     catch (const std::exception& ex)
     {

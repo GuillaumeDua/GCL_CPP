@@ -54,17 +54,25 @@ namespace gcl::container
                 return comparator(lhs.first, rhs.first);
             });
 
+            // deduplicate copy of sorted elements
             std::remove_copy_if(
                 std::begin(args),
                 std::end(args),
                 std::inserter(_storage, std::end(_storage)),
-                [previous_key = std::optional<key_type>{std::nullopt}, &args](const auto& element) mutable {
-                    const bool result = previous_key and *previous_key == element.first;
-                    previous_key = element.first;
+                [previous_value = std::optional<mapped_type>{std::nullopt}, &args, this](const auto& element) mutable {
+
+                const bool result = previous_value
+                        ? *previous_value == element.second
+                        : std::cbegin(_storage)->second == element.second;
+                    previous_value = element.second;
                     return result;
             });
         }
-        //operator==()
+
+        auto operator==(const storage_type& arg) { return _storage == arg; }
+        auto operator==(const range_map& arg) { return _storage == arg.storage(); }
+
+        // todo : how to assign last value ?
         using key_range_t = std::pair<key_type, key_type>;
         void assign(key_range_t&& key_range, mapped_type&& value)
         {   // there should be some extract()  here in some cases
@@ -162,7 +170,7 @@ namespace gcl::container::test::interval_map
     void test_constructors()
     {
         {
-            auto value = gcl::container::range_map<unsigned int, char>('a');
+            auto       value = gcl::container::range_map<unsigned int, char>('a');
             const auto expected =
                 decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}};
             if (value.storage() not_eq expected)
@@ -170,27 +178,33 @@ namespace gcl::container::test::interval_map
         }
         {
             const auto argument = 'a';
-            auto value = gcl::container::range_map<unsigned int, char>(argument);
+            auto       value = gcl::container::range_map<unsigned int, char>(argument);
             const auto expected =
                 decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}};
             if (value.storage() not_eq expected)
                 throw std::runtime_error{"test::interval_map : default constructed (const-ref)"};
         }
         {
-            auto value = gcl::container::range_map<unsigned int, char>{
-                'a',
-                {
-                    {13, 'b'},
-                    {42, 'c'}
-                }};
-            const auto expected =
-                decltype(value)::storage_type{
-                    {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'},
-                    {13, 'b'},
-                    {42, 'c'}
-            };
+            auto       value = gcl::container::range_map<unsigned int, char>{'a', {{13, 'b'}, {42, 'c'}}};
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {13, 'b'}, {42, 'c'}};
             if (value.storage() not_eq expected)
-                throw std::runtime_error{"test::interval_map : initializer_list construct"};
+                throw std::runtime_error{"test::interval_map : initializer_list construct (no duplicates)"};
+        }
+        {
+            auto       value = gcl::container::range_map<unsigned int, char>{'a', {{42, 'c'}, {13, 'b'}}};
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {13, 'b'}, {42, 'c'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : initializer_list construct (no duplicates, sort)"};
+        }
+        {
+            auto value = gcl::container::range_map<unsigned int, char>{
+                'a', {{42, 'c'}, {2, 'a'}, {13, 'b'}, {40, 'b'}, {43, 'c'}}};
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}, {13, 'b'}, {42, 'c'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : initializer_list construct (duplicates, sort)"};
         }
     }
 
