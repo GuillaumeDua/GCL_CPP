@@ -9,6 +9,7 @@
 // dynamic tests
 
 #include <gcl/serialization.hpp>
+#include <gcl/container/interval_map.hpp>
 
 void tmp()
 {	// only for gcl_v2 WIP
@@ -23,9 +24,10 @@ auto main(int, char const*[]) -> int
 {
     try
     {
-        tmp();
+        // tmp();
         // gcl::signals::initialize();
         // gcl::test::proceed();
+        gcl::container::test::interval_map::test();
     }
     catch (const std::exception& ex)
     {
