@@ -33,6 +33,7 @@ namespace gcl::container
       public:
         using key_type = storage_type::key_type;
         using mapped_type = storage_type::mapped_type;
+        using value_type = storage_type::value_type;
 
         range_map(mapped_type&& value)
         {
@@ -44,6 +45,26 @@ namespace gcl::container
             : range_map(mapped_type{value})
         {}
 
+        using value_argument_type = std::pair<std::decay_t<key_type>, mapped_type>;
+        range_map(mapped_type&& value, std::initializer_list<value_argument_type> arguments)
+            : range_map{std::forward<mapped_type>(value)}
+        {
+            auto args = std::vector<value_argument_type>{std::begin(arguments), std::end(arguments)};
+            std::sort(std::begin(args), std::end(args), [comparator = Compare{}](const auto& lhs, const auto& rhs) {
+                return comparator(lhs.first, rhs.first);
+            });
+
+            std::remove_copy_if(
+                std::begin(args),
+                std::end(args),
+                std::inserter(_storage, std::end(_storage)),
+                [previous_key = std::optional<key_type>{std::nullopt}, &args](const auto& element) mutable {
+                    const bool result = previous_key and *previous_key == element.first;
+                    previous_key = element.first;
+                    return result;
+            });
+        }
+        //operator==()
         using key_range_t = std::pair<key_type, key_type>;
         void assign(key_range_t&& key_range, mapped_type&& value)
         {   // there should be some extract()  here in some cases
@@ -86,7 +107,7 @@ namespace gcl::container
 #include <stdexcept>
 namespace gcl::container::test::interval_map
 {
-    void test()
+    void test_values()
     {
         auto value = gcl::container::range_map<unsigned int, char>('a');
         {
@@ -136,5 +157,46 @@ namespace gcl::container::test::interval_map
             if (value.storage() not_eq expected)
                 throw std::runtime_error{"test::interval_map : [min, max) override"};
         }
+    }
+
+    void test_constructors()
+    {
+        {
+            auto value = gcl::container::range_map<unsigned int, char>('a');
+            const auto expected =
+                decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : default constructed (rvalue)"};
+        }
+        {
+            const auto argument = 'a';
+            auto value = gcl::container::range_map<unsigned int, char>(argument);
+            const auto expected =
+                decltype(value)::storage_type{{std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : default constructed (const-ref)"};
+        }
+        {
+            auto value = gcl::container::range_map<unsigned int, char>{
+                'a',
+                {
+                    {13, 'b'},
+                    {42, 'c'}
+                }};
+            const auto expected =
+                decltype(value)::storage_type{
+                    {std::numeric_limits<decltype(value)::key_type>::lowest(), 'a'},
+                    {13, 'b'},
+                    {42, 'c'}
+            };
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map : initializer_list construct"};
+        }
+    }
+
+    void test()
+    {
+        test_constructors();
+        test_values();
     }
 }
