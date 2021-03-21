@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <limits>
+#include <gcl/algorithms/ranges.hpp>
 
 namespace gcl::container
 {
@@ -72,7 +73,6 @@ namespace gcl::container
         auto operator==(const storage_type& arg) { return _storage == arg; }
         auto operator==(const range_map& arg) { return _storage == arg.storage(); }
 
-        // todo : how to assign last value ?
         using key_range_t = std::pair<key_type, key_type>;
         void assign(key_range_t&& key_range, mapped_type&& value)
         {   // there should be some extract()  here in some cases
@@ -87,17 +87,35 @@ namespace gcl::container
             auto range_end = _storage.upper_bound(keyEnd);
 
             // save after-range value
-            auto value_after_range = std::move(std::prev(range_end)->second);
+            auto mapped_after_range = [&]() -> std::optional<mapped_type> {
+                auto candidate = std::prev(range_end);
+
+                if (value == candidate->second)
+                    return std::nullopt;
+                if constexpr (std::movable<mapped_type>)
+                {
+                    return gcl::algorithms::ranges::is_in_range(range_begin, range_end, candidate) // will be erase ?
+                               ? std::move(candidate->second)
+                               : candidate->second;
+                }
+                else
+                    return std::prev(range_end)->second;
+            }();
 
             // erase existing nodes in range
             range_end = _storage.erase(range_begin, range_end);
 
             // insert begin
             if (_storage.size() == 0 or std::prev(range_end)->second not_eq value)
-                range_end = _storage.insert_or_assign(range_end, keyBegin, value);
+                range_end = _storage.insert_or_assign(range_end, keyBegin, std::forward<mapped_type>(value));
             // insert end
-            if (value_after_range not_eq value)
-                range_end = _storage.insert_or_assign(range_end, keyEnd, std::move(value_after_range));
+            if (mapped_after_range)
+                range_end = _storage.insert_or_assign(range_end, keyEnd, std::move(*mapped_after_range));
+        }
+
+        void assign_last(mapped_type&& value)
+        {
+            // todo : how to assign last value ?
         }
 
         const auto& at(const key_type& key) const { return (--_storage.upper_bound(key))->second; }
@@ -166,7 +184,46 @@ namespace gcl::container::test::interval_map
                 throw std::runtime_error{"test::interval_map : [min, max) override"};
         }
     }
+    void test_rvalues()
+    { 
+        auto value = gcl::container::range_map<unsigned int, std::string>("a");
+        value.assign({5U, 10U}, "X");
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), "a"}, {5U, "X"}, {10U, "a"}};
+            if (value.storage() not_eq expected)
+            {
+                for (const auto [el_key, el_value] : value.storage())
+                {
+                    std::cout << " - [" << el_key << "] -> [" << el_value << "]\n";
+                }
+                throw std::runtime_error{"test::interval_map (rvalue): split range"};
+            }
+        }
+        value.assign({4U, 9U}, "X");
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), "a"}, {4U, "X"}, {10U, "a"}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map (rvalue): extend middle range, bottom"};
+        }
+        value.assign({5U, 11U}, "X");
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), "a"}, {4U, "X"}, {11U, "a"}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map (rvalue): extend middle range, top"};
+        }
 
+        value.assign({std::numeric_limits<unsigned int>::min(), std::numeric_limits<unsigned int>::max()}, "_");
+        {
+            const auto expected = decltype(value)::storage_type{
+                {std::numeric_limits<decltype(value)::key_type>::lowest(), "_"},
+                {std::numeric_limits<unsigned int>::max(), "a"}};
+            if (value.storage() not_eq expected)
+                throw std::runtime_error{"test::interval_map (rvalue): [min, max) override"};
+        }
+    }
     void test_constructors()
     {
         {
@@ -212,5 +269,6 @@ namespace gcl::container::test::interval_map
     {
         test_constructors();
         test_values();
+        test_rvalues();
     }
 }
