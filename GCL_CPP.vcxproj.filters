@@ -156,6 +156,9 @@
     <ClInclude Include="includes\gcl\algorithms\algorithms.hpp">
       <Filter>Header Files\gcl\algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\algorithms\maths.hpp">
+      <Filter>Header Files\gcl\algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
