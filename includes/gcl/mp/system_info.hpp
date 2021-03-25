@@ -23,6 +23,6 @@ namespace gcl::mp::system_info
     constexpr static auto is_x64 = TARGET_IS_x64;
     constexpr static auto is_x32 = TARGET_IS_x32;
 
-	static_assert(is_x64 or is_x32);
+    static_assert(is_x64 or is_x32);
     static_assert(not(is_x64 and is_x32));
 }
