@@ -16,6 +16,8 @@
 		#define TARGET_IS_x64 false
 		#define TARGET_IS_x32 true
 	#endif
+#else
+	#error "Plateform not supported"
 #endif
 
 namespace gcl::mp::system_info
