@@ -111,9 +111,6 @@
     <ClInclude Include="includes\gcl\mp\type_traits.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
-    <ClInclude Include="includes\gcl\mp\typeinfo.hpp">
-      <Filter>Header Files\gcl\mp</Filter>
-    </ClInclude>
     <ClInclude Include="includes\gcl\mp\value_traits.hpp">
       <Filter>Header Files\gcl\mp</Filter>
     </ClInclude>
@@ -158,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="includes\gcl\algorithms\maths.hpp">
       <Filter>Header Files\gcl\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\cx\typeinfo.hpp">
+      <Filter>Header Files\gcl\cx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

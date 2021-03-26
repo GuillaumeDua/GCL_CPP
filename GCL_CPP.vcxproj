@@ -31,12 +31,12 @@
     <ClInclude Include="includes\gcl\cx\crc32_hash.hpp" />
     <ClInclude Include="includes\gcl\cx\cx.hpp" />
     <ClInclude Include="includes\gcl\cx\map.hpp" />
+    <ClInclude Include="includes\gcl\cx\typeinfo.hpp" />
     <ClInclude Include="includes\gcl\functional.hpp" />
     <ClInclude Include="includes\gcl\mp\concepts.hpp" />
     <ClInclude Include="includes\gcl\mp\function_traits.hpp" />
     <ClInclude Include="includes\gcl\mp\mp.hpp" />
     <ClInclude Include="includes\gcl\mp\pack_traits.hpp" />
-    <ClInclude Include="includes\gcl\mp\typeinfo.hpp" />
     <ClInclude Include="includes\gcl\mp\type_tag.hpp" />
     <ClInclude Include="includes\gcl\mp\type_traits.hpp" />
     <ClInclude Include="includes\gcl\mp\utility.hpp" />

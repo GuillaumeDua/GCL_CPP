@@ -1,7 +1,11 @@
 #pragma once
 
+// WARNING :    Following code is WIP,
+//              basically an attempt to create a serialization system with a convinient interface,
+//              that preserve both type and value informations
+
 #include <gcl/functional.hpp>
-#include <gcl/mp/typeinfo.hpp>
+#include <gcl/cx/typeinfo.hpp>
 #include <gcl/mp/function_traits.hpp>
 
 #include <functional>
@@ -62,7 +66,7 @@ namespace gcl::serialization
         {std::is_standard_layout_v<T>};
         {std::is_default_constructible_v<T>};
         {
-            gcl::mp::typeinfo::hashcode_v<T>
+            gcl::cx::typeinfo::hashcode_v<T>
         }
         ->std::convertible_to<std::size_t>;
         // {detect::has_custom_serialization_v<T> or (std::declval<std::ostream&>() << std::declval<T>())};
@@ -86,7 +90,7 @@ namespace gcl::serialization
             return static_cast<const char*>(static_cast<const void*>(&arg));
         }
         template <typename T>
-        static inline auto type_id_v = gcl::mp::typeinfo::template hashcode_v<T>;
+        static inline auto type_id_v = gcl::cx::typeinfo::template hashcode_v<T>;
 
         using type_id_t = decltype(type_id_v<int>);
         using size_t = decltype(sizeof(int));
@@ -261,7 +265,7 @@ namespace gcl::serialization::p1
 #include <gcl/mp/pack_traits.hpp>
 #include <variant>
 #include <array>
-#include <gcl/mp/typeinfo.hpp>
+#include <gcl/cx/typeinfo.hpp>
 
 namespace gcl::serialization::p5
 {
@@ -309,8 +313,163 @@ namespace gcl::serialization::p5
     {
         using type = std::variant<int, bool, float>;
             
-        constexpr auto mapping = gcl::mp::typeinfo::to_hashcode_array<type>();
+        constexpr auto mapping = gcl::cx::typeinfo::to_hashcode_array<type>();
 
-        static_assert(mapping[0] == gcl::mp::typeinfo::hashcode_v<int>);
+        static_assert(mapping[0] == gcl::cx::typeinfo::hashcode_v<int>);
+    }
+}
+
+namespace gcl::serialization::p6
+{
+    class engine {
+        constexpr static auto spacer_el_value = ' ';
+        constexpr static auto spacer_op_value = '\n';
+
+      public:
+        template <typename on_deserialization_t>
+        class in {
+            std::istream&        input_stream;
+            on_deserialization_t on_deserialize;
+            using type_id_t = uint32_t; // todo : alias
+            using storage_type = std::unordered_map<type_id_t, std::function<void()>>;
+            storage_type storage;
+
+            template <typename T>
+            auto generate_type_handler()
+            {
+                return std::pair{
+                    gcl::cx::typeinfo::hashcode<T>(), std::function<void()>{[this]() {
+                        T value;
+                        input_stream >> value; // or deserialize, etc. (detect)
+                        if (not input_stream.good())
+                            throw std::runtime_error{
+                                "serialization::engine::deserialize (value) / storage::mapped::operator() "};
+
+                        char expected_spacer = input_stream.get();
+                        if (not input_stream.good() or expected_spacer != spacer_op_value)
+                            throw std::runtime_error{"serialization::engine::deserialize (op-spacer)"};
+                        on_deserialize(std::move(value));
+                    }}};
+            }
+
+          public:
+            in(std::istream& input, on_deserialization_t&& cb)
+                : input_stream{input}
+                , on_deserialize{std::forward<decltype(cb)>(cb)}
+            {}
+
+            template <typename... Ts>
+            requires((std::default_initializable<Ts> and ...))
+                in(std::istream& input, on_deserialization_t&& cb, std::tuple<Ts...>)
+                : input_stream{input}
+                , on_deserialize{std::forward<decltype(cb)>(cb)}
+                , storage{generate_type_handler<Ts>()...}
+            {}
+
+            template <typename... Ts>
+            void register_types()
+            {
+                (storage.insert(generate_type_handler<Ts>()), ...);
+            }
+            template <typename... Ts>
+            void unregister_types()
+            {
+                (storage.erase(gcl::cx::typeinfo::hashcode<Ts>()), ...);
+            }
+
+            void deserialize()
+            {
+                type_id_t type_id_value;
+                input_stream >> type_id_value;
+
+                if (input_stream.eof())
+                    return;
+                if (not input_stream.good())
+                    throw std::runtime_error{"serialization::engine::deserialize (typeid)"};
+
+                char expected_spacer = input_stream.get();
+                if (not input_stream.good() or expected_spacer not_eq spacer_el_value)
+                    throw std::runtime_error{"serialization::engine::deserialize (el-spacer)"};
+
+                try
+                {
+                    auto& handler = storage.at(type_id_value);
+                    handler();
+                }
+                catch (const std::out_of_range&)
+                {
+                    throw std::runtime_error{
+                        "serialization::engine::deserialize : unknown type extracted : cx-hash=" +
+                        std::to_string(type_id_value)};
+                }
+            }
+            void deserialize_all()
+            {
+                while (not input_stream.eof())
+                {
+                    deserialize();
+                }
+            }
+        };
+
+        class out {
+            std::ostream& output_stream;
+
+          public:
+            out(std::ostream& output)
+                : output_stream{output}
+            {}
+
+            template <typename T>
+            void serialize(T&& value) const
+            {
+                output_stream << gcl::cx::typeinfo::hashcode<T>() << spacer_el_value << value << spacer_op_value;
+            }
+            template <typename T>
+            const out& operator<<(T&& value) const
+            {
+                serialize(std::forward<decltype(value)>(value));
+                return *this;
+            }
+        };
+
+        template <typename on_deserialization_t>
+        using deserializer = in<on_deserialization_t>;
+        using serializer = out;
+    };
+
+    void test()
+    {
+        std::stringstream ss;
+
+        using serialization_engine = engine;
+        {
+            auto serializer = serialization_engine::out{ss};
+            serializer << 42;
+            serializer << 'a';
+            serializer << 13;
+            serializer << 'b';
+        }
+        {
+            using types = std::tuple<int, double, char, std::string>;
+            auto deserializer = serialization_engine::in{
+                ss,
+                [i = 0](auto&& arg) mutable {
+                    std::cout << i++ << " -> " << typeid(arg).name() << " : [" << arg << "]\n";
+                },
+                types{}};
+            deserializer.register_types<float>();
+            deserializer.unregister_types<float>();
+            deserializer.deserialize_all();
+
+            {
+                ss.clear(); // clear eof()
+                serialization_engine::out{ss} << 'c';
+                deserializer.deserialize();
+                serialization_engine::out{ss} << .2F;
+                deserializer.register_types<float>();
+                deserializer.deserialize();
+            }
+        }
     }
 }
