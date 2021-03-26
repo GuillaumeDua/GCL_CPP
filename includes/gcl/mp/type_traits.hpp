@@ -143,6 +143,7 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(is_red_colored<smthg_red>);
 }
 #endif
+
 namespace gcl::mp::type_traits::tests::trait_results
 {
     template <typename T>
@@ -157,7 +158,17 @@ namespace gcl::mp::type_traits::tests::trait_results
 
     using results_as_tuple = results::as_t<std::tuple>;
     using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
-    static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>);
+    static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>); // clang and clang-cl complain here
+
+    using expected_result_type = std::tuple<
+        std::false_type,
+        std::true_type,
+        std::false_type>;
+    static_assert(std::is_same_v<results_as_tuple, expected_result_type>);
+
+    using expected_result_value_type = std::tuple<bool, bool, bool>;
+    static_assert(std::is_same_v<results_as_tuple_value_type, expected_result_value_type>);
+    
 
     using expected_result_as_tuple = std::tuple<std::false_type, std::true_type, std::false_type>;
     static_assert(std::is_same_v<results::as_t<std::tuple>, expected_result_as_tuple>);
