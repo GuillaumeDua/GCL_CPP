@@ -165,6 +165,9 @@
     <ClInclude Include="includes\gcl\io\io.hpp">
       <Filter>Header Files\gcl\io</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\io\policies.hpp">
+      <Filter>Header Files\gcl\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">

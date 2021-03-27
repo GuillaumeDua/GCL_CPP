@@ -473,3 +473,5 @@ namespace gcl::serialization::p6
         }
     }
 }
+
+// todo : serializable concept ?
