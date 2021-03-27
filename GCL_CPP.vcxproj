@@ -33,6 +33,8 @@
     <ClInclude Include="includes\gcl\cx\map.hpp" />
     <ClInclude Include="includes\gcl\cx\typeinfo.hpp" />
     <ClInclude Include="includes\gcl\functional.hpp" />
+    <ClInclude Include="includes\gcl\io\io.hpp" />
+    <ClInclude Include="includes\gcl\io\serialization.hpp" />
     <ClInclude Include="includes\gcl\mp\concepts.hpp" />
     <ClInclude Include="includes\gcl\mp\function_traits.hpp" />
     <ClInclude Include="includes\gcl\mp\mp.hpp" />
@@ -42,7 +44,6 @@
     <ClInclude Include="includes\gcl\mp\utility.hpp" />
     <ClInclude Include="includes\gcl\mp\value_traits.hpp" />
     <ClInclude Include="includes\gcl\pattern\ecs.hpp" />
-    <ClInclude Include="includes\gcl\serialization.hpp" />
     <ClInclude Include="tests\gcl\test\container.hpp" />
     <ClInclude Include="tests\gcl\test\container\component_aggregator.hpp" />
     <ClInclude Include="tests\gcl\test\container\entity_vector.hpp" />

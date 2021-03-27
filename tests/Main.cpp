@@ -7,7 +7,7 @@
 #include <gcl/mp/system_info.hpp>
 
 // dynamic tests
-#include <gcl/serialization.hpp>
+#include <gcl/io/io.hpp>
 #include <gcl/container/interval_map.hpp>
 #include <gcl/algorithms/algorithms.hpp>
 

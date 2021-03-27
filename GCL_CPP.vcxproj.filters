@@ -43,12 +43,12 @@
     <Filter Include="Header Files\gcl\algorithms">
       <UniqueIdentifier>{114f2c29-2773-4906-b614-02bdf3860a50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gcl\io">
+      <UniqueIdentifier>{b5589539-4d37-439f-a0dd-b4e36c07e61c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\gcl\functional.hpp">
-      <Filter>Header Files\gcl</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\gcl\serialization.hpp">
       <Filter>Header Files\gcl</Filter>
     </ClInclude>
     <ClInclude Include="includes\gcl\pattern\ecs.hpp">
@@ -158,6 +158,12 @@
     </ClInclude>
     <ClInclude Include="includes\gcl\cx\typeinfo.hpp">
       <Filter>Header Files\gcl\cx</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\io\serialization.hpp">
+      <Filter>Header Files\gcl\io</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\io\io.hpp">
+      <Filter>Header Files\gcl\io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
