@@ -7,9 +7,9 @@
 namespace gcl::mp::utility
 {
 	template <typename T, T value>
-    constexpr static auto reverse_integer_sequence_v = []<typename T, T ... indexes>(std::integer_sequence<T, indexes...>)
+    constexpr static auto reverse_integer_sequence_v = []<typename U, U ... indexes>(std::integer_sequence<U, indexes...>)
     {
-        return std::integer_sequence<T, (value - 1 - indexes)...>{};
+        return std::integer_sequence<U, (value - 1 - indexes)...>{};
     }(std::make_integer_sequence<T, value>{});
 
     template <typename T, T value> // std::make_integer_sequence does not use auto-value
