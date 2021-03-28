@@ -158,6 +158,10 @@ namespace gcl::mp::type_traits::tests::trait_results
 
     using results_as_tuple = results::as_t<std::tuple>;
     using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
+
+    #if not defined(__clang__)
+    // See my Q on SO :
+    //  https://stackoverflow.com/questions/66821952/clang-error-implicit-instantiation-of-undefined-template-stdtuple-sizeauto/66822584
     static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>); // clang and clang-cl complain here
 
     using expected_result_type = std::tuple<
@@ -165,11 +169,10 @@ namespace gcl::mp::type_traits::tests::trait_results
         std::true_type,
         std::false_type>;
     static_assert(std::is_same_v<results_as_tuple, expected_result_type>);
-
     using expected_result_value_type = std::tuple<bool, bool, bool>;
     static_assert(std::is_same_v<results_as_tuple_value_type, expected_result_value_type>);
+    #endif
     
-
     using expected_result_as_tuple = std::tuple<std::false_type, std::true_type, std::false_type>;
     static_assert(std::is_same_v<results::as_t<std::tuple>, expected_result_as_tuple>);
     static_assert(std::is_same_v<results::as_integer_sequence<int>, std::integer_sequence<int, 0, 1, 0>>);
