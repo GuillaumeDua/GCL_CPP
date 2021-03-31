@@ -17,7 +17,7 @@ namespace gcl::mp::type_tag
     };
 }
 
-namespace gcl::concepts
+namespace gcl::mp::concepts
 {
     template <typename tag_t>
     concept tag_type = requires(tag_t)

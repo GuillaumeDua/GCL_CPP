@@ -1,17 +1,10 @@
 #pragma once
 
+#include <gcl/container/concepts.hpp>
+
 #include <concepts>
 #include <utility>
 #include <type_traits>
-
-namespace gcl::containers::concepts
-{
-    template <typename T>
-    concept resizable = requires
-    {
-        {std::declval<T>().resize(std::declval<typename T::size_type>())};
-    };
-}
 
 #include <iostream>
 
@@ -41,7 +34,7 @@ namespace gcl::io::policies
                     }
                 }();
 
-                if constexpr (gcl::containers::concepts::resizable<T>)
+                if constexpr (gcl::container::concepts::resizable<T>)
                     value.resize(size);
                 else if (std::size(value) < size)
                     throw std::runtime_error{"gcl::io::policy::binary::read : fixed-size < size"};
