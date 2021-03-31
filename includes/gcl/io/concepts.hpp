@@ -36,5 +36,5 @@ namespace gcl::io::concepts
         {std::declval<T>().deserialize_from(std::declval<std::istream&>())};
     };
     template <typename T>
-    concept custom_serializable = has_custom_serialize<T>and has_custom_deserialize<T>;
+    concept custom_serializable = has_custom_serialize<T> and has_custom_deserialize<T>;
 }
