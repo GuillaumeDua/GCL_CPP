@@ -6,8 +6,6 @@
 #include <utility>
 #include <gcl/cx/crc32_hash.hpp>
 
-// todo : move to cx
-
 namespace gcl::cx::typeinfo
 {   // constexpr typeinfo that does not relies on __cpp_rtti
     //
@@ -44,7 +42,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <typename T>
-    static constexpr inline auto type_name_v = type_name<T>();
+    [[maybe_unused]] static constexpr inline auto type_name_v = type_name<T>();
     template <auto value>
     static constexpr std::string_view type_name(/*no parameters allowed*/)
     {
@@ -72,7 +70,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <auto value>
-    static constexpr inline auto value_name_v = value_name<value>();
+    [[maybe_unused]] static constexpr inline auto value_name_v = value_name<value>();
 
     template <typename T>
     static constexpr auto hashcode()
@@ -81,7 +79,7 @@ namespace gcl::cx::typeinfo
         return gcl::cx::crc_32::hash(type_name);
     }
     template <typename T>
-    static constexpr inline auto hashcode_v = hashcode<T>();
+    [[maybe_unused]] static constexpr inline auto hashcode_v = hashcode<T>();
 }
 
 #include <gcl/mp/pack_traits.hpp>
