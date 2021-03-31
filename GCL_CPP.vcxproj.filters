@@ -168,6 +168,15 @@
     <ClInclude Include="includes\gcl\io\policies.hpp">
       <Filter>Header Files\gcl\io</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\io\concepts.hpp">
+      <Filter>Header Files\gcl\io</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\io\traits.hpp">
+      <Filter>Header Files\gcl\io</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\gcl\container\concepts.hpp">
+      <Filter>Header Files\gcl\container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">
