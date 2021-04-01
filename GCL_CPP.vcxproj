@@ -36,7 +36,7 @@
     <ClInclude Include="includes\gcl\functional.hpp" />
     <ClInclude Include="includes\gcl\io\concepts.hpp" />
     <ClInclude Include="includes\gcl\io\io.hpp" />
-    <ClInclude Include="includes\gcl\io\policies.hpp" />
+    <ClInclude Include="includes\gcl\io\policy.hpp" />
     <ClInclude Include="includes\gcl\io\serialization.hpp" />
     <ClInclude Include="includes\gcl\io\traits.hpp" />
     <ClInclude Include="includes\gcl\mp\concepts.hpp" />

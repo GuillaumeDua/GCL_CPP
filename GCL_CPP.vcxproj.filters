@@ -165,7 +165,7 @@
     <ClInclude Include="includes\gcl\io\io.hpp">
       <Filter>Header Files\gcl\io</Filter>
     </ClInclude>
-    <ClInclude Include="includes\gcl\io\policies.hpp">
+    <ClInclude Include="includes\gcl\io\policy.hpp">
       <Filter>Header Files\gcl\io</Filter>
     </ClInclude>
     <ClInclude Include="includes\gcl\io\concepts.hpp">
