@@ -2,6 +2,7 @@
 
 #include <gcl/container/concepts.hpp>
 #include <gcl/io/concepts.hpp>
+#include <gcl/mp/concepts.hpp>
 
 #include <concepts>
 #include <utility>
@@ -14,7 +15,7 @@ namespace gcl::io::policy
     template <typename policy_impl>
     struct crtp_impl {
         template <typename T>
-        // requires gcl::io::concepts::serializable<std::remove_reference_t<T>>
+        // requires gcl::io::concepts::serializable<std::remove_reference_t<T>> // todo
         static void read(std::istream& is, T&& value)
         {
             policy_impl::basic_read(is, std::forward<decltype(value)>(value));
@@ -24,9 +25,7 @@ namespace gcl::io::policy
         { // policy by-pass
             value.deserialize_from(is);
         }
-        // template <gcl::concepts::pointer T>
-        template <typename T>
-        requires std::is_pointer<T>
+        template <gcl::mp::concepts::traits_adapter::satisfy_all_of<std::is_pointer<T>> T>
         static void read(std::istream& is, T&& value)
         {
             policy_impl::read(is, *value);

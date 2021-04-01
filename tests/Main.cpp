@@ -11,12 +11,6 @@
 #include <gcl/container/interval_map.hpp>
 #include <gcl/algorithms/algorithms.hpp>
 
-void tmp()
-{	// only for gcl_v2 WIP
-    gcl::serialization::p1::test();
-    gcl::serialization::p5::test();
-}
-
 #include <stdexcept>
 #include <iostream>
 
@@ -29,6 +23,7 @@ auto main(int, char const*[]) -> int
         // gcl::test::proceed();
         gcl::container::test::interval_map::test();
         gcl::algorithms::tests::ranges::test();
+        gcl::io::tests::serialization::test();
 
         std::cout << "gcl : all runtime tests succeed\n";
     }

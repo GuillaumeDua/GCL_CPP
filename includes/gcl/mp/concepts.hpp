@@ -5,6 +5,10 @@
 
 namespace gcl::mp::concepts::traits_adapter
 {
+    // todo : when the standard allows it,
+    //        use `template <template <typename> typename... traits, typename T>` instead,
+    //        in order to make it usable in template-restriction expression, not only require clauses
+
     template <typename T, template <typename> typename... traits>
     concept satisfy_all_of = requires
     {
