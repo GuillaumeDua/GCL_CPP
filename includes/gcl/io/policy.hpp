@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace gcl::io::policies
+namespace gcl::io::policy
 {
     template <typename policy_impl>
     struct crtp_impl {
