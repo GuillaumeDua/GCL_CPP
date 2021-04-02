@@ -1,6 +1,9 @@
 #pragma once
 
+// original POC : https://godbolt.org/z/P4a6voYqP
+
 #include <gcl/io/policy.hpp>
+#include <gcl/io/concepts.hpp>
 #include <gcl/functional.hpp>
 #include <gcl/cx/typeinfo.hpp>
 // #include <gcl/mp/function_traits.hpp>
@@ -9,7 +12,7 @@
 #include <functional>
 
 // todo : serializable concept
-// todo : add aggregate speciali rule
+// todo : add aggregate speciale rule
 
 namespace gcl::io::serialization
 {
@@ -23,7 +26,7 @@ namespace gcl::io::serialization
             on_deserialization_t on_deserialize;
             storage_type         storage;
 
-            template <typename T>
+            template <gcl::io::concepts::serializable T>
             auto generate_type_handler()
             {
                 return std::pair{
@@ -43,15 +46,14 @@ namespace gcl::io::serialization
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
             {}
 
-            template <typename... Ts>
-            // requires ((std::default_initializable<Ts> and ...))
+            template <gcl::io::concepts::serializable ... Ts>
             in(std::istream& input, on_deserialization_t&& cb, std::tuple<Ts...>)
                 : input_stream{input}
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
                 , storage{generate_type_handler<Ts>()...}
             {}
 
-            template <typename... Ts>
+            template <gcl::io::concepts::serializable ... Ts>
             void register_types()
             {
                 (storage.insert(generate_type_handler<Ts>()), ...);
@@ -86,6 +88,13 @@ namespace gcl::io::serialization
             }
             template <std::size_t count = 1>
             void deserialize_n()
+            {
+                for (std::size_t i{0}; i < count and not input_stream.eof(); ++i)
+                {
+                    deserialize();
+                }
+            }
+            void deserialize_n(std::size_t count)
             {
                 for (std::size_t i{0}; i < count and not input_stream.eof(); ++i)
                 {
