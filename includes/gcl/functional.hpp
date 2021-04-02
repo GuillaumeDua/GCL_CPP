@@ -34,16 +34,16 @@ namespace gcl::functional::type_traits
 
     template <typename T>
     struct overload_arguments;
-    template <typename ... Ts>
+    template <typename... Ts>
     struct overload_arguments<gcl::functional::overload<Ts...>> {
-        // std::tuple<std::tuple<args1...>, std::tuple<args2...>, etc.>
         using types = std::tuple<typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments...>;
-        // std::tuple<args1..., args2..., etc.>
         using concatenated_types =
             decltype(std::tuple_cat(typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments{}...));
     };
     template <typename T>
-    using overload_arguments_t = typename overload_arguments<T>::type;
+    using overload_arguments_t = typename overload_arguments<T>::types;
+    template <typename T>
+    using overload_concatenated_arguments_t = typename overload_arguments<T>::concatenated_types;
 }
 
 #include <functional>
@@ -52,4 +52,18 @@ namespace gcl::functional::tests::type_traits
 {
     static_assert(gcl::functional::type_traits::is_overload_v<gcl::functional::overload<>>);
     static_assert(not gcl::functional::type_traits::is_overload_v<std::function<void()>>);
+
+    using overload_type = decltype(gcl::functional::overload{[](int) {}, []() {}, [](char, double) {}});
+    using overload_type_arguments_t = gcl::functional::type_traits::overload_arguments_t<overload_type>;
+    static_assert(std::tuple_size_v<overload_type_arguments_t> == 3);
+    static_assert(std::is_same_v<std::tuple_element_t<0, overload_type_arguments_t>, std::tuple<int>>);
+    static_assert(std::is_same_v<std::tuple_element_t<1, overload_type_arguments_t>, std::tuple<>>);
+    static_assert(std::is_same_v<std::tuple_element_t<2, overload_type_arguments_t>, std::tuple<char, double>>);
+
+    using overload_type_concatenated_arguments_t =
+        gcl::functional::type_traits::overload_concatenated_arguments_t<overload_type>;
+    static_assert(std::tuple_size_v<overload_type_concatenated_arguments_t> == 3);
+    static_assert(std::is_same_v<std::tuple_element_t<0, overload_type_concatenated_arguments_t>, int>);
+    static_assert(std::is_same_v<std::tuple_element_t<1, overload_type_concatenated_arguments_t>, char>);
+    static_assert(std::is_same_v<std::tuple_element_t<2, overload_type_concatenated_arguments_t>, double>);
 }
