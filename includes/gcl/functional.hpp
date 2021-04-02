@@ -45,3 +45,11 @@ namespace gcl::functional::type_traits
     template <typename T>
     using overload_arguments_t = typename overload_arguments<T>::type;
 }
+
+#include <functional>
+
+namespace gcl::functional::tests::type_traits
+{
+    static_assert(gcl::functional::type_traits::is_overload_v<gcl::functional::overload<>>);
+    static_assert(not gcl::functional::type_traits::is_overload_v<std::function<void()>>);
+}
