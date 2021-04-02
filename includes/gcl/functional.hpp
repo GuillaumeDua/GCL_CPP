@@ -35,9 +35,12 @@ namespace gcl::functional::type_traits
     template <typename T>
     struct overload_arguments;
     template <typename ... Ts>
-    struct overload_arguments<gcl::functional::overload<Ts...>>
-    {
-        using type = decltype(std::tuple_cat(typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments{}...));
+    struct overload_arguments<gcl::functional::overload<Ts...>> {
+        // std::tuple<std::tuple<args1...>, std::tuple<args2...>, etc.>
+        using types = std::tuple<typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments...>;
+        // std::tuple<args1..., args2..., etc.>
+        using concatenated_types =
+            decltype(std::tuple_cat(typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments{}...));
     };
     template <typename T>
     using overload_arguments_t = typename overload_arguments<T>::type;
