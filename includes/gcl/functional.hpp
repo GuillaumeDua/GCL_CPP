@@ -20,3 +20,25 @@ namespace gcl::functional
         };
     }
 }
+
+#include <gcl/mp/function_traits.hpp>
+
+namespace gcl::functional::type_traits
+{
+    template <class>
+    struct is_overload : std::false_type {};
+    template <class... Ts>
+    struct is_overload<gcl::functional::overload<Ts...>> : std::true_type {};
+    template <class... Ts>
+    constexpr static auto is_overload_v = is_overload<Ts...>::value;
+
+    template <typename T>
+    struct overload_arguments;
+    template <typename ... Ts>
+    struct overload_arguments<gcl::functional::overload<Ts...>>
+    {
+        using type = decltype(std::tuple_cat(typename gcl::mp::function_traits_t<decltype(&Ts::operator())>::arguments{}...));
+    };
+    template <typename T>
+    using overload_arguments_t = typename overload_arguments<T>::type;
+}
