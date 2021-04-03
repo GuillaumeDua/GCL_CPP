@@ -6,12 +6,12 @@
 #include <gcl/io/concepts.hpp>
 #include <gcl/functional.hpp>
 #include <gcl/cx/typeinfo.hpp>
-// #include <gcl/mp/function_traits.hpp>
+#include <gcl/mp/pack_traits.hpp>
+#include <gcl/mp/type_traits.hpp>
 
 #include <unordered_map>
 #include <functional>
 
-// todo : serializable concept
 // todo : add aggregate speciale rule
 
 namespace gcl::io::serialization
@@ -41,10 +41,31 @@ namespace gcl::io::serialization
             }
 
           public:
+
             in(std::istream& input, on_deserialization_t&& cb)
                 : input_stream{input}
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
-            {}
+            {
+                if constexpr (gcl::functional::type_traits::is_overload_v<on_deserialization_t>)
+                {
+                    auto register_each_tuple_element = [this]<typename... Ts>(std::tuple<Ts...>)
+                    {
+                        static_assert(((not std::is_const_v<Ts>)&&...));
+                        static_assert(((not std::is_reference_v<Ts>)&&...));
+
+                        register_types<Ts...>();
+                    };
+                    [register_each_tuple_element]<typename... Ts>(gcl::functional::overload<Ts...> &&)
+                    {
+                        using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
+
+                        ((register_each_tuple_element(gcl::mp::type_traits::transform_t<
+                            gcl::mp::function_traits_t<decltype(&Ts::operator())>::template arguments,
+                            remove_cv_and_ref::type>{})), ...);
+                        
+                    }(std::forward<decltype(cb)>(cb));
+                }
+            }
 
             template <gcl::io::concepts::serializable ... Ts>
             in(std::istream& input, on_deserialization_t&& cb, std::tuple<Ts...>)
@@ -168,11 +189,19 @@ namespace gcl::io::tests::serialization
                 auto deserializer = io_engine::in{
                     ss,
                     gcl::functional::overload{
+                        [&call_counter](event_1&&) mutable {
+                            if (++call_counter != 1)
+                                throw std::runtime_error{"gcl::io::tests::serialization::test : event_1"};
+                        },
+                        [&call_counter](event_2&&) mutable {
+                            if (++call_counter != 2)
+                                throw std::runtime_error{"gcl::io::tests::serialization::test : event_2"};
+                        },
                         [&call_counter](event_3&&) mutable {
                             if (++call_counter != 3)
                                 throw std::runtime_error{"gcl::io::tests::serialization::test : event_3"};
                         },
-                        [&call_counter]<typename T>(T&& arg) mutable {
+                        /*[&call_counter]<typename T>(T&& arg) mutable {
                             static_assert(not std::is_same_v<decltype(arg), event_3>);
 
                             if constexpr (std::is_same_v<T, event_1>)
@@ -181,8 +210,8 @@ namespace gcl::io::tests::serialization
                             if constexpr (std::is_same_v<T, event_2>)
                                 if (++call_counter not_eq 2)
                                     throw std::runtime_error{"gcl::io::tests::serialization::test : event_2"};
-                        }},
-                    types{}};
+                        }*/}
+                };
                 deserializer.deserialize_all();
             }
         }
