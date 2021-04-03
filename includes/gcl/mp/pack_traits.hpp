@@ -44,6 +44,16 @@ namespace gcl::mp::type_traits
     template <std::size_t N, typename... Ts>
     using type_at_t = typename type_at<N, Ts...>::type;
 
+    template <typename T, template <typename> typename transformation>
+    struct transform;
+    template <template <typename...> typename TypePack, template <typename> typename transformation, typename ... Ts>
+    struct transform<TypePack<Ts...>, transformation>
+    {
+        using type = TypePack<transformation<Ts>...>;
+    };
+    template <typename T, template <typename> typename transformation>
+    using transform_t = transform<T, transformation>::type;
+
     template <template <typename...> class T, typename... Ts>
     struct trait_as_mask {
 
@@ -213,6 +223,16 @@ namespace gcl::mp::type_traits::tests
 
     static_assert(gcl::mp::partial<std::is_same, int>::type<int>::value);
     static_assert(gcl::mp::partial<std::is_same>::type<int, int>::value);
+
+    namespace transform
+    {
+        using type_container = std::tuple<int &&, char &>;
+        using expected_type = std::tuple<int, char>;
+        static_assert(std::is_same_v<
+            expected_type,
+            gcl::mp::type_traits::transform_t<type_container, std::remove_reference_t>>
+        );
+    }
 
     namespace pack_arguments
     {
