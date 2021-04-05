@@ -6,6 +6,14 @@
 #include <tuple>
 #include <type_traits>
 
+// todo : T::operator()... -> trait<Ts...>
+
+namespace gcl::concepts
+{
+    template <typename T>
+    concept function =
+        std::is_function_v<T> or std::is_function_v<std::remove_pointer_t<T>> or std::is_member_function_pointer_v<T>;
+}
 namespace gcl::mp
 {
     struct tags {
@@ -19,7 +27,7 @@ namespace gcl::mp
         struct is_lambda {};*/
     };
 
-    template <typename Function>
+    template <gcl::concepts::function Function>
     class function_traits {
 #ifdef _MSC_VER
 #pragma warning(disable : 4348)
