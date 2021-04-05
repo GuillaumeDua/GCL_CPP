@@ -13,11 +13,12 @@
 #include <functional>
 
 // todo : add aggregate speciale rule
+// todo : detect if `on_deserialization_t::operator()` has multiples arguments
 
 namespace gcl::io::serialization
 {
     template <typename... Ts>
-    struct signature {
+    struct signature { // bind arguments together
         using storage_type = std::tuple<Ts...>;
         storage_type storage;
 
@@ -40,18 +41,47 @@ namespace gcl::io::serialization
             on_deserialization_t on_deserialize;
             storage_type         storage;
 
-            template <gcl::io::concepts::serializable T>
+            template <gcl::io::concepts::serializable ... Ts>
             auto generate_type_handler()
             {
-                return std::pair{
-                    gcl::cx::typeinfo::hashcode<T>(), std::function<void()>{[this]() {
-                        T value;
-                        io_policy::read(input_stream, value);
-                        if (not input_stream.good())
-                            throw std::runtime_error{
-                                "serialization::engine::deserialize (value) / storage::mapped::operator() "};
-                        on_deserialize(std::move(value));
-                    }}};
+                static_assert(sizeof...(Ts) not_eq 0);
+                static_assert(((not std::is_const_v<Ts>)&&...));
+                static_assert(((not std::is_reference_v<Ts>)&&...));
+
+                if constexpr (sizeof...(Ts) == 1)
+                {
+                    return std::pair{
+                        gcl::cx::typeinfo::hashcode<Ts...>(), std::function<void()>{[this]() {
+                            Ts... value;
+                            io_policy::read(input_stream, value);
+                            if (not input_stream.good())
+                                throw std::runtime_error{
+                                    "serialization::engine::deserialize (value) / storage::mapped::operator() "};
+                            on_deserialize(std::move(value));
+                        }}};
+                }
+                else
+                {
+                    using handler_signature = signature<Ts...>;
+                    return std::pair{gcl::cx::typeinfo::hashcode<handler_signature>(), std::function<void()>{[this]() {
+                                         std::tuple<Ts...> arguments;
+                                         const auto        read_one_argument = [this]<typename T>(T&& value) {
+                                             io_policy::read(input_stream, std::forward<T>(value));
+                                             if (not input_stream.good())
+                                                 throw std::runtime_error{
+                                                     "serialization::engine::deserialize (value) / "
+                                                     "storage::mapped::operator() "};
+                                         };
+                                         [ this, &arguments, &
+                                           read_one_argument ]<std::size_t... indexes>(std::index_sequence<indexes...>)
+                                         {
+                                             ((read_one_argument(std::move(std::get<indexes>(arguments)))), ...);
+                                         }
+                                         (std::make_index_sequence<std::tuple_size_v<decltype(arguments)>>{});
+
+                                         std::apply(on_deserialize, std::move(arguments));
+                                     }}};
+                }
             }
 
           public:
@@ -64,30 +94,12 @@ namespace gcl::io::serialization
                 {
                     const auto register_signature = [this]<typename... Ts>(std::tuple<Ts...>)
                     {
+                        static_assert(sizeof...(Ts) not_eq 0);
                         static_assert(((not std::is_const_v<Ts>)&&...));
                         static_assert(((not std::is_reference_v<Ts>)&&...));
 
-                        using handler_signature = signature<Ts...>;
-                        storage.insert(
-                            std::pair{gcl::cx::typeinfo::hashcode<handler_signature>(), std::function<void()>{[this]() {
-                                          std::tuple<Ts...> arguments;
-                                          const auto        read_one_argument = [this]<typename T>(T&& value) {
-
-                                              io_policy::read(input_stream, std::forward<T>(value));
-                                              if (not input_stream.good())
-                                                  throw std::runtime_error{
-                                                      "serialization::engine::deserialize (value) / "
-                                                      "storage::mapped::operator() "};
-                                          };
-                                          [ this, &arguments, &
-                                            read_one_argument ]<std::size_t... indexes>(std::index_sequence<indexes...>)
-                                          {
-                                              ((read_one_argument(std::move(std::get<indexes>(arguments)))), ...);
-                                          }
-                                          (std::make_index_sequence<std::tuple_size_v<decltype(arguments)>>{});
-
-                                          std::apply(on_deserialize, std::move(arguments));
-                                      }}});
+                        storage.insert(generate_type_handler<Ts...>());
+                        
                     };
                     [register_signature]<typename... Ts>(gcl::functional::overload<Ts...> &&)
                     {
