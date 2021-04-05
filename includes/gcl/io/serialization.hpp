@@ -15,6 +15,15 @@
 // todo : add aggregate speciale rule
 // todo : detect if `on_deserialization_t::operator()` has multiples arguments
 
+namespace gcl::io::serialization::type_traits
+{
+    template <class, class = void>
+    struct has_decltype_deductible_parenthesis_op : std::false_type {};
+    template <class T>
+    struct has_decltype_deductible_parenthesis_op<T, std::void_t<decltype(&T::operator())>> : std::true_type {};
+    template <class T>
+    constexpr static auto has_decltype_deductible_parenthesis_op_v = has_decltype_deductible_parenthesis_op<T>::value;
+}
 namespace gcl::io::serialization
 {
     template <typename... Ts>
@@ -44,7 +53,7 @@ namespace gcl::io::serialization
             template <gcl::io::concepts::serializable ... Ts>
             auto generate_type_handler()
             {
-                static_assert(sizeof...(Ts) not_eq 0);
+                //static_assert(sizeof...(Ts) not_eq 0);
                 static_assert(((not std::is_const_v<Ts>)&&...));
                 static_assert(((not std::is_reference_v<Ts>)&&...));
 
@@ -86,9 +95,11 @@ namespace gcl::io::serialization
 
           public:
 
-            in(std::istream& input, on_deserialization_t&& cb)
+            // template <gcl::io::concepts::serializable... serializable_types>
+            in(std::istream& input, on_deserialization_t&& cb/*, std::tuple<serializable_types...> = std::tuple<>{}*/)
                 : input_stream{input}
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
+                // , storage{generate_type_handler<serializable_types>()...}
             {
                 if constexpr (gcl::functional::type_traits::is_overload_v<on_deserialization_t>)
                 {
@@ -99,26 +110,32 @@ namespace gcl::io::serialization
                         static_assert(((not std::is_reference_v<Ts>)&&...));
 
                         storage.insert(generate_type_handler<Ts...>());
-                        
                     };
-                    [register_signature]<typename... Ts>(gcl::functional::overload<Ts...> &&)
+                    const auto register_deductible_signature = [this, &register_signature]<typename T>() {
+                        if constexpr (type_traits::has_decltype_deductible_parenthesis_op_v<T>)
+                        {
+                            using remove_cv_and_ref =
+                                gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
+                            ((register_signature(
+                                gcl::mp::type_traits::transform_t<
+                                    gcl::mp::function_traits_t<decltype(&T::operator())>::template arguments,
+                                    remove_cv_and_ref::type>{})));
+                        }
+                    };
+                    [register_deductible_signature]<typename... Ts>(gcl::functional::overload<Ts...> &&)
                     {
-                        using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
-
-                        ((register_signature(gcl::mp::type_traits::transform_t<
-                            gcl::mp::function_traits_t<decltype(&Ts::operator())>::template arguments,
-                            remove_cv_and_ref::type>{})), ...);
-
-                    }(std::forward<decltype(cb)>(cb));
+                        ((register_deductible_signature.template operator()<Ts>()), ...);
+                    }
+                    (std::forward<decltype(cb)>(cb));
                 }
             }
 
-            template <gcl::io::concepts::serializable ... Ts>
+            /*template <gcl::io::concepts::serializable ... Ts>
             in(std::istream& input, on_deserialization_t&& cb, std::tuple<Ts...>)
                 : input_stream{input}
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
                 , storage{generate_type_handler<Ts>()...}
-            {}
+            {}*/
 
             template <gcl::io::concepts::serializable ... Ts>
             void register_types()
@@ -249,14 +266,12 @@ namespace gcl::io::tests::serialization
             using io_engine = typename gcl::io::serialization::engine<gcl::io::policy::binary>;
             {
                 auto serializer = io_engine::out{ss};
-                // serializer << event_1{} << event_2{} << event_3{};
                 serializer << gcl::io::serialization::signature{event_1{}, event_2{}, event_3{}};
                 serializer << gcl::io::serialization::signature{42, 'c'};
+                serializer << event_1{} << event_2{} << event_3{};
             }
+            int call_counter{0};
             {
-                using types = std::tuple<event_1, event_2, event_3>;
-
-                int  call_counter{0};
                 auto deserializer = io_engine::in{
                     ss,
                     gcl::functional::overload{
@@ -277,6 +292,56 @@ namespace gcl::io::tests::serialization
                                     "gcl::io::tests::serialization : overload signature : pods : arg 2"};
                         },
                     }};
+                deserializer.deserialize_all();
+            }
+            {
+                int  call_counter{0};
+                auto deserializer = io_engine::in{
+                    ss,
+                    gcl::functional::overload{
+                        [&call_counter](event_1&&, event_2&&, event_3&&) mutable {
+                            if (++call_counter not_eq 1)
+                                throw std::runtime_error{
+                                    "gcl::io::tests::serialization : overload signature : event : call order"};
+                        },
+                        [&call_counter](int&& i, char&& c) mutable {
+                            if (++call_counter not_eq 2)
+                                throw std::runtime_error{
+                                    "gcl::io::tests::serialization : overload signature : pods : call order"};
+                            if (i not_eq 42)
+                                throw std::runtime_error{
+                                    "gcl::io::tests::serialization : overload signature : pods : arg 1"};
+                            if (c not_eq 'c')
+                                throw std::runtime_error{
+                                    "gcl::io::tests::serialization : overload signature : pods : arg 2"};
+                        },
+                        [&call_counter](auto&& arg) mutable {
+                            switch (++call_counter)
+                            {
+                            case 3:
+                                if (not std::is_same_v<std::remove_reference_t<decltype(arg)>, event_1>)
+                                    throw std::runtime_error{
+                                        "gcl::io::tests::serialization : overload signature : auto : event_1"};
+                                break;
+                            case 4:
+                                if (not std::is_same_v<std::remove_reference_t<decltype(arg)>, event_2>)
+                                    throw std::runtime_error{
+                                        "gcl::io::tests::serialization : overload signature : auto : event_2"};
+                                break;
+                            case 5:
+                                if (not std::is_same_v<std::remove_reference_t<decltype(arg)>, event_3>)
+                                    throw std::runtime_error{
+                                        "gcl::io::tests::serialization : overload signature : auto : event_3"};
+                                break;
+
+                            default:
+                                throw std::runtime_error{
+                                    "gcl::io::tests::serialization : overload signature : auto : call_order"};
+                            }
+                        }},
+                    //types{}
+                };
+                // deserializer.register_types<event_1, event_2, event_3>(); // WIP : ICE using MsVC
                 deserializer.deserialize_all();
             }
         }
