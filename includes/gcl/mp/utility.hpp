@@ -7,7 +7,7 @@
 namespace gcl::mp::utility
 {
 	template <typename T, T value>
-    constexpr static auto reverse_integer_sequence_v = []<typename U, U ... indexes>(std::integer_sequence<U, indexes...>)
+    constexpr inline auto reverse_integer_sequence_v = []<typename U, U ... indexes>(std::integer_sequence<U, indexes...>)
     {
         return std::integer_sequence<U, (value - 1 - indexes)...>{};
     }(std::make_integer_sequence<T, value>{});
@@ -20,7 +20,7 @@ namespace gcl::mp::utility
     using reverse_index_sequence_for = make_reverse_index_sequence<sizeof...(Ts)>;
 
     template <std::size_t ... Ints>
-    constexpr static auto reverse_index_sequence_v = []<std::size_t ... indexes>(std::index_sequence<indexes...>){
+    constexpr inline auto reverse_index_sequence_v = []<std::size_t ... indexes>(std::index_sequence<indexes...>){
         constexpr auto Ints_as_tuple = std::tuple{Ints...};
         return std::index_sequence<std::get<indexes>(Ints_as_tuple)...>{};
     }(reverse_index_sequence_for<decltype(Ints)...>{});

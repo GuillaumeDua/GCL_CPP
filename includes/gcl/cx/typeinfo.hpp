@@ -42,7 +42,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <typename T>
-    [[maybe_unused]] static constexpr inline auto type_name_v = type_name<T>();
+    constexpr inline auto type_name_v = type_name<T>();
     template <auto value>
     static constexpr std::string_view type_name(/*no parameters allowed*/)
     {
@@ -70,7 +70,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <auto value>
-    [[maybe_unused]] static constexpr inline auto value_name_v = value_name<value>();
+    constexpr inline auto value_name_v = value_name<value>();
 
     template <typename T>
     static constexpr auto hashcode()
@@ -79,7 +79,7 @@ namespace gcl::cx::typeinfo
         return gcl::cx::crc_32::hash(type_name);
     }
     template <typename T>
-    [[maybe_unused]] static constexpr inline auto hashcode_v = hashcode<T>();
+    constexpr inline auto hashcode_v = hashcode<T>();
 }
 
 #include <gcl/mp/pack_traits.hpp>

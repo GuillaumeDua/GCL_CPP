@@ -30,7 +30,7 @@ namespace gcl::functional::type_traits
     template <class... Ts>
     struct is_overload<gcl::functional::overload<Ts...>> : std::true_type {};
     template <class... Ts>
-    constexpr static auto is_overload_v = is_overload<Ts...>::value;
+    constexpr auto is_overload_v = is_overload<Ts...>::value;
 
     template <typename T>
     struct overload_arguments;
