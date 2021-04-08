@@ -78,8 +78,9 @@ namespace gcl::cx::typeinfo
         constexpr auto type_name = gcl::cx::typeinfo::type_name<T>();
         return gcl::cx::crc_32::hash(type_name);
     }
+    using hashcode_t = gcl::cx::hash_type;
     template <typename T>
-    [[maybe_unused]] static constexpr inline auto hashcode_v = hashcode<T>();
+    constexpr inline hashcode_t hashcode_v = hashcode<T>();
 }
 
 #include <gcl/mp/pack_traits.hpp>

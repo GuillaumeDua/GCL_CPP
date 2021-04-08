@@ -44,16 +44,16 @@ namespace gcl::io::serialization
 
         template <typename on_deserialization_t>
         class in {
-            using type_id_t = uint32_t;
+            using type_id_t = gcl::cx::typeinfo::hashcode_t;
             using storage_type = std::unordered_map<type_id_t, std::function<void()>>;
             std::istream&        input_stream;
             on_deserialization_t on_deserialize;
             storage_type         storage;
 
-            template <gcl::io::concepts::serializable ... Ts>
+            template <gcl::io::concepts::serializable... Ts>
             auto generate_type_handler()
             {
-                //static_assert(sizeof...(Ts) not_eq 0);
+                // static_assert(sizeof...(Ts) not_eq 0);
                 static_assert(((not std::is_const_v<Ts>)&&...));
                 static_assert(((not std::is_reference_v<Ts>)&&...));
 
@@ -94,12 +94,11 @@ namespace gcl::io::serialization
             }
 
           public:
-
             // template <gcl::io::concepts::serializable... serializable_types>
-            in(std::istream& input, on_deserialization_t&& cb/*, std::tuple<serializable_types...> = std::tuple<>{}*/)
+            in(std::istream& input, on_deserialization_t&& cb /*, std::tuple<serializable_types...> = std::tuple<>{}*/)
                 : input_stream{input}
                 , on_deserialize{std::forward<decltype(cb)>(cb)}
-                // , storage{generate_type_handler<serializable_types>()...}
+            // , storage{generate_type_handler<serializable_types>()...}
             {
                 if constexpr (gcl::functional::type_traits::is_overload_v<on_deserialization_t>)
                 {
@@ -137,7 +136,7 @@ namespace gcl::io::serialization
                 , storage{generate_type_handler<Ts>()...}
             {}*/
 
-            template <gcl::io::concepts::serializable ... Ts>
+            template <gcl::io::concepts::serializable... Ts>
             void register_types()
             {
                 const auto insert_if_not_exists = [this]<typename T>() {
@@ -222,7 +221,7 @@ namespace gcl::io::serialization
                 io_policy::write(output_stream, gcl::cx::typeinfo::hashcode<T>());
                 io_policy::write(output_stream, std::forward<T>(value));
             }
-            template <typename ...Ts>
+            template <typename... Ts>
             void serialize(signature<Ts...>&& argument) const
             {
                 static_assert(((not std::is_reference_v<Ts>)&&...));
@@ -231,9 +230,11 @@ namespace gcl::io::serialization
                 using argument_storage_type = std::decay_t<std::remove_reference_t<decltype(argument)>>::storage_type;
 
                 io_policy::write(output_stream, gcl::cx::typeinfo::hashcode<signature<Ts...>>());
-                [&]<std::size_t... indexes>(std::index_sequence<indexes...>){
+                [&]<std::size_t... indexes>(std::index_sequence<indexes...>)
+                {
                     ((io_policy::write(output_stream, std::move(std::get<indexes>(argument.storage)))), ...);
-                }(std::make_index_sequence<std::tuple_size_v<argument_storage_type>>{});
+                }
+                (std::make_index_sequence<std::tuple_size_v<argument_storage_type>>{});
             }
             template <typename T>
             const out& operator<<(T&& value) const
