@@ -177,6 +177,9 @@
     <ClInclude Include="includes\gcl\container\concepts.hpp">
       <Filter>Header Files\gcl\container</Filter>
     </ClInclude>
+    <ClInclude Include="includes\gcl\concepts.hpp">
+      <Filter>Header Files\gcl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Main.cpp">

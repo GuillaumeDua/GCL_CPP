@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <gcl/functional.hpp>
+#include <gcl/concepts.hpp>
 #include <gcl/mp/type_tag.hpp>
 
 #include <tuple>
@@ -8,12 +8,6 @@
 
 // todo : T::operator()... -> trait<Ts...>
 
-namespace gcl::concepts
-{
-    template <typename T>
-    concept function =
-        std::is_function_v<T> or std::is_function_v<std::remove_pointer_t<T>> or std::is_member_function_pointer_v<T>;
-}
 namespace gcl::mp
 {
     struct tags {

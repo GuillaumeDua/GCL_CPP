@@ -3,11 +3,11 @@
 #include <gcl/container/concepts.hpp>
 #include <gcl/io/concepts.hpp>
 #include <gcl/mp/concepts.hpp>
+#include <gcl/concepts.hpp>
 
 #include <concepts>
 #include <utility>
 #include <type_traits>
-
 #include <iostream>
 
 namespace gcl::io::policy
