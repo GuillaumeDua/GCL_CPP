@@ -69,7 +69,7 @@ namespace gcl::mp::type_traits
         (pack_arguments_as_t<std::tuple, Ts...>{});
     };
     template <template <typename...> class T, typename... Ts>
-    constexpr static auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
+    constexpr auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
 
     template <typename to_find, typename ... Ts>
     class index_of {
@@ -101,22 +101,22 @@ namespace gcl::mp::type_traits
         };
 
       public:
-        constexpr static auto value = impl<from_begin>();
-        constexpr static auto first_value = value;
-        constexpr static auto last_value = impl<from_end>();
+        constexpr static inline auto value = impl<from_begin>();
+        constexpr static inline auto first_value = value;
+        constexpr static inline auto last_value = impl<from_end>();
     };
 
     template <typename to_find, typename ... Ts>
-    constexpr static auto index_of_v = index_of<to_find, Ts...>::value;
+    constexpr inline auto index_of_v = index_of<to_find, Ts...>::value;
     template <typename to_find, typename ... Ts>
-    constexpr static auto first_index_of_v = index_of<to_find, Ts...>::first_value;
+    constexpr inline auto first_index_of_v = index_of<to_find, Ts...>::first_value;
     template <typename to_find, typename ... Ts>
-    constexpr static auto last_index_of_v = index_of<to_find, Ts...>::last_value;
+    constexpr inline auto last_index_of_v = index_of<to_find, Ts...>::last_value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
     template <typename T, typename... Ts>
-    static constexpr inline auto contains_v = contains<T, Ts...>::value;
+    constexpr inline auto contains_v = contains<T, Ts...>::value;
 
     template <class T>
     class reverse

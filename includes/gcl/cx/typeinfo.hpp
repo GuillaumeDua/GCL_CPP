@@ -42,7 +42,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <typename T>
-    [[maybe_unused]] static constexpr inline auto type_name_v = type_name<T>();
+    constexpr inline auto type_name_v = type_name<T>();
     template <auto value>
     static constexpr std::string_view type_name(/*no parameters allowed*/)
     {
@@ -70,7 +70,7 @@ namespace gcl::cx::typeinfo
         return str_view;
     }
     template <auto value>
-    [[maybe_unused]] static constexpr inline auto value_name_v = value_name<value>();
+    constexpr inline auto value_name_v = value_name<value>();
 
     template <typename T>
     static constexpr auto hashcode()

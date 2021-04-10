@@ -10,7 +10,7 @@ namespace gcl::mp::type_traits
     template <auto... values, template <auto...> class T>
     struct is_template<T<values...>> : std::true_type {};
     template <class T>
-    static inline constexpr auto is_template_v = is_template<T>::value;
+    inline constexpr auto is_template_v = is_template<T>::value;
 
     template <typename T, typename = void>
     struct is_complete : std::false_type {};
@@ -18,14 +18,14 @@ namespace gcl::mp::type_traits
     struct is_complete<T, std::void_t<decltype(sizeof(T))>>
         : std::true_type {};
     template <typename T>
-    constexpr static inline auto is_complete_v = is_complete<T>::value;
+    constexpr inline auto is_complete_v = is_complete<T>::value;
 
     template <class T_concrete, template <class...> class T>
     struct is_instance_of : std::false_type {};
     template <template <class...> class T, class... T_args>
     struct is_instance_of<T<T_args...>, T> : std::true_type {};
     template <class T_concrete, template <class...> class T>
-    static inline constexpr auto is_instance_of_v = is_instance_of<T_concrete, T>::value;
+    inline constexpr auto is_instance_of_v = is_instance_of<T_concrete, T>::value;
 
     template <class T, typename... Args>
     class is_brace_constructible {
@@ -38,12 +38,12 @@ namespace gcl::mp::type_traits
         constexpr inline static auto value = impl<std::void_t<>, T, Args...>::value;
     };
     template <class T, typename... Args>
-    constexpr static inline auto is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
+    constexpr inline auto is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
 
     template <bool evaluation>
     using if_t = std::conditional_t<evaluation, std::true_type, std::false_type>;
     template <bool evaluation>
-    constexpr static inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
+    constexpr inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
 
     template <template <typename> typename first_trait, template<typename> typename... traits>
     struct merge_traits
@@ -65,7 +65,7 @@ namespace gcl::mp::type_traits
 {
     template <template <typename> class trait, typename... Ts>
     struct trait_result {
-        constexpr static auto as_bitset_v = []() consteval
+        constexpr static inline auto as_bitset_v = []() consteval
         {
             using bitset_type = std::bitset<sizeof...(Ts)>;
             using bitset_initializer_t = unsigned long long;
@@ -78,14 +78,14 @@ namespace gcl::mp::type_traits
         template <template <typename...> class T>
         using as_t = T<typename trait<Ts>::type...>;
         template <template <typename...> class T>
-        constexpr static auto as_v = T{trait<Ts>::value...};
+        constexpr static inline auto as_v = T{trait<Ts>::value...};
         using as_tuple_t = as_t<std::tuple>;
-        constexpr static auto as_tuple_v = std::tuple{trait<Ts>::value...};
+        constexpr static inline auto as_tuple_v = std::tuple{trait<Ts>::value...};
         template <class Int = int>
         using as_integer_sequence = std::integer_sequence<Int, trait<Ts>::value...>;
         // constexpr static auto as_array_v = std::array{trait<Ts>::value...}; // OK with GCC 10.2
         using as_array_t = std::array<std::tuple_element_t<0, decltype(std::tuple{trait<Ts>::value...})>, sizeof...(Ts)>;
-        constexpr static auto as_array_v = as_array_t{trait<Ts>::value...};
+        constexpr static inline auto as_array_v = as_array_t{trait<Ts>::value...};
     };
 }
 

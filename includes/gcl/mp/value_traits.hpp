@@ -19,23 +19,23 @@ namespace gcl::mp::value_traits
     ();
     // Only works for Clang yet, since 11.0.0 
     // template <auto first_value = int{}, std::equality_comparable_with<decltype(first_value)> auto... values>
-    // constexpr static auto equal_v = []() consteval
+    // constexpr inline auto equal_v = []() consteval
     // {
     //     return ((values == first_value) && ...);
     // }
     // ();
     template <auto... values>
-    constexpr static auto not_equal_v = not equal_v<values...>;
+    constexpr inline auto not_equal_v = not equal_v<values...>;
 }
 #include <cstdint>
 namespace gcl::mp::value_traits
 {
     template <typename T>
-    constexpr std::size_t bit_size_v = sizeof(T) * CHAR_BIT;
+    constexpr inline std::size_t bit_size_v = sizeof(T) * CHAR_BIT;
     // sizeof(bool) is implementation-defined,
     // but here we expect - thus, define - that a boolean is 1 bit-long
     template <>
-    constexpr std::size_t bit_size_v<bool> = 1;
+    constexpr inline std::size_t bit_size_v<bool> = 1;
 
     template <typename T>
     requires(bit_size_v<std::uintmax_t> > bit_size_v<T>) constexpr static auto values_count =

@@ -14,7 +14,7 @@ namespace gcl::mp::type_traits
     template <typename T>
     using is_std_array_t = typename is_std_array<T>::type;
     template <typename T>
-    constexpr static auto is_std_array_v = is_std_array_t<T>::value;
+    constexpr auto is_std_array_v = is_std_array_t<T>::value;
 }
 namespace gcl::concepts
 {
@@ -71,7 +71,7 @@ namespace gcl::cx::array
         return return_value;
     };
     template <concepts::Array auto arg>
-    constexpr static auto remove_duplicates_v = remove_duplicates<arg>();
+    constexpr auto remove_duplicates_v = remove_duplicates<arg>();
     template <concepts::Array auto arg>
     using remove_duplicates_t = typename std::decay_t<decltype(remove_duplicates_v<arg>)>;
 
