@@ -26,6 +26,7 @@
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms\array.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\algorithms\tuple.hpp" />
     <ClInclude Include="includes\gcl\compile_time_constant\ctc.hpp" />
+    <ClInclude Include="includes\gcl\concepts.hpp" />
     <ClInclude Include="includes\gcl\container\concepts.hpp" />
     <ClInclude Include="includes\gcl\container\interval_map.hpp" />
     <ClInclude Include="includes\gcl\cx\array.hpp" />

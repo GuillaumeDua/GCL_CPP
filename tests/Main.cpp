@@ -5,6 +5,8 @@
 #include <gcl/cx/cx.hpp>
 #include <gcl/compile_time_constant/ctc.hpp>
 #include <gcl/mp/system_info.hpp>
+#include <gcl/concepts.hpp>
+#include <gcl/functional.hpp>
 
 // dynamic tests
 #include <gcl/io/io.hpp>

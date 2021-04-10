@@ -44,6 +44,18 @@ namespace gcl::mp::type_traits
     using if_t = std::conditional_t<evaluation, std::true_type, std::false_type>;
     template <bool evaluation>
     constexpr inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
+
+    template <template <typename> typename first_trait, template<typename> typename... traits>
+    struct merge_traits
+    {
+        template <typename T>
+        using type = typename merge_traits<traits...>::template type<first_trait<T>>;
+    };
+    template <template <typename> typename first_trait>
+    struct merge_traits<first_trait> {
+        template <typename T>
+        using type = first_trait<T>;
+    };
 }
 
 #include <bitset>
@@ -143,6 +155,11 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(is_red_colored<smthg_red>);
 }
 #endif
+namespace gcl::mp::type_traits::tests::merge_traits
+{
+    using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
+    static_assert(std::is_same_v<int, remove_cv_and_ref::type<const int&&>>);
+}
 
 namespace gcl::mp::type_traits::tests::trait_results
 {

@@ -1,10 +1,12 @@
 #pragma once
 
-// #include <gcl/functional.hpp>
+#include <gcl/concepts.hpp>
 #include <gcl/mp/type_tag.hpp>
 
 #include <tuple>
 #include <type_traits>
+
+// todo : T::operator()... -> trait<Ts...>
 
 namespace gcl::mp
 {
@@ -19,7 +21,7 @@ namespace gcl::mp
         struct is_lambda {};*/
     };
 
-    template <typename Function>
+    template <gcl::concepts::function Function>
     class function_traits {
 #ifdef _MSC_VER
 #pragma warning(disable : 4348)

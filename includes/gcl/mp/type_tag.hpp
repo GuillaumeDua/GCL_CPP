@@ -6,6 +6,13 @@
 
 namespace gcl::mp::type_tag
 {
+    template <typename T>
+    struct type_to_type {
+        using type = T;
+    };
+    template <typename T>
+    using type_to_type_t = typename type_to_type<T>::type;
+
     template <typename... Ts>
     class container {
         template <typename T>
@@ -58,6 +65,18 @@ namespace gcl::mp::type_tag
     using add_tags_t = typename add_tags<tag_arguments...>::type;
 }
 
+namespace gcl::mp::tests::type_tag::type_to_type
+{
+    static_assert(std::is_same_v<gcl::mp::type_tag::type_to_type_t<int>, int>);
+    constexpr void test()
+    {
+        int  i{0};
+        auto lambda_with_capture = [&i]() {};
+        static_assert(std::is_same_v<
+                      gcl::mp::type_tag::type_to_type_t<decltype(lambda_with_capture)>,
+                      decltype(lambda_with_capture)>);
+    }
+}
 namespace gcl::mp::tests::type_tag::container
 {
     struct tag_1 {};

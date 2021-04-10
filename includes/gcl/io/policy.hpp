@@ -3,11 +3,11 @@
 #include <gcl/container/concepts.hpp>
 #include <gcl/io/concepts.hpp>
 #include <gcl/mp/concepts.hpp>
+#include <gcl/concepts.hpp>
 
 #include <concepts>
 #include <utility>
 #include <type_traits>
-
 #include <iostream>
 
 namespace gcl::io::policy
@@ -25,7 +25,7 @@ namespace gcl::io::policy
         { // policy by-pass
             value.deserialize_from(is);
         }
-        template <gcl::mp::concepts::traits_adapter::satisfy_all_of<std::is_pointer<T>> T>
+        template <gcl::concepts::pointer T> // [modif]
         static void read(std::istream& is, T&& value)
         {
             policy_impl::read(is, *value);
@@ -141,9 +141,9 @@ namespace gcl::io::policy
             requires concepts::has_custom_deserialize<T> or
             concepts::istream_shiftable<T> static void basic_read(std::istream& is, T&& value)
         {
-                // todo : if constexpr has_custom_deserialize
-                //    deserialize
-                // else
+            // todo : if constexpr has_custom_deserialize
+            //    deserialize
+            // else
             extract_RS(is >> std::forward<T>(value));
         }
         template <typename T>
