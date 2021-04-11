@@ -52,7 +52,7 @@ namespace gcl::mp::type_traits
         using type = TypePack<transformation<Ts>...>;
     };
     template <typename T, template <typename> typename transformation>
-    using transform_t = transform<T, transformation>::type;
+    using transform_t = typename transform<T, transformation>::type;
 
     template <template <typename...> class T, typename... Ts>
     struct trait_as_mask {
@@ -211,8 +211,13 @@ namespace gcl::mp
     template <template <typename...> class base_type, typename... Ts>
     struct partial {
         // differs type instanciation with partial template-type parameters
-        template <typename... Us, typename = std::enable_if_t<sizeof...(Us) >= 1>>
+        #if __clang__
+        template <typename... Us>
         using type = base_type<Ts..., Us...>;
+        #else
+        template <typename... Us, typename = std::enable_if_t<(sizeof...(Us) >= 1)>>
+        using type = base_type<Ts..., Us...>;
+        #endif
     };
 }
 

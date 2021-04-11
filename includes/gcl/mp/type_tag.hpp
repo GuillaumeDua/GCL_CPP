@@ -71,7 +71,7 @@ namespace gcl::mp::tests::type_tag::type_to_type
     constexpr void test()
     {
         int  i{0};
-        auto lambda_with_capture = [&i]() {};
+        auto lambda_with_capture = [&i]() { (void)i; };
         static_assert(std::is_same_v<
                       gcl::mp::type_tag::type_to_type_t<decltype(lambda_with_capture)>,
                       decltype(lambda_with_capture)>);
