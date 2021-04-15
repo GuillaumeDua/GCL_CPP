@@ -15,10 +15,14 @@ namespace gcl::mp::concepts::traits_adapter
     //                  std::derived_from<std::true_type>` as equality check
     // see https://godbolt.org/z/MsY4P1arj for details
 
+#if (defined(__GNUC__) and not __GNUC_PREREQ(10, 3))
+// include <features.h>
+#pragma message(                                                                                                       \
+    "[gcl::mp::concepts::traits_adapter] switching to compiler-specific implementation details because GCC " __VERSION__)
+
     template <typename T, template <typename> typename... traits>
     concept satisfy_all_of = requires
     {
-        // requires (std::conjunction_v<traits<T>...>);
         {
             std::conjunction<traits<T>...> {}
         }
@@ -40,6 +44,23 @@ namespace gcl::mp::concepts::traits_adapter
         }
         ->std::derived_from<std::true_type>;
     };
+#else
+    template <typename T, template <typename> typename... traits>
+    concept satisfy_all_of = requires
+    {
+        requires(std::conjunction_v<traits<T>...>);
+    };
+    template <typename T, template <typename> typename... traits>
+    concept satisfy_any_of = requires
+    {
+        requires(std::disjunction_v<traits<T>...>);
+    };
+    template <typename T, template <typename> typename... traits>
+    concept satisfy_none_of = requires
+    {
+        requires(std::conjunction<std::negation<traits<T>>...>{});
+    };
+#endif
 }
 
 namespace gcl::mp::concepts::tests::traits_adapter
