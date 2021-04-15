@@ -14,9 +14,10 @@ namespace gcl::mp::concepts::traits_adapter
     //                  implementation is incomplete, the current implementation uses `{ trait{} } ->
     //                  std::derived_from<std::true_type>` as equality check
     // see https://godbolt.org/z/MsY4P1arj for details
-
+#if not defined(__GNUC_PREREQ)
+#define __GNUC_PREREQ(major, minor) false
+#endif
 #if (defined(__GNUC__) and not __GNUC_PREREQ(10, 3))
-// include <features.h>
 #pragma message(                                                                                                       \
     "[gcl::mp::concepts::traits_adapter] switching to compiler-specific implementation details because GCC " __VERSION__)
 
@@ -58,7 +59,7 @@ namespace gcl::mp::concepts::traits_adapter
     template <typename T, template <typename> typename... traits>
     concept satisfy_none_of = requires
     {
-        requires(std::conjunction<std::negation<traits<T>>...>{});
+        requires(std::conjunction_v<std::negation<traits<T>>...>);
     };
 #endif
 }
