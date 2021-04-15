@@ -145,6 +145,7 @@ namespace gcl::mp::type_traits::tests::if_t
     {
         { T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
         { type_traits::if_t<T::color == decltype(T::color)::red>{}} -> std::same_as<std::true_type>;
+        // equivalent to : `requires (T::color == decltype(T::color)::red);`
     };
     enum colors { red, blue, green };
     struct smthg_blue { constexpr static auto color = colors::blue; };
