@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gcl/mp/concepts.hpp>
+#include <concepts>
 
 namespace gcl::mp::value_traits
 {
@@ -28,6 +29,7 @@ namespace gcl::mp::value_traits
     constexpr inline auto not_equal_v = not equal_v<values...>;
 }
 #include <cstdint>
+#include <climits>
 namespace gcl::mp::value_traits
 {
     template <typename T>
