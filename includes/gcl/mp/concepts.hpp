@@ -17,7 +17,7 @@ namespace gcl::mp::concepts::traits_adapter
 #if not defined(__GNUC_PREREQ)
 #define __GNUC_PREREQ(major, minor) false
 #endif
-#if (defined(__GNUC__) and not __GNUC_PREREQ(10, 3))
+#if (not defined(__clang__) and defined(__GNUC__) and not __GNUC_PREREQ(10, 3))
 #pragma message(                                                                                                       \
     "[gcl::mp::concepts::traits_adapter] switching to compiler-specific implementation details because GCC " __VERSION__)
 
