@@ -29,3 +29,8 @@ message(STATUS "${PROJECT_NAME}_BUILD_TEST : ${${PROJECT_NAME}_BUILD_TEST}")
 if (${PROJECT_NAME}_BUILD_TEST)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif()
+
+# todo : include2dot
+# todo : dependency graph
+#	cmake SRC_DIR --graphviz=xxx.dot
+#	dot -Tpng xxx.dot xxx.pgf
