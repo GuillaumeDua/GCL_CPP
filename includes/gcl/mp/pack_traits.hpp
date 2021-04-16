@@ -9,7 +9,7 @@
 
 namespace gcl::mp::type_traits
 {
-    template <template <typename ...> class T, typename ... Ts>
+    template <template <typename...> class T, typename... Ts>
     class pack_arguments_as {
         template <template <typename...> class PackType, typename... PackArgs>
         constexpr static auto impl(PackType<PackArgs...>)
@@ -21,23 +21,24 @@ namespace gcl::mp::type_traits
         {
             return T<PackArgs...>{};
         }
+
       public:
         using type = decltype(impl(std::declval<Ts>()...));
     };
-    template <template <typename ...> class T, typename ... Ts>
+    template <template <typename...> class T, typename... Ts>
     using pack_arguments_as_t = typename pack_arguments_as<T, Ts...>::type;
-    template <typename ... Ts>
-    using arguments_index_sequence_t = decltype(std::make_index_sequence<std::tuple_size_v<pack_arguments_as_t<std::tuple, Ts...>>>{});
+    template <typename... Ts>
+    using arguments_index_sequence_t =
+        decltype(std::make_index_sequence<std::tuple_size_v<pack_arguments_as_t<std::tuple, Ts...>>>{});
 
     template <typename T, typename U>
     struct concatenate;
-    template <template <typename...> typename T, typename ... Ts, typename ... Us>
-    struct concatenate<T<Ts...>, T<Us...>>
-    {
+    template <template <typename...> typename T, typename... Ts, typename... Us>
+    struct concatenate<T<Ts...>, T<Us...>> {
         using type = T<Ts..., Us...>;
     };
     template <typename T, typename U>
-    using concatenate_t = typename concatenate<T,U>::type;
+    using concatenate_t = typename concatenate<T, U>::type;
 
     template <std::size_t N, typename... Ts>
     using type_at = typename std::tuple_element<N, std::tuple<Ts...>>;
@@ -46,9 +47,8 @@ namespace gcl::mp::type_traits
 
     template <typename T, template <typename> typename transformation>
     struct transform;
-    template <template <typename...> typename TypePack, template <typename> typename transformation, typename ... Ts>
-    struct transform<TypePack<Ts...>, transformation>
-    {
+    template <template <typename...> typename TypePack, template <typename> typename transformation, typename... Ts>
+    struct transform<TypePack<Ts...>, transformation> {
         using type = TypePack<transformation<Ts>...>;
     };
     template <typename T, template <typename> typename transformation>
@@ -71,13 +71,86 @@ namespace gcl::mp::type_traits
     template <template <typename...> class T, typename... Ts>
     constexpr auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
 
-    template <typename to_find, typename ... Ts>
+    template <class T>
+    class reverse {
+        static_assert(gcl::mp::type_traits::is_template_v<T>);
+
+        template <template <typename...> class Type, typename... Ts>
+        constexpr static auto impl(Type<Ts...>)
+        {
+            // todo : consteval (works with GCC 10.2 and MSVC, not clang 11.0.1)
+            return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr
+            {
+                using Ts_as_tuple = std::tuple<Ts...>;
+                using return_type = Type<std::tuple_element_t<indexes, Ts_as_tuple>...>;
+                return return_type{};
+            }
+            (gcl::mp::utility::make_reverse_index_sequence<sizeof...(Ts)>{});
+        }
+        template <template <auto...> class Type, auto... values>
+        constexpr static auto impl(Type<values...>)
+        {
+            return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr
+            {
+                constexpr auto Ts_as_tuple = std::tuple{values...};
+                using return_type = Type<std::get<indexes>(Ts_as_tuple)...>;
+                return return_type{};
+            }
+            (gcl::mp::utility::make_reverse_index_sequence<sizeof...(values)>{});
+        }
+
+      public:
+        using type = decltype(impl(std::declval<T>()));
+    };
+    template <class T>
+    using reverse_t = typename reverse<T>::type;
+
+#if __clang__
+#pragma message(                                                                                                       \
+    "gcl::mp::type_traits::index_of : swtiching to clang-specific implementation ... (see details in comment)")
+    // Clang specific implementation, that use recursion instead of parameter-pack expansion,
+    //  as Clang 12.0.0 does not correctly evaluate some expressions/functions as constexpr
+    // (recursive implementation)
+    template <typename T, typename... Ts>
+    class index_of {
+        static_assert(sizeof...(Ts) > 0);
+        using TsArgsAsTuple = gcl::mp::type_traits::pack_arguments_as_t<std::tuple, Ts...>;
+        static_assert(std::tuple_size_v<TsArgsAsTuple> > 0);
+
+        template <typename TupleType>
+        struct impl;
+
+        template <typename first, typename... Us>
+        struct impl<std::tuple<first, Us...>> {
+            constexpr inline static auto value = []() constexpr
+            {
+                if constexpr (std::is_same_v<T, first>)
+                    return (std::tuple_size_v<TsArgsAsTuple> - sizeof...(Us) - 1);
+                else
+                    return impl<std::tuple<Us...>>::value;
+            }
+            ();
+        };
+        template <typename first>
+        struct impl<std::tuple<first>> {
+            static_assert(std::is_same_v<T, first>, "gcl::mp::index_of : no match found");
+            constexpr inline static auto value = std::tuple_size_v<TsArgsAsTuple> - 1;
+        };
+
+      public:
+        constexpr inline static auto value = impl<TsArgsAsTuple>::value;
+        constexpr static inline auto first_value = value;
+        constexpr static inline auto last_value = impl<reverse_t<TsArgsAsTuple>>::value;
+    };
+#else
+    // (non-recursive implementation)
+    template <typename to_find, typename... Ts>
     class index_of {
         template <auto distance_algorithm>
         consteval static auto impl()
-        {   
+        {
             using ArgsAsTuple = pack_arguments_as_t<std::tuple, Ts...>;
-            constexpr auto index = []<std::size_t... I>(std::index_sequence<I...>) consteval
+            constexpr auto index = []<std::size_t... I>(std::index_sequence<I...>) constexpr
             {
                 constexpr auto matches = std::array{std::is_same_v<to_find, std::tuple_element_t<I, ArgsAsTuple>>...};
                 static_assert(
@@ -89,11 +162,11 @@ namespace gcl::mp::type_traits
             return index;
         }
 
-        constexpr static auto from_begin = []<class ContainerType>(ContainerType container) consteval
+        constexpr static auto from_begin = []<class ContainerType>(ContainerType container) constexpr
         {
             return std::distance(std::cbegin(container), std::find(std::cbegin(container), std::cend(container), true));
         };
-        constexpr static auto from_end = []<class ContainerType>(ContainerType container) consteval
+        constexpr static auto from_end = []<class ContainerType>(ContainerType container) constexpr
         {
             return std::size(container) - 1 -
                    std::distance(
@@ -105,51 +178,19 @@ namespace gcl::mp::type_traits
         constexpr static inline auto first_value = value;
         constexpr static inline auto last_value = impl<from_end>();
     };
+#endif
 
-    template <typename to_find, typename ... Ts>
+    template <typename to_find, typename... Ts>
     constexpr inline auto index_of_v = index_of<to_find, Ts...>::value;
-    template <typename to_find, typename ... Ts>
+    template <typename to_find, typename... Ts>
     constexpr inline auto first_index_of_v = index_of<to_find, Ts...>::first_value;
-    template <typename to_find, typename ... Ts>
+    template <typename to_find, typename... Ts>
     constexpr inline auto last_index_of_v = index_of<to_find, Ts...>::last_value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
     template <typename T, typename... Ts>
     constexpr inline auto contains_v = contains<T, Ts...>::value;
-
-    template <class T>
-    class reverse
-    {
-        static_assert(gcl::mp::type_traits::is_template_v<T>);
-
-        template <template <typename...> class Type, typename ... Ts>
-        constexpr static auto impl(Type<Ts...>) 
-        {   // todo : gcl::mp::utility::reverse_index_sequence / gcl::mp::utility::make_reverse_index_sequence
-            return []<std::size_t ... indexes>(std::index_sequence<indexes...>) constexpr {
-                // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
-                using Ts_as_tuple = std::tuple<Ts...>;
-                using return_type = Type<std::tuple_element_t<sizeof...(indexes) - 1 - indexes, Ts_as_tuple>...>;
-                return std::declval<return_type>();
-            }(std::make_index_sequence<sizeof...(Ts)>{});
-        }
-        template <template <auto...> class Type, auto... values>
-        constexpr static auto impl(Type<values...>)
-        {
-            return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr {
-                // todo : consteval (works with GCC 10.2 and Clang 11.0.1, not MSVC)
-                constexpr auto Ts_as_tuple = std::tuple{values...};
-                using return_type = Type<std::get<sizeof...(indexes) - 1 - indexes>(Ts_as_tuple)...>;
-                return std::declval<return_type>();
-            }
-            (std::make_index_sequence<sizeof...(values)>{});
-        }
-
-        public:
-            using type = decltype(impl(std::declval<T>()));
-    };
-    template <class T>
-    using reverse_t = typename reverse<T>::type;
 
     template <typename T, template <typename> typename trait>
     struct filters;
@@ -176,22 +217,22 @@ namespace gcl::mp
         using type = T<Ts...>;
         using reverse_type = typename gcl::mp::type_traits::reverse_t<type>;
         template <template <class...> class template_type = std::tuple>
-        using arguments_as = type_traits::pack_arguments_as_t<template_type, type>;
+        using arguments_as = type_traits::template pack_arguments_as_t<template_type, type>;
         template <size_t N>
         using type_at = type_traits::type_at_t<N, Ts...>; // typename std::tuple_element<N, arguments>::type;
 
         template <typename U>
         static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments_as<>>;
         template <typename U>
-        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, arguments_as<>>;
+        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, Ts...>;
         template <typename U>
         static constexpr inline auto last_index_of_v = gcl::mp::type_traits::last_index_of_v<U, arguments_as<>>;
 
         static constexpr inline auto size = std::tuple_size_v<arguments_as<std::tuple>>;
         template <typename U>
-        static constexpr inline auto contains = type_traits::contains_v<U, Ts...>;
+        static constexpr inline /*auto*/ bool contains = type_traits::contains_v<U, Ts...>;
         template <template <class...> class template_type>
-        static inline constexpr auto is_instance_of_v = type_traits::is_instance_of_v<type, template_type>;
+        static inline constexpr /*auto*/ bool is_instance_of_v = type_traits::is_instance_of_v<type, template_type>;
 
         template <template <typename> typename trait>
         using satisfy_trait_t = std::conjunction<trait<Ts>...>;
@@ -211,13 +252,8 @@ namespace gcl::mp
     template <template <typename...> class base_type, typename... Ts>
     struct partial {
         // differs type instanciation with partial template-type parameters
-        #if __clang__
         template <typename... Us>
-        using type = base_type<Ts..., Us...>;
-        #else
-        template <typename... Us, typename = std::enable_if_t<(sizeof...(Us) >= 1)>>
-        using type = base_type<Ts..., Us...>;
-        #endif
+        requires(sizeof...(Us) >= 1) using type = base_type<Ts..., Us...>;
     };
 }
 
@@ -238,7 +274,6 @@ namespace gcl::mp::type_traits::tests
             gcl::mp::type_traits::transform_t<type_container, std::remove_reference_t>>
         );
     }
-
     namespace pack_arguments
     {
         template <typename... Ts>
@@ -291,9 +326,15 @@ namespace gcl::mp::type_traits::tests
         struct pack {};
 
         using type_pack = pack<int, double, char, float>;
+        // average case
         static_assert(gcl::mp::type_traits::index_of_v<char, type_pack> == 2);
         static_assert(gcl::mp::type_traits::index_of_v<char, 
             int, double, char, float> == 2);
+        // corner cases
+        static_assert(gcl::mp::type_traits::index_of_v<int, type_pack> == 0);
+        static_assert(gcl::mp::type_traits::index_of_v<int, int, double, char, float> == 0);
+        static_assert(gcl::mp::type_traits::index_of_v<float, type_pack> == 3);
+        static_assert(gcl::mp::type_traits::index_of_v<float, int, double, char, float> == 3);
     }
     namespace reverse
     {
@@ -345,9 +386,15 @@ namespace gcl::mp::tests::pack_traits
     using pack_type_with_repetitions = pack_type<int, char, double, int, char>;
     using pack_type_with_repetitions_trait = gcl::mp::pack_traits<pack_type_with_repetitions>;
 
+    // Clang error :
+    //  - error: invalid operands to binary expression ('const auto' and 'int')
+    //  see https://stackoverflow.com/questions/67127710/clang-invalid-operands-to-binary-expression-const-auto-and-int-with-cons
+    //  see https://stackoverflow.com/questions/67123073/clang-constexpr-function-evaluation
+    #if not __clang__
     static_assert(pack_type_with_repetitions_trait::index_of_v<char> == 1);
     static_assert(pack_type_with_repetitions_trait::first_index_of_v<char> == 1);
     static_assert(pack_type_with_repetitions_trait::last_index_of_v<char> == 4);
+    #endif
 
     namespace filters
     {
