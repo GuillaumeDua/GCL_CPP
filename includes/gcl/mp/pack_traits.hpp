@@ -45,6 +45,19 @@ namespace gcl::mp::type_traits
     template <std::size_t N, typename... Ts>
     using type_at_t = typename type_at<N, Ts...>::type;
 
+    template <typename T, typename... Ts>
+    struct count_of {
+        constexpr inline static auto value = []<typename ... Us>(std::tuple<Us...>) constexpr
+        {
+            std::size_t index{0};
+            ((std::is_same_v<T, Us> ? ++index : 0), ...);
+            return index;
+        }
+        (gcl::mp::type_traits::pack_arguments_as_t<std::tuple, Ts...>{});
+    };
+    template <typename T, typename... Ts>
+    constexpr inline auto count_of_v = count_of<T, Ts...>::value;
+
     template <typename T, template <typename> typename transformation>
     struct transform;
     template <template <typename...> typename TypePack, template <typename> typename transformation, typename... Ts>
@@ -264,6 +277,9 @@ namespace gcl::mp::type_traits::tests
 
     static_assert(gcl::mp::partial<std::is_same, int>::type<int>::value);
     static_assert(gcl::mp::partial<std::is_same>::type<int, int>::value);
+
+    static_assert(gcl::mp::type_traits::count_of_v<int, char, double, int, char> == 1);
+    static_assert(gcl::mp::type_traits::count_of_v<int, std::tuple<char, double, int, char>> == 1);
 
     namespace transform
     {
