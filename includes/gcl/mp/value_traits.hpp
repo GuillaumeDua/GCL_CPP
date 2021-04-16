@@ -13,7 +13,7 @@ namespace gcl::mp::value_traits
     template <auto... values>
     requires(std::equality_comparable_with<
              decltype(std::get<0>(std::tuple{values...})),
-             decltype(values)>&&...) constexpr static auto equal_v = []() consteval
+             decltype(values)>&&...) constexpr auto equal_v = []() consteval
     {
         return ((values == std::get<0>(std::tuple{values...})) && ...);
     }
