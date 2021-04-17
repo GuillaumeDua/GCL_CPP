@@ -120,7 +120,7 @@ namespace gcl::mp::type_traits
 
 #if __clang__
 #pragma message(                                                                                                       \
-    "gcl::mp::type_traits::index_of : swtiching to clang-specific implementation ... (see details in comment)")
+    "gcl::mp::type_traits::index_of : switching to clang-specific implementation ... (see details in comment)")
     // Clang specific implementation, that use recursion instead of parameter-pack expansion,
     //  as Clang 12.0.0 does not correctly evaluate some expressions/functions as constexpr
     // (recursive implementation)
