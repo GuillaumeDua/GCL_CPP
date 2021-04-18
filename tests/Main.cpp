@@ -1,5 +1,3 @@
-// #define _GCL_DEBUG
-
 // static tests
 #include <gcl/mp/mp.hpp>
 #include <gcl/cx/cx.hpp>
@@ -40,3 +38,6 @@ auto main(int, char const*[]) -> int
 
     return 0;
 }
+
+// todo : 1 component -> 1 cmake component
+// todo : dependency graph visualization
