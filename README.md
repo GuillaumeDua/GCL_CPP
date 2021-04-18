@@ -4,6 +4,12 @@
 
 ---
 
+Status
+
+[![MSBuild](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
+
+---
+
 This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier.
 
 Each **component** *(split by namespace)* aims to be :
