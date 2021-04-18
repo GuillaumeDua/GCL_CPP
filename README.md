@@ -1,6 +1,6 @@
 # **GCL C++**
 
-[**WIP** : v1 -> v2 milestone](https://github.com/GuillaumeDua/GCL_CPP/milestone/2) for details
+:construction: **WIP** : [v1 -> v2](https://github.com/GuillaumeDua/GCL_CPP/milestone/2)
 
 ---
 
