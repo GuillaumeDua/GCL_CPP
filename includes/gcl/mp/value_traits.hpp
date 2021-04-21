@@ -1,6 +1,10 @@
 #pragma once
 
 #include <gcl/mp/concepts.hpp>
+#include <concepts>
+#include <utility>
+#include <tuple>
+#include <type_traits>
 
 namespace gcl::mp::value_traits
 {
@@ -12,7 +16,7 @@ namespace gcl::mp::value_traits
     template <auto... values>
     requires(std::equality_comparable_with<
              decltype(std::get<0>(std::tuple{values...})),
-             decltype(values)>&&...) constexpr static auto equal_v = []() consteval
+             decltype(values)>&&...) constexpr auto equal_v = []() consteval
     {
         return ((values == std::get<0>(std::tuple{values...})) && ...);
     }
@@ -28,6 +32,7 @@ namespace gcl::mp::value_traits
     constexpr inline auto not_equal_v = not equal_v<values...>;
 }
 #include <cstdint>
+#include <climits>
 namespace gcl::mp::value_traits
 {
     template <typename T>
@@ -67,7 +72,7 @@ namespace gcl::mp::value_traits::tests::equal
 #include <limits>
 namespace gcl::mp::value_traits::tests
 {
-    static void bit_size_v()
+    [[maybe_unused]] void bit_size_v()
     {
         if constexpr (gcl::mp::system_info::is_x64)
         {   // might be wrong, depending on the target/plateform
@@ -83,7 +88,7 @@ namespace gcl::mp::value_traits::tests
             static_assert(gcl::mp::value_traits::bit_size_v<uint64_t> == 64);
         }
     }
-    static void values_count()
+    [[maybe_unused]] void values_count()
     {
         if constexpr (gcl::mp::system_info::is_x64)
         { // might be wrong, depending on the target/plateform

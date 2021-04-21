@@ -145,6 +145,7 @@ namespace gcl::mp::type_traits::tests::if_t
     {
         { T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
         { type_traits::if_t<T::color == decltype(T::color)::red>{}} -> std::same_as<std::true_type>;
+        // equivalent to : `requires (T::color == decltype(T::color)::red);`
     };
     enum colors { red, blue, green };
     struct smthg_blue { constexpr static auto color = colors::blue; };
@@ -174,11 +175,11 @@ namespace gcl::mp::type_traits::tests::trait_results
     static_assert(expected_result_as_bitset[2] == results::as_bitset_v[2]);
 
     using results_as_tuple = results::as_t<std::tuple>;
-    using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
 
     #if not defined(__clang__)
     // See my Q on SO :
     //  https://stackoverflow.com/questions/66821952/clang-error-implicit-instantiation-of-undefined-template-stdtuple-sizeauto/66822584
+    using results_as_tuple_value_type = std::decay_t<decltype(results::as_v<std::tuple>)>;
     static_assert(std::tuple_size_v<results_as_tuple> == std::tuple_size_v<results_as_tuple_value_type>); // clang and clang-cl complain here
 
     using expected_result_type = std::tuple<
