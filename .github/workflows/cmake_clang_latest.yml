@@ -22,8 +22,9 @@ jobs:
       run: |
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         sudo update-alternatives \
-          --install /usr/bin/clang clang /usr/bin/clang-12 100 \
-          --slave /usr/bin/clang++ clang++ /usr/bin/clang++-12
+          --install /usr/bin/clang clang /usr/bin/clang-12 100
+        sudo update-alternatives \
+          --install /usr/bin/clang++ clang++ /usr/bin/clang++-12
         sudo apt install libc++1-12 libc++-12-dev libc++abi-12-dev libc++abi1-12 # warning : erase other versions !
 
 
