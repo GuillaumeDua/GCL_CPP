@@ -1,13 +1,11 @@
 # **GCL C++**
 
+[![CMake_Clang_latest](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_clang_latest.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_clang_latest.yml)
+[![CMake_GCC_10](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_gcc_10.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_gcc_10.yml)
+[![MSBuild](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
+
 :construction: **WIP** : [v1 -> v2](https://github.com/GuillaumeDua/GCL_CPP/milestone/2)
 
----
-
-Status
-
-[![MSBuild](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
-[![CMake](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake.yml)
 ---
 
 This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier.
