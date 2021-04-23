@@ -11,6 +11,12 @@ namespace gcl::concepts
     template <typename T>
     concept function =
         std::is_function_v<T> or std::is_function_v<std::remove_pointer_t<T>> or std::is_member_function_pointer_v<T>;
+
+    template <typename... Ts>
+    concept have_common_type = requires()
+    {
+        std::common_type_t<Ts...>{};
+    };
 }
 
 namespace gcl::concepts::tests

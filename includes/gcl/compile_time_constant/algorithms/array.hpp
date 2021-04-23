@@ -1,19 +1,12 @@
 #pragma once
 
+#include <gcl/concepts.hpp>
+
 #include <array>
 #include <tuple>
 #include <type_traits>
 #include <concepts>
 #include <algorithm>
-
-namespace gcl::concepts
-{
-    template <typename... Ts>
-    concept have_common_type = requires()
-    {
-        std::common_type_t<Ts...>{};
-    };
-}
 
 namespace gcl::ctc::algorithms::array
 {
