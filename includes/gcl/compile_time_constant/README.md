@@ -50,7 +50,7 @@ static_assert(values == expected_result);
 
 ### **`gcl::ctc::algorithms::tuple`**
 
-| File | Element name | Description | example |
-| ---- | ------------ | ----------- | ------- |
-| `gcl/algorithms/ranges.hpp` | gcl::algorithms::ranges::is_in_range(Range, input) | return true if `intput` is in `range` | `is_in_range({1,2,3}, 2) == true` |
-| `gcl/algorithms/ranges.hpp` | gcl::algorithms::ranges::is_in_range(RangeIt, RangeIt, InputIt) | same as above, but using `begin`, `end` iterators | |
+| Element name | Description | example |
+| ------------ | ----------- | ------- |
+| tuple::tuple_to_std_array(TupleType value) | convert `value` into a  | `is_in_range({1,2,3}, 2) == true` |
+
