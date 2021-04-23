@@ -92,6 +92,16 @@ None.
 
 None.
 
+## STL implementations support
+
+### **`libstdc++`**
+
+None.
+
+### **`libc++`**
+
+Broken on release prior to 13 (requires concepts implementations)
+
 ### About the name
 
 > `GCL` stands for `Guss's Common Library`

@@ -135,7 +135,7 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(type_traits::if_v<true> == true);
     static_assert(type_traits::if_v<false> == false);
 }
-#if __cpp_concepts
+
 #include <concepts>
 namespace gcl::mp::type_traits::tests::if_t
 {
@@ -155,7 +155,7 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(not is_red_colored<smthg_blue>);
     static_assert(is_red_colored<smthg_red>);
 }
-#endif
+
 namespace gcl::mp::type_traits::tests::merge_traits
 {
     using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
