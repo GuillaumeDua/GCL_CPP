@@ -37,8 +37,9 @@ namespace gcl::algorithms::tests::maths
     static_assert(gcl::algorithms::maths::distance(0, 0) == 0);
     static_assert(gcl::algorithms::maths::distance(-1, 1) == 2);
     static_assert(gcl::algorithms::maths::distance(1, -1) == 2);
+    constexpr unsigned char uchar_zero{0};
     static_assert(
-        gcl::algorithms::maths::distance(unsigned char{0}, std::numeric_limits<unsigned char>::max()) ==
+        gcl::algorithms::maths::distance(uchar_zero, std::numeric_limits<unsigned char>::max()) ==
         std::numeric_limits<unsigned char>::max());
 
     static_assert(gcl::algorithms::maths::abs(-1) == 1);
