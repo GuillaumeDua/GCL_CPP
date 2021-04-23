@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gcl/concepts.hpp>
+
 #include <tuple>
 #include <array>
 #include <algorithm>
@@ -89,6 +91,7 @@ namespace gcl::ctc::algorithms::tuple
     {
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
         {
+            static_assert(gcl::concepts::have_common_type<decltype(std::get<indexes>(tuple_value))...>);
             using element_type = std::common_type_t<decltype(std::get<indexes>(tuple_value))...>;
             return std::array<element_type, sizeof...(indexes)>{std::get<indexes>(tuple_value)...};
         }
