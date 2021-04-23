@@ -79,10 +79,16 @@ Also, a warning will be generated at compile-time accordingly.*
 
 #### **`Clang`** / **`Clang-CL`**
 
-| File | Element | Description |
+| File      | Element | Description |
 | --------- | ------- | ----------- |
 | gcl/mp/pack_traits.hpp | `gcl::mp::type_traits::index_of<T, Ts...>` | uses an alternative implementation that use recursion, in opposition to other compilers |
 | gcl/mp/pack_traits.hpp | `gcl::mp::pack_traits<...>::index_of_v`<br>`gcl::mp::pack_traits<...>::first_index_of_v`<br>`gcl::mp::pack_traits<...>::last_index_of_v` | Known limitation of Clang 12.0.0<br>*Invalid operands to binary expression ('const auto' and 'int')* |
+
+#### **`Clang-CL`**
+
+| File      | Element | Description |
+| --------- | ------- | ----------- |
+| gcl/cx/array.hpp | `gcl::cx::array::remove_duplicates_v<datas>` | a non-type template parameter cannot have type 'std::array<T, N>' |
 
 #### **`GCC`**
 
