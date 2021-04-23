@@ -38,30 +38,24 @@ namespace gcl::mp::concepts
 }
 namespace gcl::mp::type_tag
 {
-    template <concepts::tag_type ... tag_arguments>
-    class add_tags
-    {
+    template <concepts::tag_type... tag_arguments>
+    class add_tags {
         template <concepts::tag_type tag>
-            requires ((std::same_as<tag, tag_arguments> || ...))
-        struct add_single_tag
-        {
-            constexpr static typename tag::value_type get_value(typename tag::value_type)
-            {
-                return tag::value;
-            }
+        requires((std::same_as<tag, tag_arguments> || ...)) struct add_single_tag {
+            constexpr static typename tag::value_type get_value(typename tag::value_type) { return tag::value; }
         };
 
-    public:
-        class type : add_single_tag<tag_arguments>...
-        {
+      public:
+        class type : add_single_tag<tag_arguments>... {
             using add_single_tag<tag_arguments>::get_value...;
-        public:
+
+          public:
             template <typename T>
             constexpr static T value = get_value(T{});
-        };    
+        };
     };
 
-    template <concepts::tag_type ... tag_arguments>
+    template <concepts::tag_type... tag_arguments>
     using add_tags_t = typename add_tags<tag_arguments...>::type;
 }
 
