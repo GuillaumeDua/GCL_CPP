@@ -90,6 +90,7 @@ namespace gcl::mp::type_traits
 }
 
 //  tests
+#include <string>
 namespace gcl::mp::type_traits::tests::is_template
 {
     static_assert(gcl::mp::type_traits::is_template_v<std::tuple<int, char>>);
@@ -143,7 +144,7 @@ namespace gcl::mp::type_traits::tests::if_t
     template <typename T>
     concept is_red_colored = requires(T)
     {
-        { T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
+        //{ T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
         { type_traits::if_t<T::color == decltype(T::color)::red>{}} -> std::same_as<std::true_type>;
         // equivalent to : `requires (T::color == decltype(T::color)::red);`
     };
