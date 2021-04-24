@@ -7,14 +7,15 @@ assignees: ''
 
 ---
 
-** Component name **
+**Component name**
 
-*(ex : `gcl::mp::function_traits`)*
+*(ex : `gcl::mp::function_traits`. use `gcl` if your issue impacts the whole library)*
 
 **Context** 
 
 - OS : *(ex : Ubuntu 20.04)*
-- Compiler name + release : *(ex : `Clang 11.0.1`)*
+- Configuration(s) : *(ex : x64-RelWithDebInfos)*
+- Compiler(s) name + release : *(ex : `Clang 11.0.1`)*
 - Runtime or compile-time issue ?
   - [ ] Compile time issue
   - [ ] Runtime issue
