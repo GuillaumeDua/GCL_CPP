@@ -22,7 +22,7 @@ namespace gcl::container
 
         void ensure_is_valid()
         {
-            if (std::size(storage) == 0 or std::begin(storage).first != std::numeric_limits<key_type>::lowest())
+            if (std::size(_storage) == 0 or std::begin(_storage).first != std::numeric_limits<key_type>::lowest())
                 throw std::runtime_error{"gcl::container::range_map::ensure_is_valid"};
             for (auto it = std::next(std::cbegin(_storage)); it != std::cend(_storage); ++it)
             {
@@ -32,9 +32,9 @@ namespace gcl::container
         }
 
       public:
-        using key_type = storage_type::key_type;
-        using mapped_type = storage_type::mapped_type;
-        using value_type = storage_type::value_type;
+        using key_type = typename storage_type::key_type;
+        using mapped_type = typename storage_type::mapped_type;
+        using value_type = typename storage_type::value_type;
 
         range_map(mapped_type&& value)
         {
