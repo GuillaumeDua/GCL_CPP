@@ -125,7 +125,7 @@
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS=-stdlib=stdlibc++",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS=-stdlib=libstdc++",
       "variables": [
         {
           "name": "GCL_BUILD_TEST",
