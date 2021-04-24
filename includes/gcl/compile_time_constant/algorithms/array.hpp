@@ -63,7 +63,7 @@ namespace gcl::ctc::algorithms::array
             std::copy(end, std::end(values), std::next(it));
         }
         // std::unique()
-        auto unique_end = [&values]() consteval
+        auto unique_end = [&values]() constexpr //consteval (Clang does not allow consteval in constant expression)
         {
             std::size_t i{1};
             while (i < std::size(values) and values.at(i - 1) < values.at(i))
