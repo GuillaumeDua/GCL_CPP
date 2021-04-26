@@ -60,7 +60,7 @@ namespace gcl::container
                 std::begin(args),
                 std::end(args),
                 std::inserter(_storage, std::end(_storage)),
-                [previous_value = std::optional<mapped_type>{std::nullopt}, &args, this](const auto& element) mutable {
+                [previous_value = std::optional<mapped_type>{std::nullopt}, this](const auto& element) mutable {
 
                 const bool result = previous_value
                         ? *previous_value == element.second
@@ -193,7 +193,7 @@ namespace gcl::container::test::interval_map
                 {std::numeric_limits<decltype(value)::key_type>::lowest(), "a"}, {5U, "X"}, {10U, "a"}};
             if (value.storage() not_eq expected)
             {
-                for (const auto [el_key, el_value] : value.storage())
+                for (const auto & [el_key, el_value] : value.storage())
                 {
                     std::cout << " - [" << el_key << "] -> [" << el_value << "]\n";
                 }
