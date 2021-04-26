@@ -24,7 +24,7 @@ namespace gcl::cx::typeinfo
     template <typename T>
     static constexpr /*consteval*/ std::string_view type_name(/*no parameters allowed*/)
     {
-#if defined(__GNUC__)
+#if defined(__GNUC__) or defined(__clang__)
         std::string_view str_view = __PRETTY_FUNCTION__;
         str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
         const char prefix[] = "T = ";
@@ -52,7 +52,7 @@ namespace gcl::cx::typeinfo
     template <auto value>
     static constexpr std::string_view value_name(/*no parameters allowed*/)
     {
-#if defined(__GNUC__)
+#if defined(__GNUC__) or defined(__clang__)
         std::string_view str_view = __PRETTY_FUNCTION__;
         str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
         const char prefix[] = "value = ";
@@ -111,10 +111,10 @@ namespace gcl::cx::typeinfo::test
 {
      // basic type
      static_assert(gcl::cx::typeinfo::type_name<int(42)>() == "int");
-#if defined(_MSC_VER)
-     static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "0x2a");
-#else
+#if defined(__GNUC__) or defined(__clang__)
      static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "42");
+#else
+     static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "0x2a");
 #endif
      
      // namespace, scoped
