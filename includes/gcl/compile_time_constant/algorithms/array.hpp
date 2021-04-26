@@ -89,7 +89,7 @@ namespace gcl::ctc::tests::algorithms::array::deduplicate
     // MSVC/CL does not consider deduplicate calls as constexpr ...
     // static_assert(gcl::ctc::deduplicate<'b', 'a', 'c', 'a', 'c', 'b', 'b'>() == std::array{'a', 'b', 'c'});
 
-    static void by_values()
+    [[maybe_unused]] static void by_values()
     {
         namespace ctc_array_algorithms = gcl::ctc::algorithms::array;
         constexpr auto values = []() consteval
@@ -105,7 +105,7 @@ namespace gcl::ctc::tests::algorithms::array::deduplicate
         static_assert(std::is_same_v<decltype(values), decltype(expected_result)>);
         static_assert(values == expected_result);
     }
-    static void by_values_heterogenous()
+    [[maybe_unused]] static void by_values_heterogenous()
     {
         namespace ctc_array_algorithms = gcl::ctc::algorithms::array;
         constexpr auto values = []() consteval

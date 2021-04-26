@@ -113,7 +113,6 @@ namespace gcl::ctc::algorithms::tuple
         requires(size >= N)
     constexpr auto tuple_remove_suffix(std::array<ElementType, size> tuple_value)
     {
-        using tuple_t = std::array<ElementType, size>;
         return [&tuple_value]<std::size_t... indexes>(std::index_sequence<indexes...>)
         {
             return std::array{std::get<indexes>(tuple_value)...};
