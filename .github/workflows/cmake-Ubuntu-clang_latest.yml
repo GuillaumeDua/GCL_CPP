@@ -24,8 +24,8 @@ jobs:
           --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
         sudo apt install libc++1-12 libc++-12-dev libc++abi-12-dev libc++abi1-12 # warning : erase other versions !
 
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{github.workspace}}/build
+    - name: cmake create build env - ${{matrix.BUILD_TYPE}}
+      run: cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
       
     - name: cmake cache - ${{matrix.BUILD_TYPE}}
       shell: bash
