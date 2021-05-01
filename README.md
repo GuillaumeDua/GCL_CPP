@@ -2,7 +2,7 @@
 
 [![Ubuntu CMake Clang latest](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-clang_latest.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-clang_latest.yml)
 [![Ubuntu CMake GCC 10](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-gcc_10.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-gcc_10.yml)
-[![Windows MSBuild x64](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
+[![MSBuild-Windows-CL_latest](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/MSBuild-Windows-CL_latest.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/MSBuild-Windows-CL_latest.yml)
 [![Windows CMake ClangCL](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Windows-ClangCL.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Windows-ClangCL.yml)
 
 :construction: **WIP** : [see milestone v1 -> v2](https://github.com/GuillaumeDua/GCL_CPP/milestone/2)
