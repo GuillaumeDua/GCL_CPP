@@ -22,9 +22,9 @@ namespace gcl::container
 
         void ensure_is_valid()
         {
-            if (std::size(storage) == 0 or std::begin(storage).first != std::numeric_limits<key_type>::lowest())
+            if (std::size(_storage) == 0 or std::begin(_storage).first != std::numeric_limits<key_type>::lowest())
                 throw std::runtime_error{"gcl::container::range_map::ensure_is_valid"};
-            for (auto it = std::next(std::cbegin()); it != std::cend(); ++it)
+            for (auto it = std::next(std::cbegin(_storage)); it != std::cend(_storage); ++it)
             {
                 if (std::prev(it)->first == it->first)
                     throw std::runtime_error{"gcl::container::range_map::ensure_is_valid"};
@@ -32,9 +32,9 @@ namespace gcl::container
         }
 
       public:
-        using key_type = storage_type::key_type;
-        using mapped_type = storage_type::mapped_type;
-        using value_type = storage_type::value_type;
+        using key_type = typename storage_type::key_type;
+        using mapped_type = typename storage_type::mapped_type;
+        using value_type = typename storage_type::value_type;
 
         range_map(mapped_type&& value)
         {
@@ -60,7 +60,7 @@ namespace gcl::container
                 std::begin(args),
                 std::end(args),
                 std::inserter(_storage, std::end(_storage)),
-                [previous_value = std::optional<mapped_type>{std::nullopt}, &args, this](const auto& element) mutable {
+                [previous_value = std::optional<mapped_type>{std::nullopt}, this](const auto& element) mutable {
 
                 const bool result = previous_value
                         ? *previous_value == element.second
@@ -193,7 +193,7 @@ namespace gcl::container::test::interval_map
                 {std::numeric_limits<decltype(value)::key_type>::lowest(), "a"}, {5U, "X"}, {10U, "a"}};
             if (value.storage() not_eq expected)
             {
-                for (const auto [el_key, el_value] : value.storage())
+                for (const auto & [el_key, el_value] : value.storage())
                 {
                     std::cout << " - [" << el_key << "] -> [" << el_value << "]\n";
                 }

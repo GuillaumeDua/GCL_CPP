@@ -90,6 +90,7 @@ namespace gcl::mp::type_traits
 }
 
 //  tests
+#include <string>
 namespace gcl::mp::type_traits::tests::is_template
 {
     static_assert(gcl::mp::type_traits::is_template_v<std::tuple<int, char>>);
@@ -135,7 +136,7 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(type_traits::if_v<true> == true);
     static_assert(type_traits::if_v<false> == false);
 }
-#if __cpp_concepts
+
 #include <concepts>
 namespace gcl::mp::type_traits::tests::if_t
 {
@@ -143,7 +144,7 @@ namespace gcl::mp::type_traits::tests::if_t
     template <typename T>
     concept is_red_colored = requires(T)
     {
-        { T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
+        //{ T::color == decltype(T::color)::red } -> std::convertible_to<bool>;
         { type_traits::if_t<T::color == decltype(T::color)::red>{}} -> std::same_as<std::true_type>;
         // equivalent to : `requires (T::color == decltype(T::color)::red);`
     };
@@ -155,7 +156,7 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(not is_red_colored<smthg_blue>);
     static_assert(is_red_colored<smthg_red>);
 }
-#endif
+
 namespace gcl::mp::type_traits::tests::merge_traits
 {
     using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;

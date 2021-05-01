@@ -53,7 +53,15 @@ namespace gcl::functional::tests::type_traits
     static_assert(gcl::functional::type_traits::is_overload_v<gcl::functional::overload<>>);
     static_assert(not gcl::functional::type_traits::is_overload_v<std::function<void()>>);
 
+    #if defined(__clang__)
+    [[maybe_unused]] auto overload_value = gcl::functional::overload{[](int) {}, []() {}, [](char, double) {}};
+    using overload_type = decltype(overload_value);
+    #else
     using overload_type = decltype(gcl::functional::overload{[](int) {}, []() {}, [](char, double) {}});
+    #endif
+
+
+
     using overload_type_arguments_t = gcl::functional::type_traits::overload_arguments_t<overload_type>;
     static_assert(std::tuple_size_v<overload_type_arguments_t> == 3);
     static_assert(std::is_same_v<std::tuple_element_t<0, overload_type_arguments_t>, std::tuple<int>>);

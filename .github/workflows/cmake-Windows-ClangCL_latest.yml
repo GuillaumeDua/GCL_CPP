@@ -1,0 +1,44 @@
+name: cmake-Windows-ClangCL
+
+on: [push, pull_request]
+
+env:
+  SOLUTION_FILE_PATH: .
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    strategy:
+        matrix:
+            BUILD_TYPE: [Debug, Release]
+            ARCH: [Win32, x64]
+            GENERATOR: ["Visual Studio 16 2019"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: cmake create build env - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
+      run: cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+
+    - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
+      working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+      run: cmake
+        -S ${{github.workspace}}
+        -B .
+        -G "${{matrix.GENERATOR}}"
+        -A ${{matrix.ARCH}}
+        -T ClangCL
+        -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+        #-Dgcl_cpp_BUILD_TEST=On
+
+    - name: cmake build - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
+      working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+      run: cmake
+        --build .
+        --config ${{matrix.BUILD_TYPE}}
+        --parallel 10
+
+    #- name: test
+    #  run: cd build ; ctest -j 10 -C Debug --output-on-failure

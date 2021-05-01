@@ -117,8 +117,11 @@ namespace gcl::cx::array::literals::tests::operator_std_array
 namespace gcl::cx::tests::array
 {
     constexpr auto datas = std::array{'a', 'b', 'a', 'c', 'a'};
+#if (defined(__clang__)) // not Clang nor Clang-CL
+#else
     static_assert(std::is_same_v<std::array<char, 3>, gcl::cx::array::remove_duplicates_t<datas>>);
     static_assert(gcl::cx::array::remove_duplicates_v<datas> == std::array{'a', 'b', 'c'});
+#endif
     static_assert(gcl::cx::array::to_array('a', 'b', 'c') == std::array{'a', 'b', 'c'});
     static_assert(gcl::cx::array::to_array<'a', 'b', 'c'>() == std::array{'a', 'b', 'c'});
 }

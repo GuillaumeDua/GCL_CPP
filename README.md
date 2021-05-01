@@ -1,67 +1,114 @@
 # **GCL C++**
 
-[![CMake_Clang_latest](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_clang_latest.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_clang_latest.yml)
-[![CMake_GCC_10](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_gcc_10.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake_gcc_10.yml)
-[![MSBuild](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg?branch=master&event=push)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
+[![Ubuntu CMake Clang latest](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-clang_latest.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-clang_latest.yml)
+[![Ubuntu CMake GCC 10](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-gcc_10.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Ubuntu-gcc_10.yml)
+[![Windows MSBuild x64](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/msbuild.yml)
+[![Windows CMake ClangCL](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Windows-ClangCL.yml/badge.svg)](https://github.com/GuillaumeDua/GCL_CPP/actions/workflows/cmake-Windows-ClangCL.yml)
 
-:construction: **WIP** : [v1 -> v2](https://github.com/GuillaumeDua/GCL_CPP/milestone/2)
+:construction: **WIP** : [see milestone v1 -> v2](https://github.com/GuillaumeDua/GCL_CPP/milestone/2)
 
 ---
 
 This **modern-C++**, **header-only library** is a stack of useful and convinient components that make my everyday projects & jobs way easier.
 
-Each **component** *(split by namespace)* aims to be :
+Each **component** *(spli by namespaces)* aims to be :
+
 - **easy-to-use**
 - **easy-to-maintain**
 - **powerful**
 
 > **NB :** This library is a never-ending WIP, as it matches needs according to the C++ standards and compilers implementations.  
-> Thus, many components only exists to fill STL holes, and so are likely to disappear when standard features are implemented *-and released-* in the standard and by compilers.  
-> *If at some point, a compiler does not support a specific feature, this information will be register as a limitation in-code comment*  
-> - Example : Clang 11.0.0 does not implement `"Lambdas in unevaluated contexts" (P0315R4)`
+> Thus, many components only exists to fill what I consider to be STL holes, and so are likely to disappear when standard features are implemented *-and released-* in the standard and by compilers.  
+
+## Build
+
+This library is header-only, meaning you only need to add `includes/gcl` to your include path.
+
+However, a `CMake` target exposes an `gcl_cpp` INTERFACE library target that you can integrate into your build.  
+
+Currently, the only available option is `gcl_cpp_BUILD_TEST` - which is set to `OFF` by default - that generates a binary to run runtime tests.
+
+## Tests
+
+As this library components are mainly template-metaprogramming or constexpr ones, most of the tests are processed at **`compile-time`**.  
+
+Currently, there is no option to disable compile-time tests.  
+*If you need such option, create a Github issue, or make a pull-request.*
+
+As mentioned in the previous section, a CMake target can be generate, when enabling the `gcl_cpp_BUILD_TEST` option.  
+However, it only cover runtime tests.
 
 ## Versions
 
 | Name | Description |
 | ---- | ----------- |
-| **`v2`** | **WIP** with C++17/2a implementations |
-| **`v1`** | **Legacy** tag that still exists for projects that depends on, but no longer maintain<br>Offers C++11/14/17 implementations in `gcl` namespace<br>as well as C++98/03 implementations in `gcl::deprecated` namespace |
+| **`v2`** | [WIP/refactoring](https://github.com/GuillaumeDua/GCL_CPP/milestone/2) to only use C++17/2a/20 implementations |
+| **`v1`** | **Legacy** tag that still exists for projects that depends on, but is no longer maintained<br>Offers C++11/14/17 implementations in `gcl` namespace<br>as well as C++98/03 implementations in `gcl::deprecated` namespace |
 
 ## Features
 
-### table-of-content :
-| **component** name                 | description                                                                                |
-|------------------------------------|--------------------------------------------------------------------------------------------|
-| `mp`                               | meta-programming functions *(partial template definition, require/constraints, ...)*       |
-| `tuple_utils`                      | functions to extend std::tuple functionalities.<br>*(type_at, index_of, for_each, ...)*    |
-| `test`                             | stand-alone test library                                                                   |
-| `pattern::ecs`                     | ECS (Entity Component System) design                                                       |
-| `container::component_aggregator`  | generic variadic CRTP + type-erasure                                                       |
-| `container::polymorphic_vector`    | contiguous container that store type-erased datas<br>allow per-type fast linear access<br>allow linear fast access as well     |
-| `container::entity_vector`         | same as container::polymorphic_vector<br>add per-properties fast linear access             |
-| `container::polymorphic_reference` | reference wrapper to type-erased value                                                     |
-| `container::linear_vector`         | wrapper to a std::vector<std::unique_ptr\<T\>><br>elements have constant memory place      |
-| `functionnal`                      | function traits,<br>bunch of functions to combine homogeneous/heterogenous functions       |
-| `introspection`                    | SFINAE detectors for nested types, class members, and functions                            |
-| `io`                               | basic std::ostream/std::istream wrapper                                                    |
-| `serialization`                    | generic serializer with static/dynamic polymorphism<br>see my [talk at CppFRug](https://github.com/cpp-frug/paris/tree/master/events/2017-01-19_n14/Serial)              |
-| `type_index`                       | static-to-dynamic and dynamic-to-static brige for class instanciation                      |
-| `type_info`                        | helpers to type informations<br>*(type_id, variadic_template::index_of, variadic_template::type_at, ... )*<br>and *constexpr std::string_view experimental::type_name\<T\>* |
-| `color`                            | colors for console output                                                                  |
+### table-of-content
 
-### incomplete
-| **component** name               | description                              |                   todo                          |
-|----------------------------------|------------------------------------------|-------------------------------------------------|
-| `io`                             | basic std::ostream/std::istream wrapper  |  merge with gcl\:\:poc\:\:fd_proxy              |
-| `maths`                          | basic maths functions                    |  C++17 refactoring / constexpr                  |
+| **component** name | description                                                                                |
+|--------------------|--------------------------------------------------------------------------------------------|
+| `mp`           | meta-programming elements to provide computation at compile-time       |
+| `cx`           | constexpr elements |
+| `ctc`          | compile-time constants.<br>mainly provides algorithms to manipulate `std::array` and `std::tuple` at compile-time |
+| `io`           | io manipulation, mainly for serialization |
+| `container`    | containers |
+| `pattern`      | mid-level design patterns, such as ECS |
+| [algorithms](./includes/gcl/algorithms/README.md)   | some algorithms |
+| `functional`   | function-related elements |
+| `concepts`     | concepts definition. Note that most concepts are defined within components they are related to.<br>For instance, `gcl::mp::concepts` and `gcl::io::concepts` |
 
-### other namespaces :
-| **component** name                 | description                                                                                |
-|------------------------------------|--------------------------------------------------------------------------------------------|
-| `gcl::<component_name>::experimental` | features that are still in development and may or may not work properly.<br>*(not fully tested, may rely on a language bug/hack, ...)* |
-| `gcl::test`                        | use for both `gcl::test` component, and all tests<br>*(e.g `gcl::test::<component_name>`)* |
-| `gcl::deprecated`                  | deprecated components implementation<br>*(c++0x, c++11)*<br>interface may change between a component like `gcl::deprecated::<component_name>` and `gcl::<component_name>` |
-| `gcl::old`                         | shameful C++98/0x components that are not supported anymore                                 |
 
-### About the name :
+## Compilers support
+
+This library aims to compile using the following compilers :
+
+- `GCC`
+- `Clang`
+- `MsVC-CL`
+- `MS Clang-CL`
+
+*If at some point, a compiler does not support a specific feature, this information will be register as a limitation in-code comment  
+Also, a warning will be generated at compile-time accordingly.*
+
+> - Example : `Clang 11.0.0` does not implement `"Lambdas in unevaluated contexts" (P0315R4)`
+
+### Currently known limitations
+
+#### **`Clang`** / **`Clang-CL`**
+
+| File      | Element | Description |
+| --------- | ------- | ----------- |
+| gcl/mp/pack_traits.hpp | `gcl::mp::type_traits::index_of<T, Ts...>` | uses an alternative implementation that use recursion, in opposition to other compilers |
+| gcl/mp/pack_traits.hpp | `gcl::mp::pack_traits<...>::index_of_v`<br>`gcl::mp::pack_traits<...>::first_index_of_v`<br>`gcl::mp::pack_traits<...>::last_index_of_v` | Known limitation of Clang 12.0.0<br>*Invalid operands to binary expression ('const auto' and 'int')* |
+
+#### **`Clang-CL`**
+
+| File      | Element | Description |
+| --------- | ------- | ----------- |
+| gcl/cx/array.hpp | `gcl::cx::array::remove_duplicates_v<datas>` | a non-type template parameter cannot have type 'std::array<T, N>' |
+
+#### **`GCC`**
+
+None.
+
+#### **`MsVC-CL`**
+
+None.
+
+## STL implementations support
+
+### **`libstdc++`**
+
+None.
+
+### **`libc++`**
+
+Broken on release prior to 13 (requires concepts implementations)
+
+### About the name
+
 > `GCL` stands for `Guss's Common Library`

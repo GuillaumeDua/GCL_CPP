@@ -1,19 +1,12 @@
 #pragma once
 
+#include <gcl/concepts.hpp>
+
 #include <array>
 #include <tuple>
 #include <type_traits>
 #include <concepts>
 #include <algorithm>
-
-namespace gcl::concepts
-{
-    template <typename... Ts>
-    concept have_common_type = requires()
-    {
-        std::common_type_t<Ts...>{};
-    };
-}
 
 namespace gcl::ctc::algorithms::array
 {
@@ -70,7 +63,7 @@ namespace gcl::ctc::algorithms::array
             std::copy(end, std::end(values), std::next(it));
         }
         // std::unique()
-        auto unique_end = [&values]() consteval
+        auto unique_end = [&values]() constexpr //consteval (Clang does not allow consteval in constant expression)
         {
             std::size_t i{1};
             while (i < std::size(values) and values.at(i - 1) < values.at(i))
@@ -96,7 +89,7 @@ namespace gcl::ctc::tests::algorithms::array::deduplicate
     // MSVC/CL does not consider deduplicate calls as constexpr ...
     // static_assert(gcl::ctc::deduplicate<'b', 'a', 'c', 'a', 'c', 'b', 'b'>() == std::array{'a', 'b', 'c'});
 
-    static void by_values()
+    [[maybe_unused]] static void by_values()
     {
         namespace ctc_array_algorithms = gcl::ctc::algorithms::array;
         constexpr auto values = []() consteval
@@ -112,7 +105,7 @@ namespace gcl::ctc::tests::algorithms::array::deduplicate
         static_assert(std::is_same_v<decltype(values), decltype(expected_result)>);
         static_assert(values == expected_result);
     }
-    static void by_values_heterogenous()
+    [[maybe_unused]] static void by_values_heterogenous()
     {
         namespace ctc_array_algorithms = gcl::ctc::algorithms::array;
         constexpr auto values = []() consteval

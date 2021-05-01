@@ -13,6 +13,7 @@ namespace gcl::mp::value_traits
         constexpr static auto size = sizeof...(values);
     };
 
+    #if not defined(_LIBCPP_VERSION) or _LIBCPP_VERSION >= 13000
     template <auto... values>
     requires(std::equality_comparable_with<
              decltype(std::get<0>(std::tuple{values...})),
@@ -21,6 +22,7 @@ namespace gcl::mp::value_traits
         return ((values == std::get<0>(std::tuple{values...})) && ...);
     }
     ();
+
     // Only works for Clang yet, since 11.0.0 
     // template <auto first_value = int{}, std::equality_comparable_with<decltype(first_value)> auto... values>
     // constexpr inline auto equal_v = []() consteval
@@ -30,6 +32,9 @@ namespace gcl::mp::value_traits
     // ();
     template <auto... values>
     constexpr inline auto not_equal_v = not equal_v<values...>;
+#else
+#pragma message("libc++ (prior to 13) detected, disabling gcl::mp::value_traits::equal_v, not_equal_v features")
+#endif
 }
 #include <cstdint>
 #include <climits>
@@ -50,6 +55,7 @@ namespace gcl::mp::value_traits
 
 namespace gcl::mp::value_traits::tests::equal
 {
+#if not defined(_LIBCPP_VERSION) or _LIBCPP_VERSION >= 13000
     static_assert(equal_v<>);
     static_assert(equal_v<true>);
     static_assert(equal_v<true, true>);
@@ -66,6 +72,7 @@ namespace gcl::mp::value_traits::tests::equal
     static_assert(not_equal_v<true, false, true, true>);
     static_assert(not_equal_v<true, true, false, true>);
     static_assert(not_equal_v<true, true, true, false>);
+#endif
 }
 
 #include <gcl/mp/system_info.hpp>

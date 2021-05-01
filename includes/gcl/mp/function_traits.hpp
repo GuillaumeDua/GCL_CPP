@@ -38,7 +38,7 @@ namespace gcl::mp
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
 
             constexpr static bool is_member_function_v = true;
-            constexpr static bool is_class_v = std::is_class_v<Function>; 
+            constexpr static bool is_class_v = std::is_class_v<Function>;
             constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
             constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
             constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
@@ -90,16 +90,14 @@ namespace gcl::mp
             using argument = typename std::tuple_element_t<N, std::tuple<Arguments...>>;
 
             constexpr static bool is_member_function_v = false;
-            constexpr static bool is_class_v = std::is_class_v<Function>; 
+            constexpr static bool is_class_v = std::is_class_v<Function>;
             constexpr static bool is_const_v = function_attr::template contains<tags::is_const>;
             constexpr static bool is_volatile_v = function_attr::template contains<tags::is_volatile>;
             constexpr static bool is_noexcept_v = function_attr::template contains<tags::is_no_except>;
         };
         template <typename ReturnType, typename... Arguments>
         struct function_traits_impl<ReturnType (*)(Arguments...) noexcept>
-            : function_traits_impl<
-                  ReturnType (*)(Arguments...),
-                  type_tag::container<tags::is_no_except>> {};
+            : function_traits_impl<ReturnType (*)(Arguments...), type_tag::container<tags::is_no_except>> {};
 
 #ifdef _MSC_VER
 #pragma warning(default : 4348)
@@ -148,29 +146,25 @@ namespace gcl::mp::test
     void check_function_attributes()
     {
 #if not __clang__
+        constexpr auto check_attr = []<typename T, std::array<bool, 3> attr_expectations>() consteval
         {
-            constexpr auto check_attr = []<typename T, std::array<bool, 3> attr_expectations>() consteval
-            {
-                static_assert(std::get<0>(attr_expectations) == function_traits_t<T>::is_const_v);
-                static_assert(std::get<1>(attr_expectations) == function_traits_t<T>::is_noexcept_v);
-                static_assert(std::get<2>(attr_expectations) == function_traits_t<T>::is_volatile_v);
-                return true; // symbol deduction
-            };
-            constexpr static auto _ = std::array{
-                // ensure consteval context
-                check_attr
-                    .template operator()<decltype(&toto::const_member), std::array<bool, 3>{true, false, false}>(),
-                check_attr
-                    .template operator()<decltype(&toto::not_const_member), std::array<bool, 3>{false, false, false}>(),
-                check_attr.template
-                operator()<decltype(&toto::noexcept_not_const_member), std::array<bool, 3>{false, true, false}>(),
-                check_attr.template
-                operator()<decltype(&toto::noexcept_const_member), std::array<bool, 3>{true, true, false}>(),
-                check_attr
-                    .template operator()<decltype(&toto::volatile_member), std::array<bool, 3>{false, false, true}>(),
-                check_attr.template
-                operator()<decltype(&toto::noexcept_volatile_member), std::array<bool, 3>{false, true, true}>()};
-        }
+            static_assert(std::get<0>(attr_expectations) == function_traits_t<T>::is_const_v);
+            static_assert(std::get<1>(attr_expectations) == function_traits_t<T>::is_noexcept_v);
+            static_assert(std::get<2>(attr_expectations) == function_traits_t<T>::is_volatile_v);
+            return true; // symbol deduction
+        };
+        constexpr static auto _ = std::array{
+            // ensure consteval context
+            check_attr.template operator()<decltype(&toto::const_member), std::array<bool, 3>{true, false, false}>(),
+            check_attr
+                .template operator()<decltype(&toto::not_const_member), std::array<bool, 3>{false, false, false}>(),
+            check_attr.template
+            operator()<decltype(&toto::noexcept_not_const_member), std::array<bool, 3>{false, true, false}>(),
+            check_attr
+                .template operator()<decltype(&toto::noexcept_const_member), std::array<bool, 3>{true, true, false}>(),
+            check_attr.template operator()<decltype(&toto::volatile_member), std::array<bool, 3>{false, false, true}>(),
+            check_attr.template
+            operator()<decltype(&toto::noexcept_volatile_member), std::array<bool, 3>{false, true, true}>()};
+#endif
     }
-    #endif
 }
