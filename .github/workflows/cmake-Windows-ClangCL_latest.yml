@@ -2,6 +2,9 @@ name: cmake-Windows-ClangCL
 
 on: [push, pull_request]
 
+env:
+  SOLUTION_FILE_PATH: .
+
 jobs:
   build:
 
@@ -22,7 +25,7 @@ jobs:
     - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
       working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
       run: cmake
-        -S $GITHUB_WORKSPACE
+        -S ${{env.GITHUB_WORKSPACE}}
         -B .
         -G ${{matrix.GENERATOR}}
         -A ${{matrix.ARCH}}
