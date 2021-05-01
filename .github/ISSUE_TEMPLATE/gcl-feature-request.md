@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Scope**
+### **Scope**
 
 - [ ] C++
   - [ ] New `gcl` component
@@ -20,7 +20,7 @@ assignees: ''
   - [ ] Architecture support
 - [ ] Documentation
 
-**Description**
+### **Description**
 
 A clear and concise description of what the suggestion is about.
 
@@ -29,13 +29,13 @@ A clear and concise description of what the suggestion is about.
 - `C++` : new `gcl::event` implementation
 - `configuration`: Add Windows-MsCL-x64-RelWithDebInfos configuration support)*
 
-**Details**
+### **Details**
 
 Details about your suggestion.  
 Might contain implementation details, designs, links to external components, etc.
 
-**[optional] Expected behavior**
+### **[optional] Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**[optional] Additional context**
+### **[optional] Additional context**
 Add any other context about the suggestion here here.
