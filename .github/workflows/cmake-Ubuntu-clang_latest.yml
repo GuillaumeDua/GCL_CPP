@@ -15,7 +15,6 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Initialize compiler (Clang, latest)
-      
       run: |
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         sudo update-alternatives \
@@ -30,7 +29,8 @@ jobs:
     - name: cmake cache - ${{matrix.BUILD_TYPE}}
       shell: bash
       working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+      run: cmake $GITHUB_WORKSPACE
+        -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
       env:
         CC:   clang
         CXX:  clang++
@@ -38,7 +38,9 @@ jobs:
     - name: cmake build - ${{matrix.BUILD_TYPE}}
       working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
       shell: bash
-      run: cmake --build . --config ${{matrix.BUILD_TYPE}}
+      run: cmake
+        --build .
+        --config ${{matrix.BUILD_TYPE}}
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build

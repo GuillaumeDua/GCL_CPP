@@ -2,22 +2,19 @@ name: cmake-Ubuntu-gcc_10
 
 on: [push, pull_request]
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+
     runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+            BUILD_TYPE: [Debug, Release]
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Initialize compiler (GCC)
-      
       run: |
           sudo apt update
           sudo apt install gcc-10 g++-10
@@ -26,24 +23,21 @@ jobs:
             --slave /usr/bin/g++ g++  /usr/bin/g++-10 \
             --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{github.workspace}}/build
+    - name: cmake create build env - ${{matrix.BUILD_TYPE}}
+      run: cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
 
-    - name: Configure CMake
+    - name: cmake cache - ${{matrix.BUILD_TYPE}}
       shell: bash
-      working-directory: ${{github.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
       env:
         CC:   gcc-10
         CXX:  g++-10
 
-    - name: Build
-      working-directory: ${{github.workspace}}/build
+    - name: cmake build - ${{matrix.BUILD_TYPE}}
+      working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
-      env:
-        CC:   gcc-10
-        CXX:  g++-10
+      run: cmake --build . --config ${{matrix.BUILD_TYPE}}
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build
