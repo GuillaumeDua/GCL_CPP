@@ -25,7 +25,7 @@ jobs:
     - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
       working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
       run: cmake
-        -S ${{env.GITHUB_WORKSPACE}}
+        -S ${{github.workspace}}
         -B .
         -G ${{matrix.GENERATOR}}
         -A ${{matrix.ARCH}}
