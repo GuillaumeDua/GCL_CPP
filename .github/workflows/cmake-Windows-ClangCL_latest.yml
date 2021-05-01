@@ -27,7 +27,7 @@ jobs:
       run: cmake
         -S ${{github.workspace}}
         -B .
-        -G ${{matrix.GENERATOR}}
+        -G "${{matrix.GENERATOR}}"
         -A ${{matrix.ARCH}}
         -T ClangCL
         -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
