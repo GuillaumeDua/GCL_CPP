@@ -33,3 +33,7 @@ x86
 *.i*86
 *.x86_64
 *.hex
+
+# CMake
+./build/
+./build_local/
