@@ -1,30 +1,12 @@
 #pragma once
 
+#include <gcl/concepts.hpp>
+
 #include <array>
 #include <algorithm>
 #include <type_traits>
 #include <ranges>
 
-namespace gcl::mp::type_traits
-{ // detection not covered by `is_instance_of`
-    template <typename T>
-    struct is_std_array : std::false_type {};
-    template <typename T, std::size_t N>
-    struct is_std_array<std::array<T, N>> : std::true_type {};
-    template <typename T>
-    using is_std_array_t = typename is_std_array<T>::type;
-    template <typename T>
-    constexpr auto is_std_array_v = is_std_array_t<T>::value;
-}
-namespace gcl::concepts
-{
-    template <typename T>
-    concept StdArray = gcl::mp::type_traits::is_std_array_v<T>;
-    template <typename T>
-    concept RawArray = std::is_array_v<T>;
-    template <typename T>
-    concept Array = StdArray<T> or RawArray<T>;
-}
 namespace gcl::cx::array::literals
 {
     template <typename T, std::size_t N>
@@ -47,7 +29,7 @@ namespace gcl::cx::array::literals
 }
 namespace gcl::cx::array
 {
-    template <concepts::Array auto arg>
+    template <concepts::array_ auto arg>
     consteval static auto remove_duplicates()
     {
         using argument_type = decltype(arg);
@@ -70,9 +52,9 @@ namespace gcl::cx::array
         std::copy(std::begin(copy), last_not_duplicate, std::begin(return_value));
         return return_value;
     };
-    template <concepts::Array auto arg>
+    template <concepts::array_ auto arg>
     constexpr auto remove_duplicates_v = remove_duplicates<arg>();
-    template <concepts::Array auto arg>
+    template <concepts::array_ auto arg>
     using remove_duplicates_t = typename std::decay_t<decltype(remove_duplicates_v<arg>)>;
 
     template <typename... Ts>
