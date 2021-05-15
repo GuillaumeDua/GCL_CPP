@@ -2,20 +2,26 @@
 
 namespace gcl::mp::meta
 {
-    template <typename... Ts>
-    struct join;
-    template <typename first_type, typename second_type, typename... Ts>
-    struct join<first_type, second_type, Ts...> {
-        static_assert(sizeof...(Ts) not_eq 0);
-        using type = typename join<typename join<first_type, second_type>::type, Ts...>::type;
-    };
-    template <typename T>
-    struct join<T> {
-        using type = T;
-    };
-    template <template <typename...> typename Type, typename... Ts, typename... Us>
-    struct join<Type<Ts...>, Type<Us...>> {
-        using type = Type<Ts..., Us...>;
+    template <typename ... Ts>
+    class join {
+        template <typename...>
+        struct impl;
+        template <typename first_type, typename second_type, typename... types>
+        struct impl<first_type, second_type, types...> {
+            static_assert(sizeof...(Ts) not_eq 0);
+            using type = typename join<typename join<first_type, second_type>::type, types...>::type;
+        };
+        template <typename T>
+        struct impl<T> {
+            using type = T;
+        };
+        template <template <typename...> typename Type, typename... Us, typename... Vs>
+        struct impl<Type<Us...>, Type<Vs...>> {
+            using type = Type<Us..., Vs...>;
+        };
+
+      public:
+          using type = typename impl<Ts...>::type;
     };
     template <typename... Ts>
     using join_t = typename join<Ts...>::type;
