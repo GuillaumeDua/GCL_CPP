@@ -22,16 +22,17 @@ namespace gcl::mp::meta
     using join_t = typename join<Ts...>::type;
 }
 
-#include <tuple>
-
 namespace gcl::mp::tests::meta
 {
+    template <typename ... Ts>
+    struct type_seq {};
+
     using namespace gcl::mp::meta;
-    static_assert(std::is_same_v<std::tuple<int, char, double>, join_t<std::tuple<int>, std::tuple<char, double>>>);
-    static_assert(std::is_same_v<std::tuple<int, char, double>, join_t<std::tuple<int, char, double>>>);
+    static_assert(std::is_same_v<type_seq<int, char, double>, join_t<type_seq<int>, type_seq<char, double>>>);
+    static_assert(std::is_same_v<type_seq<int, char, double>, join_t<type_seq<int, char, double>>>);
     static_assert(
-        std::is_same_v<std::tuple<int, char, double>, join_t<std::tuple<int>, std::tuple<char>, std::tuple<double>>>);
+        std::is_same_v<type_seq<int, char, double>, join_t<type_seq<int>, type_seq<char>, type_seq<double>>>);
     static_assert(std::is_same_v<
-                  std::tuple<int, char, double, float>,
-                  join_t<std::tuple<int>, std::tuple<char>, std::tuple<double>, std::tuple<float>>>);
+                  type_seq<int, char, double, float>,
+                  join_t<type_seq<int>, type_seq<char>, type_seq<double>, type_seq<float>>>);
 }
