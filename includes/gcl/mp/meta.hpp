@@ -36,11 +36,21 @@ namespace gcl::mp::meta
       public:
         using type = join_t<Type<>, element_type<Ts>...>;
     };
+    template <template <typename...> typename Type, typename... Ts, typename... to_remove>
+    class remove<Type<Ts...>, Type<to_remove...>> {
+        template <typename T>
+        using element_type = std::conditional_t<((std::is_same_v<T, to_remove> || ...)), Type<>, Type<T>>;
+
+      public:
+        using type = join_t<Type<>, element_type<Ts>...>;
+    };
     template <typename T, typename ... to_remove>
     using remove_t = typename remove<T, to_remove...>::type;
 
     template <typename... Ts>
     class type_sequence {
+
+        constexpr type_sequence() = default;
 
         template <typename T>
         struct flatten {
@@ -63,6 +73,7 @@ namespace gcl::mp::meta
         template <typename... to_remove>
         using remove = remove_t<type_sequence<Ts...>, to_remove...>;
     };
+
 }
 
 namespace gcl::mp::tests::meta
@@ -108,5 +119,6 @@ namespace gcl::mp::tests::meta
     {
         static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<char>>);
         static_assert(std::is_same_v<type_sequence<>, type_sequence<>::remove<char>>);
+        static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<type_sequence<char>>>);
     }
 }
