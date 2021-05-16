@@ -1,7 +1,28 @@
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 namespace gcl::mp::meta
 {
+    template <template <typename...> class T, typename... Ts>
+    class pack_as {
+
+        template <typename... types>
+        struct impl {
+            using type = T<types...>;
+        };
+        template <template <typename...> class pack_t, typename... types>
+        struct impl<pack_t<types...>> {
+            using type = T<types...>;
+        };
+
+      public:
+        using type = typename impl<Ts...>::type;
+    };
+    template <template <typename...> class T, typename... Ts>
+    using pack_as_t = typename pack_as<T, Ts...>::type;
+
     template <typename ... Ts>
     requires(sizeof...(Ts) not_eq 0)
     class join {
@@ -26,54 +47,65 @@ namespace gcl::mp::meta
     template <typename... Ts>
     using join_t = typename join<Ts...>::type;
 
-    template <typename T, typename... to_remove> 
-    class remove;
-    template <template <typename ...> typename Type, typename ... Ts, typename ... to_remove>
-    class remove<Type<Ts...>, to_remove...> {
+    template <typename T, template <typename> typename predicate>
+    class filter;
+    template <template <typename...> typename Type, typename... Ts, template<typename> typename predicate>
+    class filter<Type<Ts...>, predicate> {
+
         template <typename T>
-        using element_type = std::conditional_t<((std::is_same_v<T, to_remove> || ...)), Type<>, Type<T>>;
+        using element_type = std::conditional_t<predicate<T>::value, Type<>, Type<T>>;
 
       public:
         using type = join_t<Type<>, element_type<Ts>...>;
     };
-    template <template <typename...> typename Type, typename... Ts, typename... to_remove>
-    class remove<Type<Ts...>, Type<to_remove...>> {
-        template <typename T>
-        using element_type = std::conditional_t<((std::is_same_v<T, to_remove> || ...)), Type<>, Type<T>>;
+    template <typename T, template <typename> typename predicate>
+    using filter_t = typename filter<T, predicate>::type;
 
-      public:
-        using type = join_t<Type<>, element_type<Ts>...>;
+    template <typename T, typename... to_remove>
+    class remove
+    {
+        template <typename candidate>
+        struct listed_as_to_remove {
+            constexpr static auto value = ((std::is_same_v<candidate, to_remove> or ...));
+        };
+
+    public:
+        using type = filter_t<T, listed_as_to_remove>;
     };
-    template <typename T, typename ... to_remove>
+    template <typename T, typename... to_remove>
     using remove_t = typename remove<T, to_remove...>::type;
 
     template <typename... Ts>
     class type_sequence {
 
-        constexpr type_sequence() = default;
+        constexpr static auto size = sizeof...(Ts);
+        constexpr static auto empty = (size == 0);
+        // todo : at / get <index>
 
-        template <typename T>
-        struct flatten {
-            using type = type_sequence<T>;
-        };
-        template <typename... argument_types>
-        struct flatten<type_sequence<argument_types...>> {
-            using type = type_sequence<argument_types...>;
-        };
-        template <typename T>
-        using flatten_t = typename flatten<T>::type;
+        constexpr type_sequence() = default;
 
         // todo : remove_if<type_trait_as_predicate> => filter
         // todo : `- remove_duplicates => previous position
         // todo : conjunction, disjunction
+        // todo : split
 
       public:
         template <typename... arguments_t>
-        using add = join_t<type_sequence<Ts...>, flatten_t<arguments_t>...>;
+        using add = join_t<type_sequence<Ts...>, pack_as_t<type_sequence, arguments_t>...>;
         template <typename... to_remove>
-        using remove = remove_t<type_sequence<Ts...>, to_remove...>;
+        using remove = remove_t<type_sequence<Ts...>, to_remove...>; // todo : flatten / repack
     };
 
+    //template <typename ... Ts, typename ...Us>
+    //constexpr auto operator+(type_sequence<Ts...>, type_sequence<Us...>)
+    //{
+    //    return type_sequence<Ts...>::template add<Us...>;
+    //}
+    //template <typename... Ts, typename... Us>
+    //constexpr auto operator-(type_sequence<Ts...>, type_sequence<Us...>)
+    //{
+    //    return type_sequence<Ts...>::template remove<Us...>;
+    //}
 }
 
 namespace gcl::mp::tests::meta
@@ -82,6 +114,12 @@ namespace gcl::mp::tests::meta
     struct type_seq {};
 
     using namespace gcl::mp::meta;
+
+    namespace pack_as
+    {
+        static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, int, char>>);
+        static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, type_seq<int, char>>>);
+    }
 
     namespace join
     {
@@ -92,6 +130,12 @@ namespace gcl::mp::tests::meta
         static_assert(std::is_same_v<
                       type_seq<int, char, double, float>,
                       join_t<type_seq<int>, type_seq<char>, type_seq<double>, type_seq<float>>>);
+    }
+    namespace filters
+    {
+        template <typename T>
+        using is_int = std::is_same<T, int>;
+        static_assert(std::is_same_v<type_seq<char>, filter<type_seq<int, char>, is_int>::type>);
     }
     namespace remove
     {
@@ -119,6 +163,6 @@ namespace gcl::mp::tests::meta
     {
         static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<char>>);
         static_assert(std::is_same_v<type_sequence<>, type_sequence<>::remove<char>>);
-        static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<type_sequence<char>>>);
+        // static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<type_sequence<char>>>);
     }
 }
