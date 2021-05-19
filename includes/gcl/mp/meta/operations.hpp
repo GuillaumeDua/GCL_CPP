@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gcl/mp/type_traits.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -23,9 +25,29 @@ namespace gcl::mp::meta
     template <template <typename...> class T, typename... Ts>
     using pack_as_t = typename pack_as<T, Ts...>::type;
 
+    template <typename... Ts>
+    requires(sizeof...(Ts) not_eq 0) struct first;
+    template <typename T, typename... Ts>
+    struct first<T, Ts...> {
+        using type = T;
+    };
     template <typename ... Ts>
-    requires(sizeof...(Ts) not_eq 0)
-    class join {
+    using first_t = typename first<Ts...>::type;
+
+    template <typename T, typename ...>
+    requires(gcl::mp::type_traits::is_template_v<T>)
+    class append;
+    template <template <typename...> typename T, typename ... Ts, typename ... args_t>
+    class append<T<Ts...>, args_t...> {
+    public:
+        using type = T<Ts..., args_t...>;
+    };
+    template <typename T, typename ... args_t>
+    using append_t = typename append<T, args_t...>::type;
+
+    // todo : refactor this shitty impl ... =)
+    template <typename... Ts>
+    requires(sizeof...(Ts) not_eq 0) class join {
         template <typename...>
         struct impl;
         template <typename first_type, typename second_type, typename... types>
@@ -42,14 +64,14 @@ namespace gcl::mp::meta
         };
 
       public:
-          using type = typename impl<Ts...>::type;
+        using type = typename impl<Ts...>::type;
     };
     template <typename... Ts>
     using join_t = typename join<Ts...>::type;
 
     template <typename T, template <typename> typename predicate>
     class filter;
-    template <template <typename...> typename Type, typename... Ts, template<typename> typename predicate>
+    template <template <typename...> typename Type, typename... Ts, template <typename> typename predicate>
     class filter<Type<Ts...>, predicate> {
 
         template <typename T>
@@ -62,14 +84,13 @@ namespace gcl::mp::meta
     using filter_t = typename filter<T, predicate>::type;
 
     template <typename T, typename... to_remove>
-    class remove
-    {
+    class remove {
         template <typename candidate>
         struct listed_as_to_remove {
             constexpr static auto value = ((std::is_same_v<candidate, to_remove> or ...));
         };
 
-    public:
+      public:
         using type = filter_t<T, listed_as_to_remove>;
     };
     template <typename T, typename... to_remove>
@@ -96,13 +117,13 @@ namespace gcl::mp::meta
         using remove = remove_t<type_sequence<Ts...>, to_remove...>; // todo : flatten / repack
     };
 
-    //template <typename ... Ts, typename ...Us>
-    //constexpr auto operator+(type_sequence<Ts...>, type_sequence<Us...>)
+    // template <typename ... Ts, typename ...Us>
+    // constexpr auto operator+(type_sequence<Ts...>, type_sequence<Us...>)
     //{
     //    return type_sequence<Ts...>::template add<Us...>;
     //}
-    //template <typename... Ts, typename... Us>
-    //constexpr auto operator-(type_sequence<Ts...>, type_sequence<Us...>)
+    // template <typename... Ts, typename... Us>
+    // constexpr auto operator-(type_sequence<Ts...>, type_sequence<Us...>)
     //{
     //    return type_sequence<Ts...>::template remove<Us...>;
     //}
@@ -110,7 +131,7 @@ namespace gcl::mp::meta
 
 namespace gcl::mp::tests::meta
 {
-    template <typename ... Ts>
+    template <typename... Ts>
     struct type_seq {};
 
     using namespace gcl::mp::meta;
@@ -120,7 +141,16 @@ namespace gcl::mp::tests::meta
         static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, int, char>>);
         static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, type_seq<int, char>>>);
     }
-
+    namespace first
+    {
+        static_assert(std::is_same_v<int, first_t<int, char>>);
+        static_assert(not std::is_same_v<int, first_t<char>>);
+    }
+    namespace append
+    {
+        static_assert(std::is_same_v<append_t<type_seq<int>, float>, type_seq<int, float>>);
+        static_assert(std::is_same_v<append_t<type_seq<int>, type_seq<float>>, type_seq<int, type_seq<float>>>);
+    }
     namespace join
     {
         static_assert(std::is_same_v<type_seq<int, char, double>, join_t<type_seq<int>, type_seq<char, double>>>);
