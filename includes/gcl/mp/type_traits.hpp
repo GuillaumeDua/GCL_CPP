@@ -12,6 +12,15 @@ namespace gcl::mp::type_traits
     template <class T>
     inline constexpr auto is_template_v = is_template<T>::value;
 
+    template <class T, class U>
+    struct is_same_template_type : std::false_type {};
+    template <template <class...> class T, class... T_args, class... U_args>
+    struct is_same_template_type<T<T_args...>, T<U_args...>> : std::true_type {};
+    template <template <auto...> class T, auto... T_values, auto... U_values>
+    struct is_same_template_type<T<T_values...>, T<U_values...>> : std::true_type {};
+    template <class T, class U>
+    inline constexpr auto is_same_template_type_v = is_same_template_type<T, U>::value;
+
     template <typename T, typename = void>
     struct is_complete : std::false_type {};
     template <typename T>
@@ -96,6 +105,10 @@ namespace gcl::mp::type_traits::tests::is_template
     static_assert(gcl::mp::type_traits::is_template_v<std::tuple<int, char>>);
     static_assert(gcl::mp::type_traits::is_template_v<std::string>); // std::basic_string<charT, allocator>
     static_assert(not gcl::mp::type_traits::is_template_v<int>);
+}
+namespace gcl::mp::type_traits::tests::is_same_template_type
+{
+    static_assert(gcl::mp::type_traits::is_same_template_type_v<std::tuple<int>, std::tuple<char, float>>);
 }
 namespace gcl::mp::type_traits::tests::is_complete
 {
