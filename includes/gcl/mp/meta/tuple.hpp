@@ -13,9 +13,6 @@ namespace gcl::mp
         constexpr static auto size = sizeof...(types);
         constexpr static auto empty = size == 0;
 
-        template <auto ts_size = sizeof...(types)>
-        // enable default constructor that does not collide with value constructor,
-        // and cannot be by-passed
         constexpr tuple() requires(not empty)
             : storage{generate_storage(types{}...)}
         {}
