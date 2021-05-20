@@ -25,6 +25,15 @@ namespace gcl::mp::meta
     template <template <typename...> class T, typename... Ts>
     using pack_as_t = typename pack_as<T, Ts...>::type;
 
+    template <typename T>
+    requires(gcl::mp::type_traits::is_template_v<T>) struct size;
+    template <template <typename...> typename T, typename... Ts>
+    struct size<T<Ts...>> {
+        constexpr static auto value = sizeof...(Ts);
+    };
+    template <typename T>
+    constexpr auto size_v = size<T>::value;
+
     template <typename... Ts>
     requires(sizeof...(Ts) not_eq 0) struct first;
     template <typename T, typename... Ts>
@@ -140,6 +149,12 @@ namespace gcl::mp::tests::meta
     {
         static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, int, char>>);
         static_assert(std::is_same_v<type_seq<int, char>, pack_as_t<type_seq, type_seq<int, char>>>);
+    }
+    namespace size
+    {
+        static_assert(size_v<type_seq<>> == 0);
+        static_assert(size_v<type_seq<int>> == 1);
+        static_assert(size_v<type_seq<int, char>> == 2);
     }
     namespace first
     {
