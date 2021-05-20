@@ -21,7 +21,7 @@ jobs:
 
     - name: cmake create build env - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
       run: |
-        cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} && \
+        cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
         cmake -E make_directory ${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
 
     - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
