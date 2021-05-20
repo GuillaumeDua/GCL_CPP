@@ -1,4 +1,4 @@
-name: cmake-Ubuntu-clang_latest-stdlibc++
+name: cmake-Ubuntu-clang_latest
 
 on: [push, pull_request]
 
@@ -10,6 +10,7 @@ jobs:
     strategy:
         matrix:
             BUILD_TYPE: [Debug, Release]
+            STL_IMPLEMENTATION: [libstdc++, libc++]
 
     steps:
     - uses: actions/checkout@v2
@@ -23,19 +24,17 @@ jobs:
           --install /usr/bin/clang clang /usr/bin/clang-12 100
         sudo update-alternatives \
           --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
-        sudo apt install libc++1-12 libc++-12-dev libc++abi-12-dev libc++abi1-12 # warning : erase other versions !
+        sudo apt install libc++1-12 libc++-12-dev libc++abi-12-dev libc++abi1-12
 
-    - name: cmake create build env - ${{matrix.BUILD_TYPE}}
+    - name: cmake create build env - ${{matrix.BUILD_TYPE}} - ${{matrix.STL_IMPLEMENTATION}}
       run: |
         cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
         cmake -E make_directory ${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}
       
-    - name: cmake cache - ${{matrix.BUILD_TYPE}}
-     #shell: bash
-     #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+    - name: cmake cache - ${{matrix.BUILD_TYPE}} - ${{matrix.STL_IMPLEMENTATION}}
       run: |
         cmake \
-            -DCMAKE_CXX_FLAGS=-stdlib=libstdc++                                                     \
+            -DCMAKE_CXX_FLAGS=-stdlib=${{matrix.STL_IMPLEMENTATION}}                                \
             -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
             -DCMAKE_BUILD_TYPE:STRING="${{matrix.BUILD_TYPE}}"                                      \
             -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \
@@ -46,8 +45,7 @@ jobs:
         CC:   clang-12
         CXX:  clang++-12
 
-    - name: cmake build - ${{matrix.BUILD_TYPE}}
-     #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+    - name: cmake build - ${{matrix.BUILD_TYPE}} - ${{matrix.STL_IMPLEMENTATION}}
       run: |
         cmake \
             --build ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}  \
