@@ -1,4 +1,4 @@
-name: cmake-Ubuntu-clang_latest #-stdlibc++
+name: cmake-Ubuntu-clang_latest-stdlibc++
 
 on: [push, pull_request]
 
@@ -32,9 +32,9 @@ jobs:
     - name: cmake cache - ${{matrix.BUILD_TYPE}}
      #shell: bash
      #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
-     #-DCMAKE_CXX_FLAGS=-stdlib=libstdc++
       run: |
         cmake \
+            -DCMAKE_CXX_FLAGS=-stdlib=libstdc++                                                     \
             -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
             -DCMAKE_BUILD_TYPE:STRING="${{matrix.BUILD_TYPE}}"                                      \
             -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \

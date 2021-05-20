@@ -27,22 +27,22 @@ jobs:
     - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
       #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
       run: |
-        cmake \
-            -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
-            -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}                                               \
-            -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
-            -S ${{github.workspace}}                                                                \
-            -B ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}              \
-            -G "${{matrix.GENERATOR}}"                                                              \
-            -A ${{matrix.ARCH}}                                                                     \
+        cmake `
+            -DGCL_BUILD_TEST:BOOL=TRUE                                                              `
+            -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}                                               `
+            -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} `
+            -S ${{github.workspace}}                                                                `
+            -B ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}              `
+            -G "${{matrix.GENERATOR}}"                                                              `
+            -A ${{matrix.ARCH}}                                                                     `
             -T ClangCL
         
     - name: cmake build - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
      #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
       run: |
-        cmake \
-            --build ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
-            --config ${{matrix.BUILD_TYPE}} \
+        cmake `
+            --build ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} `
+            --config ${{matrix.BUILD_TYPE}} `
             --parallel 10
 
     #- name: test
