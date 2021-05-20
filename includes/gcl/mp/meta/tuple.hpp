@@ -16,12 +16,9 @@ namespace gcl::mp
         template <auto ts_size = sizeof...(types)>
         // enable default constructor that does not collide with value constructor,
         // and cannot be by-passed
-        requires(ts_size == sizeof...(types) and size not_eq 0)
-        constexpr tuple()
+        constexpr tuple() requires(not empty)
             : storage{generate_storage(types{}...)}
         {}
-        template <auto ts_size = sizeof...(types)>
-        requires(ts_size == sizeof...(types))
         constexpr tuple(types&&... values)
             : storage{generate_storage(std::forward<decltype(values)>(values)...)}
         {}
