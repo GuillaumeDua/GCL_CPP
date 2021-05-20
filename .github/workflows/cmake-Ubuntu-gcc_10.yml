@@ -24,20 +24,31 @@ jobs:
             --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
     - name: cmake create build env - ${{matrix.BUILD_TYPE}}
-      run: cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
-
+      run: |
+        cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}} && \
+        cmake -E make_directory ${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}
+      
     - name: cmake cache - ${{matrix.BUILD_TYPE}}
-      shell: bash
-      working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+     #shell: bash
+     #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+      run: |
+        cmake \
+            -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
+            -DCMAKE_BUILD_TYPE:STRING=${{matrix.BUILD_TYPE}}                                        \
+            -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \
+            -S ${{github.workspace}}                                                                \
+            -B ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+        
       env:
         CC:   gcc-10
         CXX:  g++-10
 
     - name: cmake build - ${{matrix.BUILD_TYPE}}
-      working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
-      shell: bash
-      run: cmake --build . --config ${{matrix.BUILD_TYPE}}
+     #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+      run: |
+        cmake \
+            --build ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}  \
+            --config ${{matrix.BUILD_TYPE}}
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build

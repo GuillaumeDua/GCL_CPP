@@ -20,25 +20,30 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: cmake create build env - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
-      run: cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+      run: |
+        cmake -E make_directory ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} && \
+        cmake -E make_directory ${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
 
     - name: cmake cache - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
-      working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
-      run: cmake
+      #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+      run: |
+        cmake \
+        -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
+        -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}                                               \
+        -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
         -S ${{github.workspace}}
-        -B .
+        -B ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
         -G "${{matrix.GENERATOR}}"
         -A ${{matrix.ARCH}}
         -T ClangCL
-        -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
-        #-Dgcl_cpp_BUILD_TEST=On
-
+        
     - name: cmake build - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
-      working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
-      run: cmake
-        --build .
-        --config ${{matrix.BUILD_TYPE}}
-        --parallel 10
+     #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
+      run: |
+        cmake \
+            --build ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
+            --config ${{matrix.BUILD_TYPE}} \
+            --parallel 10
 
     #- name: test
     #  run: cd build ; ctest -j 10 -C Debug --output-on-failure
