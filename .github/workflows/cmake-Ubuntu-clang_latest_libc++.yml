@@ -17,7 +17,6 @@ jobs:
     - name: Initialize compiler (Clang, latest)
       run: |
         sudo apt update
-        sudo apt install libstdc++-10-dev
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         sudo update-alternatives \
           --install /usr/bin/clang clang /usr/bin/clang-12 100
@@ -35,7 +34,7 @@ jobs:
      #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
       run: |
         cmake \
-            -DCMAKE_CXX_FLAGS=-stdlib=libstdc++                                                     \
+            -DCMAKE_CXX_FLAGS=-stdlib=libc++                                                        \
             -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
             -DCMAKE_BUILD_TYPE:STRING="${{matrix.BUILD_TYPE}}"                                      \
             -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \
