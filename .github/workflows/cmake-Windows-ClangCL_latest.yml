@@ -28,14 +28,14 @@ jobs:
       #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
       run: |
         cmake \
-        -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
-        -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}                                               \
-        -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
-        -S ${{github.workspace}}
-        -B ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}
-        -G "${{matrix.GENERATOR}}"
-        -A ${{matrix.ARCH}}
-        -T ClangCL
+            -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
+            -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}                                               \
+            -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}} \
+            -S ${{github.workspace}}                                                                \
+            -B ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}              \
+            -G "${{matrix.GENERATOR}}"                                                              \
+            -A ${{matrix.ARCH}}                                                                     \
+            -T ClangCL
         
     - name: cmake build - ${{matrix.ARCH}} ${{matrix.BUILD_TYPE}}
      #working-directory: ${{github.workspace}}/out/build/${{matrix.ARCH}}/${{matrix.BUILD_TYPE}}

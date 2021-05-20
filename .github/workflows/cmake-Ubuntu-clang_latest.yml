@@ -16,6 +16,7 @@ jobs:
 
     - name: Initialize compiler (Clang, latest)
       run: |
+        sudo apt update
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         sudo update-alternatives \
           --install /usr/bin/clang clang /usr/bin/clang-12 100
@@ -31,11 +32,11 @@ jobs:
     - name: cmake cache - ${{matrix.BUILD_TYPE}}
      #shell: bash
      #working-directory: ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
+     #-DCMAKE_CXX_FLAGS=-stdlib=libstdc++
       run: |
         cmake \
-           #-DCMAKE_CXX_FLAGS=-stdlib=libstdc++                                                     \
             -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
-            -DCMAKE_BUILD_TYPE:STRING=${{matrix.BUILD_TYPE}}                                        \
+            -DCMAKE_BUILD_TYPE:STRING="${{matrix.BUILD_TYPE}}"                                      \
             -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \
             -S ${{github.workspace}}                                                                \
             -B ${{github.workspace}}/out/build/${{matrix.BUILD_TYPE}}
