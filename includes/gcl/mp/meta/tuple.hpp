@@ -23,7 +23,7 @@ namespace gcl::mp
         
       private:
         // storage : by-pass missing features : auto non-static members, lambdas in unevaluated context
-        static constexpr auto generate_storage(types&&... values)
+        /*static constexpr auto generate_storage(types&&... values)
         {
             return [&values...]<std::size_t... indexes>(std::index_sequence<indexes...>)
             {
@@ -34,6 +34,27 @@ namespace gcl::mp
                 {
                     return [value = init_value](type_index<index>) mutable -> auto& { return value; };
                 };
+                return gcl::mp::meta::functional::overload{generate_storage_entry.template operator()<types, indexes>(
+                    std::forward<decltype(values)>(values))...};
+            }
+            (std::make_index_sequence<sizeof...(types)>{});
+        };*/
+        static constexpr auto generate_storage(types&&... values)
+        {
+            const auto generate_storage_entry = []<typename T, std::size_t index>(T && init_value) constexpr
+            {
+                return [value = init_value](type_index<index>) mutable -> auto& { return value; };
+            };
+
+            #if defined(_MSC_VER) and not defined(__clang__)
+            return [&]<std::size_t... indexes>(std::index_sequence<indexes...>)
+            #else
+            return [&generate_storage_entry, &values... ]<std::size_t... indexes>(std::index_sequence<indexes...>)
+            #endif
+            {
+                static_assert(sizeof...(indexes) == sizeof...(types));
+                static_assert(sizeof...(indexes) == sizeof...(values));
+
                 return gcl::mp::meta::functional::overload{generate_storage_entry.template operator()<types, indexes>(
                     std::forward<decltype(values)>(values))...};
             }
@@ -78,13 +99,15 @@ namespace gcl::mp::tests
     using namespace gcl::mp;
 
     using empty_tuple = tuple<>;
-    /*using one_element_tuple = tuple<int>;
+    using one_element_tuple = tuple<int>;
     using two_element_tuple = tuple<int, char>;
-    */
+    
     static constexpr auto empty_tuple_default_init = empty_tuple{};
-    /*
-    static constexpr auto one_element_tuple_default_init = one_element_tuple{};
-    static constexpr auto one_element_tuple_values_init = one_element_tuple{42};
+    
+    //static constexpr auto one_element_tuple_default_init = one_element_tuple{};
+
+
+    /*static constexpr auto one_element_tuple_values_init = one_element_tuple{42};
     static constexpr auto two_element_tuple_default_init = two_element_tuple{};
     static constexpr auto two_element_tuple_values_init = two_element_tuple{42, 'a'};
 
@@ -94,6 +117,4 @@ namespace gcl::mp::tests
     static_assert(std::is_same_v<two_element_tuple::type_at<1>, char>);
     static_assert(std::is_same_v<decltype(std::declval<two_element_tuple>().get<0>()), int&>);
     static_assert(std::is_same_v<decltype(std::declval<const two_element_tuple&>().get<1>()), const char&>);*/
-
-    
 }

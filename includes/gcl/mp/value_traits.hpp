@@ -75,13 +75,13 @@ namespace gcl::mp::value_traits::tests::equal
 #endif
 }
 
-#include <gcl/mp/system_info.hpp>
+#include <gcl/mp/preprocessor.hpp>
 #include <limits>
 namespace gcl::mp::value_traits::tests
 {
     [[maybe_unused]] void bit_size_v()
     {
-        if constexpr (gcl::mp::system_info::is_x64)
+        if constexpr (gcl::mp::preprocessor::plateform::is_x64)
         {   // might be wrong, depending on the target/plateform
             static_assert(gcl::mp::value_traits::bit_size_v<bool> == 1);
             static_assert(gcl::mp::value_traits::bit_size_v<char> == 8);
@@ -97,7 +97,7 @@ namespace gcl::mp::value_traits::tests
     }
     [[maybe_unused]] void values_count()
     {
-        if constexpr (gcl::mp::system_info::is_x64)
+        if constexpr (gcl::mp::preprocessor::plateform::is_x64)
         { // might be wrong, depending on the target/plateform
             static_assert(gcl::mp::value_traits::values_count<bool> == 2);
             static_assert(gcl::mp::value_traits::values_count<char> - 1 == std::numeric_limits<unsigned char>::max());

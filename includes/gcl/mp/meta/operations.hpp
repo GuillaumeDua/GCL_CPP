@@ -78,6 +78,8 @@ namespace gcl::mp::meta
     template <typename... Ts>
     using join_t = typename join<Ts...>::type;
 
+    // todo : split at index
+
     template <typename T, template <typename> typename predicate>
     class filter;
     template <template <typename...> typename Type, typename... Ts, template <typename> typename predicate>
