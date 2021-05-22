@@ -10,7 +10,7 @@ jobs:
     strategy:
         matrix:
             BUILD_TYPE: [Debug, Release]
-            STL_IMPLEMENTATION: [libstdc++, libc++]
+            STL_IMPLEMENTATION: [libstdc++, libc++ -lc++abi]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
     - name: cmake cache - ${{matrix.BUILD_TYPE}} - ${{matrix.STL_IMPLEMENTATION}}
       run: |
         cmake \
-            -DCMAKE_CXX_FLAGS=-stdlib=${{matrix.STL_IMPLEMENTATION}}                                \
+            -DCMAKE_CXX_FLAGS="-stdlib=${{matrix.STL_IMPLEMENTATION}}"                              \
             -DGCL_BUILD_TEST:BOOL=TRUE                                                              \
             -DCMAKE_BUILD_TYPE:STRING="${{matrix.BUILD_TYPE}}"                                      \
             -DCMAKE_INSTALL_PREFIX:PATH=${{github.workspace}}/out/install/${{matrix.BUILD_TYPE}}    \
