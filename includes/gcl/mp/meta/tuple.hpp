@@ -36,7 +36,7 @@ namespace gcl::mp
 
             const auto generate_storage_entry = []<typename T, std::size_t index>(T && init_value) constexpr
             {
-                return [value = init_value](type_index<index>) mutable -> auto& { return value; };
+                return [value = init_value](type_index<index>) mutable noexcept -> auto& { return value; };
             };
             return gcl::mp::meta::functional::overload{
                 generate_storage_entry.template operator()<types, indexes>(std::forward<decltype(values)>(values))...};
@@ -75,7 +75,25 @@ namespace gcl::mp
             (std::make_index_sequence<size>{});
         }
     };
+    // When Clang, Msvc-cl gets better, replace `tuple::generate_storage` implementation by :
+    /*static constexpr auto generate_storage(types&&... values)
+    {
+        return [&values...]<std::size_t... indexes>(std::index_sequence<indexes...>)
+        {
+            static_assert(sizeof...(indexes) == sizeof...(types));
+            static_assert(sizeof...(indexes) == sizeof...(values));
+
+            const auto generate_storage_entry = []<typename T, std::size_t index>(T && init_value) constexpr
+            {
+                return [value = init_value](type_index<index>) mutable -> auto& { return value; };
+            };
+            return gcl::mp::meta::functional::overload{generate_storage_entry.template operator()<types, indexes>(
+                std::forward<decltype(values)>(values))...};
+        }
+        (std::make_index_sequence<sizeof...(types)>{});
+    };*/
 }
+
 namespace gcl::mp
 {
     template <std::size_t I, class... Types>
@@ -97,23 +115,7 @@ namespace gcl::mp
     constexpr const T&& get(const tuple<Types...>&& t) noexcept;
 }
 
-// When Clang, Msvc-cl gets better, replace `tuple::generate_storage` implementation by :
-/*static constexpr auto generate_storage(types&&... values)
-{
-    return [&values...]<std::size_t... indexes>(std::index_sequence<indexes...>)
-    {
-        static_assert(sizeof...(indexes) == sizeof...(types));
-        static_assert(sizeof...(indexes) == sizeof...(values));
 
-        const auto generate_storage_entry = []<typename T, std::size_t index>(T && init_value) constexpr
-        {
-            return [value = init_value](type_index<index>) mutable -> auto& { return value; };
-        };
-        return gcl::mp::meta::functional::overload{generate_storage_entry.template operator()<types, indexes>(
-            std::forward<decltype(values)>(values))...};
-    }
-    (std::make_index_sequence<sizeof...(types)>{});
-};*/
 
 #include <stdexcept>
 #include <exception>
