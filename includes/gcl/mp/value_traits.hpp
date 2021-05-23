@@ -52,7 +52,7 @@ namespace gcl::mp::value_traits
         (std::uintmax_t{1} << bit_size_v<T>);
 }
 
-
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::value_traits::tests::equal
 {
 #if not defined(_LIBCPP_VERSION) or _LIBCPP_VERSION >= 13000
@@ -115,3 +115,4 @@ namespace gcl::mp::value_traits::tests
         }
     }
 }
+#endif

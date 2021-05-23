@@ -107,6 +107,7 @@ namespace gcl::cx::typeinfo
     }
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::cx::typeinfo::test
 {
      // basic type
@@ -140,3 +141,4 @@ namespace gcl::cx::typeinfo::test
      static_assert(mapping[1] == gcl::cx::typeinfo::hashcode_v<bool>);
      static_assert(mapping[2] == gcl::cx::typeinfo::hashcode_v<float>);
 }
+#endif

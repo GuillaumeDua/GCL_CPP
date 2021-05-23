@@ -115,8 +115,7 @@ namespace gcl::mp
     constexpr const T&& get(const tuple<Types...>&& t) noexcept;
 }
 
-
-
+#if defined(GCL_BUILD_CT_TESTS)
 #include <stdexcept>
 #include <exception>
 namespace gcl::mp::tests::tuples
@@ -151,3 +150,4 @@ namespace gcl::mp::tests::tuples
         [[maybe_unused]] const auto faillible_tuple_value_init = faillible_tuple{can_throw_constructor{}};
     }
 }
+#endif

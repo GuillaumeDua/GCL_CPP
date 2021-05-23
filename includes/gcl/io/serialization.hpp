@@ -243,8 +243,8 @@ namespace gcl::io::serialization
     };
 }
 
+#if defined(GCL_BUILD_RT_TESTS)
 #include <sstream>
-
 namespace gcl::io::tests::serialization
 {
     static void test()
@@ -364,3 +364,4 @@ namespace gcl::io::tests::serialization
         }
     }
 }
+#endif

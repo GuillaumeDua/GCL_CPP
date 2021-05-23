@@ -64,6 +64,7 @@ namespace gcl::mp::concepts::traits_adapter
 #endif
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::concepts::tests::traits_adapter
 {
     static_assert(std::is_unsigned<unsigned>::value);
@@ -73,3 +74,4 @@ namespace gcl::mp::concepts::tests::traits_adapter
     static_assert(gcl::mp::concepts::traits_adapter::satisfy_any_of<unsigned, std::is_unsigned, std::is_pointer>);
     static_assert(gcl::mp::concepts::traits_adapter::satisfy_none_of<unsigned, std::is_rvalue_reference, std::is_pointer>);
 }
+#endif

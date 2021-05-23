@@ -103,6 +103,7 @@ namespace gcl::cx::array
     // }
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::type_traits::tests::is_std_array
 {
     static_assert(gcl::mp::type_traits::is_std_array_v<std::array<char, 3>>);
@@ -125,3 +126,4 @@ namespace gcl::cx::tests::array
     static_assert(gcl::cx::array::to_array('a', 'b', 'c') == std::array{'a', 'b', 'c'});
     static_assert(gcl::cx::array::to_array<'a', 'b', 'c'>() == std::array{'a', 'b', 'c'});
 }
+#endif

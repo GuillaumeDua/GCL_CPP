@@ -130,6 +130,7 @@ namespace gcl::container
     using interval_map = range_map<Key, T, Compare, Allocator>;
 }
 
+#if defined(GCL_BUILD_RT_TESTS)
 #include <stdexcept>
 namespace gcl::container::test::interval_map
 {
@@ -272,3 +273,4 @@ namespace gcl::container::test::interval_map
         test_rvalues();
     }
 }
+#endif

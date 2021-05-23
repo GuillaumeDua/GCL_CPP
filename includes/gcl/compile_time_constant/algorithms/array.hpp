@@ -84,6 +84,7 @@ namespace gcl::ctc::algorithms::array
     }
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::ctc::tests::algorithms::array::deduplicate
 {
     // MSVC/CL does not consider deduplicate calls as constexpr ...
@@ -123,3 +124,4 @@ namespace gcl::ctc::tests::algorithms::array::deduplicate
         static_assert(values == expected_result);
     }
 }
+#endif

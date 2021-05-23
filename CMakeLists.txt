@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
 project(GCL VERSION 2.0 LANGUAGES CXX)
 
+option(${PROJECT_NAME}_BUILD_CT_TESTS "${PROJECT_NAME} : Build compile-time tests ?" OFF)
+message(STATUS "${PROJECT_NAME} -- ${PROJECT_NAME}_BUILD_CT_TESTS is ${${PROJECT_NAME}_BUILD_CT_TESTS}")
+if (${${PROJECT_NAME}_BUILD_CT_TESTS})
+	add_compile_definitions(${PROJECT_NAME}_BUILD_CT_TESTS)
+endif()
+
 add_library(gcl_cpp INTERFACE)
 target_include_directories(gcl_cpp INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/includes
@@ -25,8 +31,12 @@ target_compile_features(gcl_cpp INTERFACE
 )
 
 option(${PROJECT_NAME}_BUILD_TEST "${PROJECT_NAME} : Build tests ?" OFF)
-message(STATUS "${PROJECT_NAME}_BUILD_TEST : ${${PROJECT_NAME}_BUILD_TEST}")
+message(STATUS "${PROJECT_NAME} -- ${PROJECT_NAME}_BUILD_TEST is ${${PROJECT_NAME}_BUILD_TEST}")
 if (${PROJECT_NAME}_BUILD_TEST)
+	message(STATUS "${PROJECT_NAME} -- ${PROJECT_NAME}_BUILD_TEST -- forcing ${PROJECT_NAME}_BUILD_RT_TESTS to ON")
+	add_compile_definitions(${PROJECT_NAME}_BUILD_RT_TESTS)
+	message(STATUS "${PROJECT_NAME} -- ${PROJECT_NAME}_BUILD_TEST -- forcing ${PROJECT_NAME}_BUILD_CT_TESTS to ON")
+	add_compile_definitions(${PROJECT_NAME}_BUILD_CT_TESTS)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif()
 

@@ -59,3 +59,20 @@ namespace gcl::mp::preprocessor::compiler
 #endif
         ;
 }
+namespace gcl::mp::preprocessor
+{
+    constexpr auto gcl_build_ct_tests =
+#if defined(GCL_BUILD_CT_TESTS)
+        true
+#else
+        false
+#endif
+        ;
+    constexpr auto gcl_build_rt_tests =
+#if defined(GCL_BUILD_RT_TESTS)
+        true
+#else
+        false
+#endif
+        ;
+}

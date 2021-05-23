@@ -142,6 +142,7 @@ namespace gcl::ctc::algorithms::tuple
     }
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::ctc::tests::algorithms::tuple
 {
     namespace ctc_tuple_algorithms = gcl::ctc::algorithms::tuple;
@@ -162,3 +163,4 @@ namespace gcl::ctc::tests::algorithms::tuple
     static_assert(ctc_tuple_algorithms::tuple_remove_prefix<2>(std::tuple{'a', 42, 'b', 43}) == std::tuple{'b', 43});
     static_assert(ctc_tuple_algorithms::tuple_remove_prefix<2>(std::array{'a', 'b', 'c'}) == std::array{'c'});
 }
+#endif

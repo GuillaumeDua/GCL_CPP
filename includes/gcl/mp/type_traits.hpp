@@ -98,7 +98,7 @@ namespace gcl::mp::type_traits
     };
 }
 
-//  tests
+#if defined(GCL_BUILD_CT_TESTS)
 #include <string>
 namespace gcl::mp::type_traits::tests::is_template
 {
@@ -216,3 +216,4 @@ namespace gcl::mp::type_traits::tests::trait_results
     using expected_result_as_type_pack = type_pack<std::false_type, std::true_type, std::false_type>;
     static_assert(std::is_same_v<results_as_type_pack, expected_result_as_type_pack>);
 }
+#endif

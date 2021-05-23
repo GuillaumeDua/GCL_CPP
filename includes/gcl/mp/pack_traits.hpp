@@ -270,6 +270,7 @@ namespace gcl::mp
     };
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::type_traits::tests
 {
     static_assert(std::is_same_v<gcl::mp::type_traits::type_at_t<2, char, bool, int, float>, int>);
@@ -419,3 +420,4 @@ namespace gcl::mp::tests::pack_traits
         static_assert(std::is_same_v<pack_type<int*, char*>, T1_pack_trait::filters<std::is_pointer>>);
     }
 }
+#endif

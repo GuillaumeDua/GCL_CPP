@@ -32,6 +32,7 @@ namespace gcl::algorithms::maths
     }
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::algorithms::tests::maths
 {
     static_assert(gcl::algorithms::maths::distance(0, 0) == 0);
@@ -45,3 +46,4 @@ namespace gcl::algorithms::tests::maths
     static_assert(gcl::algorithms::maths::abs(-1) == 1);
     static_assert(gcl::algorithms::maths::abs(1) == 1);
 }
+#endif

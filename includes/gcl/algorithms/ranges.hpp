@@ -42,6 +42,7 @@ namespace gcl::algorithms::ranges
     }
 }
 
+#if defined(GCL_BUILD_RT_TESTS)
 #include <map>
 #include <algorithm>
 namespace gcl::algorithms::tests::ranges
@@ -62,3 +63,4 @@ namespace gcl::algorithms::tests::ranges
     void test() { is_in_range();
     }
 }
+#endif

@@ -120,6 +120,7 @@ namespace gcl::mp
     // using function_traits = member_function_traits_impl<decltype(&Function::operator()...)>;
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 #include <array>
 namespace gcl::mp::test
 {
@@ -168,3 +169,4 @@ namespace gcl::mp::test
 #endif
     }
 }
+#endif

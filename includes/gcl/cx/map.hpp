@@ -39,6 +39,7 @@ namespace gcl::cx
     map(Pairs<Key, Value>... args) -> map<Key, Value, sizeof...(Pairs)>;
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::cx::tests
 {
     consteval static void map()
@@ -51,3 +52,4 @@ namespace gcl::cx::tests
         static_assert(value.at('b') == 55);
     }
 }
+#endif

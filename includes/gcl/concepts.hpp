@@ -19,6 +19,7 @@ namespace gcl::concepts
     };
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::concepts::tests
 {
     static_assert(gcl::concepts::pointer<int*>);
@@ -38,3 +39,4 @@ namespace gcl::concepts::tests
         static_assert(gcl::concepts::function<decltype(&A::static_func)>);
     }
 }
+#endif

@@ -59,6 +59,7 @@ namespace gcl::mp::type_tag
     using add_tags_t = typename add_tags<tag_arguments...>::type;
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::tests::type_tag::type_to_type
 {
     static_assert(std::is_same_v<gcl::mp::type_tag::type_to_type_t<int>, int>);
@@ -91,3 +92,4 @@ namespace gcl::mp::tests::type_tag::add_tags
     static_assert(tagged::value<char> == 'a');
     static_assert(tagged::value<int> == 42);
 }
+#endif

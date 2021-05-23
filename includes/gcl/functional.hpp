@@ -46,8 +46,8 @@ namespace gcl::functional::type_traits
     using overload_concatenated_arguments_t = typename overload_arguments<T>::concatenated_types;
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 #include <functional>
-
 namespace gcl::functional::tests::type_traits
 {
     static_assert(gcl::functional::type_traits::is_overload_v<gcl::functional::overload<>>);
@@ -59,8 +59,6 @@ namespace gcl::functional::tests::type_traits
     #else
     using overload_type = decltype(gcl::functional::overload{[](int) {}, []() {}, [](char, double) {}});
     #endif
-
-
 
     using overload_type_arguments_t = gcl::functional::type_traits::overload_arguments_t<overload_type>;
     static_assert(std::tuple_size_v<overload_type_arguments_t> == 3);
@@ -75,3 +73,4 @@ namespace gcl::functional::tests::type_traits
     static_assert(std::is_same_v<std::tuple_element_t<1, overload_type_concatenated_arguments_t>, char>);
     static_assert(std::is_same_v<std::tuple_element_t<2, overload_type_concatenated_arguments_t>, double>);
 }
+#endif

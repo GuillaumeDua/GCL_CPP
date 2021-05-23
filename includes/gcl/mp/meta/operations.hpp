@@ -140,6 +140,7 @@ namespace gcl::mp::meta
     //}
 }
 
+#if defined(GCL_BUILD_CT_TESTS)
 namespace gcl::mp::tests::meta
 {
     template <typename... Ts>
@@ -213,3 +214,4 @@ namespace gcl::mp::tests::meta
         // static_assert(std::is_same_v<type_sequence<int>, type_sequence<int, char>::remove<type_sequence<char>>>);
     }
 }
+#endif
