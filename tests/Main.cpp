@@ -1,11 +1,11 @@
-#if not defined(GCL_BUILD_RT_TESTS)
-static_assert(false, "GCL_BUILD_RT_TESTS required to build runtime tests");
+#if not defined(GCL_ENABLE_RUNTIME_TESTS)
+static_assert(false, "GCL_ENABLE_RUNTIME_TESTS required to build runtime tests");
 #endif
-#if not defined(GCL_BUILD_CT_TESTS)
-static_assert(false, "GCL_BUILD_CT_TESTS required to build compile-time tests");
+#if not defined(GCL_ENABLE_COMPILE_TIME_TESTS)
+static_assert(false, "GCL_ENABLE_COMPILE_TIME_TESTS required to build compile-time tests");
 #endif
 
-// static tests (GCL_BUILD_CT_TESTS)
+// static tests (GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <gcl/mp/mp.hpp>
 #include <gcl/cx/cx.hpp>
 #include <gcl/compile_time_constant/ctc.hpp>
@@ -13,7 +13,7 @@ static_assert(false, "GCL_BUILD_CT_TESTS required to build compile-time tests");
 #include <gcl/concepts.hpp>
 #include <gcl/functional.hpp>
 
-// dynamic tests (GCL_BUILD_RT_TESTS)
+// dynamic tests (GCL_ENABLE_RUNTIME_TESTS)
 #include <gcl/io/io.hpp>
 #include <gcl/container/interval_map.hpp>
 #include <gcl/algorithms/algorithms.hpp>
@@ -24,7 +24,7 @@ static_assert(false, "GCL_BUILD_CT_TESTS required to build compile-time tests");
 auto main(int, char const*[]) -> int
 {
     try
-    {   // GCL_BUILD_RT_TESTS
+    {   // GCL_ENABLE_RUNTIME_TESTS
         // gcl::signals::initialize();
         // gcl::test::proceed();
         gcl::container::test::interval_map::test();

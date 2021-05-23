@@ -59,7 +59,7 @@ namespace gcl::mp::type_tag
     using add_tags_t = typename add_tags<tag_arguments...>::type;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::tests::type_tag::type_to_type
 {
     static_assert(std::is_same_v<gcl::mp::type_tag::type_to_type_t<int>, int>);

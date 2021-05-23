@@ -98,7 +98,7 @@ namespace gcl::mp::type_traits
     };
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <string>
 namespace gcl::mp::type_traits::tests::is_template
 {

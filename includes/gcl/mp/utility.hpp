@@ -30,7 +30,7 @@ namespace gcl::mp::utility
     using reverse_index_sequence = std::decay_t<decltype(reverse_index_sequence_v<Ints...>)>;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::utility::tests
 {
     static_assert(std::is_same_v<

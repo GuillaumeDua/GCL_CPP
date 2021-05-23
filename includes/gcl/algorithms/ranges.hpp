@@ -42,7 +42,7 @@ namespace gcl::algorithms::ranges
     }
 }
 
-#if defined(GCL_BUILD_RT_TESTS)
+#if defined(GCL_ENABLE_RUNTIME_TESTS)
 #include <map>
 #include <algorithm>
 namespace gcl::algorithms::tests::ranges

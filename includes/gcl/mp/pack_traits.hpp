@@ -270,7 +270,7 @@ namespace gcl::mp
     };
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::type_traits::tests
 {
     static_assert(std::is_same_v<gcl::mp::type_traits::type_at_t<2, char, bool, int, float>, int>);

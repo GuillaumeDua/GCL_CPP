@@ -120,7 +120,7 @@ namespace gcl::mp
     // using function_traits = member_function_traits_impl<decltype(&Function::operator()...)>;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <array>
 namespace gcl::mp::test
 {

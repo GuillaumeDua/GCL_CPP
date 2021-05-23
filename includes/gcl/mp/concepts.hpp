@@ -64,7 +64,7 @@ namespace gcl::mp::concepts::traits_adapter
 #endif
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::concepts::tests::traits_adapter
 {
     static_assert(std::is_unsigned<unsigned>::value);

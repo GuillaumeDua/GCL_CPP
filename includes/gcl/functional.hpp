@@ -46,7 +46,7 @@ namespace gcl::functional::type_traits
     using overload_concatenated_arguments_t = typename overload_arguments<T>::concatenated_types;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <functional>
 namespace gcl::functional::tests::type_traits
 {

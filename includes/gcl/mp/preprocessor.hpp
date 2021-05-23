@@ -61,15 +61,15 @@ namespace gcl::mp::preprocessor::compiler
 }
 namespace gcl::mp::preprocessor
 {
-    constexpr auto gcl_build_ct_tests =
-#if defined(GCL_BUILD_CT_TESTS)
+    constexpr auto gcl_enable_compile_time_tests =
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
         true
 #else
         false
 #endif
         ;
-    constexpr auto gcl_build_rt_tests =
-#if defined(GCL_BUILD_RT_TESTS)
+    constexpr auto gcl_enable_runtime_tests =
+#if defined(GCL_ENABLE_RUNTIME_TESTS)
         true
 #else
         false

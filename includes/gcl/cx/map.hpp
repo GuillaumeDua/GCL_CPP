@@ -39,7 +39,7 @@ namespace gcl::cx
     map(Pairs<Key, Value>... args) -> map<Key, Value, sizeof...(Pairs)>;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::cx::tests
 {
     consteval static void map()

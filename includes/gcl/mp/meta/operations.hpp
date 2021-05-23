@@ -140,7 +140,7 @@ namespace gcl::mp::meta
     //}
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::tests::meta
 {
     template <typename... Ts>

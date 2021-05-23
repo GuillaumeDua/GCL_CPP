@@ -115,7 +115,7 @@ namespace gcl::mp
     constexpr const T&& get(const tuple<Types...>&& t) noexcept;
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <stdexcept>
 #include <exception>
 namespace gcl::mp::tests::tuples

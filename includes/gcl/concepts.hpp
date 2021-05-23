@@ -19,7 +19,7 @@ namespace gcl::concepts
     };
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::concepts::tests
 {
     static_assert(gcl::concepts::pointer<int*>);

@@ -243,7 +243,7 @@ namespace gcl::io::serialization
     };
 }
 
-#if defined(GCL_BUILD_RT_TESTS)
+#if defined(GCL_ENABLE_RUNTIME_TESTS)
 #include <sstream>
 namespace gcl::io::tests::serialization
 {

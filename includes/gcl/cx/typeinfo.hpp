@@ -107,7 +107,7 @@ namespace gcl::cx::typeinfo
     }
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::cx::typeinfo::test
 {
      // basic type

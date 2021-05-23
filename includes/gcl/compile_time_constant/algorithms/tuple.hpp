@@ -142,7 +142,7 @@ namespace gcl::ctc::algorithms::tuple
     }
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::ctc::tests::algorithms::tuple
 {
     namespace ctc_tuple_algorithms = gcl::ctc::algorithms::tuple;

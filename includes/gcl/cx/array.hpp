@@ -103,7 +103,7 @@ namespace gcl::cx::array
     // }
 }
 
-#if defined(GCL_BUILD_CT_TESTS)
+#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::type_traits::tests::is_std_array
 {
     static_assert(gcl::mp::type_traits::is_std_array_v<std::array<char, 3>>);
