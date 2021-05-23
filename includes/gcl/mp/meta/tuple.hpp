@@ -54,18 +54,19 @@ namespace gcl::mp
         using type_at = typename type_at_impl<index>::type;
 
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr auto& get()
+        requires(not empty and index <= (size - 1)) constexpr auto& get() noexcept
         {
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr const auto& get() const
+        requires(not empty and index <= (size - 1)) constexpr const auto& get() const noexcept
         {
-            return const_cast<tuple*>(this)->get<index>(); // violate constness invariants
+            return const_cast<tuple*>(this)->get<index>(); // somehow violates constness invariants
         }
 
         template <typename... arg_types>
-        requires(sizeof...(arg_types) == size) constexpr bool operator==(const tuple<arg_types...>& other) const
+        requires(sizeof...(arg_types) == size) constexpr bool operator==(
+            const tuple<arg_types...>& other) const noexcept
         {
             return [ this, &other ]<std::size_t... indexes>(std::index_sequence<indexes...>)
             {
@@ -74,6 +75,26 @@ namespace gcl::mp
             (std::make_index_sequence<size>{});
         }
     };
+}
+namespace gcl::mp
+{
+    template <std::size_t I, class... Types>
+    constexpr auto get(tuple<Types...>& t) noexcept;
+    template <std::size_t I, class... Types>
+    constexpr auto get(tuple<Types...>&& t) noexcept;
+    template <std::size_t I, class... Types>
+    constexpr auto const& get(const tuple<Types...>& t) noexcept;
+    template <std::size_t I, class... Types>
+    constexpr auto const&& get(const tuple<Types...>&& t) noexcept;
+
+    template <class T, class... Types>
+    constexpr T& get(tuple<Types...>& t) noexcept;
+    template <class T, class... Types>
+    constexpr T&& get(tuple<Types...>&& t) noexcept;
+    template <class T, class... Types>
+    constexpr const T& get(const tuple<Types...>& t) noexcept;
+    template <class T, class... Types>
+    constexpr const T&& get(const tuple<Types...>&& t) noexcept;
 }
 
 // When Clang, Msvc-cl gets better, replace `tuple::generate_storage` implementation by :
@@ -94,7 +115,9 @@ namespace gcl::mp
     (std::make_index_sequence<sizeof...(types)>{});
 };*/
 
-namespace gcl::mp::tests
+#include <stdexcept>
+#include <exception>
+namespace gcl::mp::tests::tuples
 {
     using namespace gcl::mp;
 
@@ -103,12 +126,10 @@ namespace gcl::mp::tests
     using two_element_tuple = tuple<int, char>;
     
     static constexpr auto empty_tuple_default_init = empty_tuple{};
-    
     static constexpr auto one_element_tuple_default_init = one_element_tuple{};
-
+    static constexpr auto two_element_tuple_default_init = two_element_tuple{};
 
     static constexpr auto one_element_tuple_values_init = one_element_tuple{42};
-    static constexpr auto two_element_tuple_default_init = two_element_tuple{};
     static constexpr auto two_element_tuple_values_init = two_element_tuple{42, 'a'};
 
     static_assert(std::is_same_v<tuple<int, char>, decltype(tuple{42, 'a'})>);
@@ -117,4 +138,14 @@ namespace gcl::mp::tests
     static_assert(std::is_same_v<two_element_tuple::type_at<1>, char>);
     static_assert(std::is_same_v<decltype(std::declval<two_element_tuple>().get<0>()), int&>);
     static_assert(std::is_same_v<decltype(std::declval<const two_element_tuple&>().get<1>()), const char&>);
+
+
+    void non_literal_type(){
+        struct can_throw_constructor {
+            can_throw_constructor() { throw std::runtime_error{""}; };
+        };
+        using faillible_tuple = tuple<can_throw_constructor>;
+        [[maybe_unused]] const auto faillible_tuple_default_init = faillible_tuple{};
+        [[maybe_unused]] const auto faillible_tuple_value_init = faillible_tuple{can_throw_constructor{}};
+    }
 }
