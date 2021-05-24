@@ -36,13 +36,13 @@ namespace gcl::mp
 
             const auto generate_storage_entry = []<typename T, std::size_t index>(T && init_value) constexpr
             {
-                return [value = init_value](type_index<index>) mutable noexcept -> auto& { return value; };
+                return [value = init_value](type_index<index>) constexpr mutable noexcept -> auto&& { return value; };
             };
             return gcl::mp::meta::functional::overload{
                 generate_storage_entry.template operator()<types, indexes>(std::forward<decltype(values)>(values))...};
         };
         using storage_type = decltype(generate_storage(types{}...));
-        storage_type storage;
+        mutable storage_type storage;
 
         template <std::size_t index>
         struct type_at_impl { // defer symbol (Clang)
@@ -54,14 +54,19 @@ namespace gcl::mp
         using type_at = typename type_at_impl<index>::type;
 
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr auto& get() noexcept
+        requires(not empty and index <= (size - 1)) constexpr auto& get() & noexcept
         {
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr const auto& get() const noexcept
+        requires(not empty and index <= (size - 1)) constexpr const auto& get() const & noexcept
         {
-            return const_cast<tuple*>(this)->get<index>(); // somehow violates constness invariants
+            return storage(type_index<index>{});
+        }
+        template <std::size_t index>
+        requires(not empty and index <= (size - 1)) constexpr auto&& get() && noexcept
+        {
+            return std::move(storage(type_index<index>{}));
         }
 
         template <typename... arg_types>
@@ -114,6 +119,19 @@ namespace gcl::mp
     template <class T, class... Types>
     constexpr const T&& get(const tuple<Types...>&& t) noexcept;
 }
+namespace gcl::mp::tests::tuples::get
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    void usage() {
+        tuple_type value;
+        static_cast<tuple_type&>(value).get<1>();
+        static_cast<tuple_type&&>(value).get<1>();
+        static_cast<const tuple_type&>(value).get<1>();
+        static_cast<const tuple_type&&>(value).get<1>();
+    }
+}
 
 #if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <stdexcept>
@@ -137,9 +155,11 @@ namespace gcl::mp::tests::tuples
 
     static_assert(std::is_same_v<two_element_tuple::type_at<0>, int>);
     static_assert(std::is_same_v<two_element_tuple::type_at<1>, char>);
-    static_assert(std::is_same_v<decltype(std::declval<two_element_tuple>().get<0>()), int&>);
-    static_assert(std::is_same_v<decltype(std::declval<const two_element_tuple&>().get<1>()), const char&>);
 
+    static_assert(std::is_same_v<decltype(std::declval<two_element_tuple&>().get<0>()), int&>);
+    static_assert(std::is_same_v<decltype(std::declval<const two_element_tuple&>().get<1>()), const char&>);
+    static_assert(std::is_same_v<decltype(std::declval<two_element_tuple>().get<0>()), int&&>);
+    static_assert(std::is_same_v<decltype(std::declval<two_element_tuple&&>().get<0>()), int&&>);
 
     void non_literal_type(){
         struct can_throw_constructor {
