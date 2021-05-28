@@ -68,6 +68,11 @@ namespace gcl::mp
         {
             return std::move(storage(type_index<index>{}));
         }
+        template <std::size_t index>
+        requires(not empty and index <= (size - 1)) constexpr auto&& get() const && noexcept
+        {
+            return std::move(storage(type_index<index>{}));
+        }
 
         template <typename... arg_types>
         requires(sizeof...(arg_types) == size) constexpr bool operator==(
@@ -102,22 +107,35 @@ namespace gcl::mp
 namespace gcl::mp
 {
     template <std::size_t I, class... Types>
-    constexpr auto get(tuple<Types...>& t) noexcept;
+    constexpr auto get(tuple<Types...>& value) noexcept
+    {
+        return value.template get<I>();
+    }
+
     template <std::size_t I, class... Types>
-    constexpr auto get(tuple<Types...>&& t) noexcept;
+    constexpr auto get(tuple<Types...>&& value) noexcept
+    {
+        return value.template get<I>();
+    }
     template <std::size_t I, class... Types>
-    constexpr auto const& get(const tuple<Types...>& t) noexcept;
+    constexpr auto const& get(const tuple<Types...>& value) noexcept
+    {
+        return value.template get<I>();
+    }
     template <std::size_t I, class... Types>
-    constexpr auto const&& get(const tuple<Types...>&& t) noexcept;
+    constexpr auto const&& get(const tuple<Types...>&& value) noexcept
+    {
+        return value.template get<I>();
+    }
 
     template <class T, class... Types>
-    constexpr T& get(tuple<Types...>& t) noexcept;
+    constexpr T& get(tuple<Types...>& value) noexcept;
     template <class T, class... Types>
-    constexpr T&& get(tuple<Types...>&& t) noexcept;
+    constexpr T&& get(tuple<Types...>&& value) noexcept;
     template <class T, class... Types>
-    constexpr const T& get(const tuple<Types...>& t) noexcept;
+    constexpr const T& get(const tuple<Types...>& value) noexcept;
     template <class T, class... Types>
-    constexpr const T&& get(const tuple<Types...>&& t) noexcept;
+    constexpr const T&& get(const tuple<Types...>&& value) noexcept;
 }
 namespace gcl::mp::tests::tuples::get
 {
@@ -130,6 +148,11 @@ namespace gcl::mp::tests::tuples::get
         static_cast<tuple_type&&>(value).get<1>();
         static_cast<const tuple_type&>(value).get<1>();
         static_cast<const tuple_type&&>(value).get<1>();
+
+        gcl::mp::get<1>(static_cast<tuple_type&>(value));
+        gcl::mp::get<1>(static_cast<tuple_type&&>(value));
+        gcl::mp::get<1>(static_cast<const tuple_type&>(value));
+        //gcl::mp::get<1>(static_cast<const tuple_type&&>(value));
     }
 }
 
