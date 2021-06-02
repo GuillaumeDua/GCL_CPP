@@ -12,6 +12,8 @@ namespace gcl::mp
 
         constexpr static auto size = sizeof...(types);
         constexpr static auto empty = size == 0;
+        template <std::size_t index>
+        constexpr static auto valid_index = not empty and index <= (size - 1);
 
         constexpr tuple() requires(not empty)
             : storage{generate_storage(types{}...)}
@@ -22,6 +24,7 @@ namespace gcl::mp
         constexpr tuple(tuple&&) = default;
 
       private:
+
         // storage : by-pass missing features : auto non-static members, lambdas in unevaluated context
         using index_sequence = std::make_index_sequence<sizeof...(types)>;
         static constexpr auto generate_storage(types&&... values)
@@ -45,31 +48,34 @@ namespace gcl::mp
         mutable storage_type storage;
 
         template <std::size_t index>
+        requires(valid_index<index>)
         struct type_at_impl { // defer symbol (Clang)
             using type = std::remove_reference_t<decltype(std::declval<tuple>().template get<index>())>;
         };
 
       public:
         template <std::size_t index>
+        requires(valid_index<index>)
         using type_at = typename type_at_impl<index>::type;
 
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr auto& get() & noexcept
+        requires(valid_index<index>)
+        constexpr auto& get() & noexcept
         {
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr const auto& get() const & noexcept
+        requires(valid_index<index>) constexpr const auto& get() const& noexcept
         {
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr auto&& get() && noexcept
+        requires(valid_index<index>) constexpr auto&& get() && noexcept
         {
             return std::move(storage(type_index<index>{}));
         }
         template <std::size_t index>
-        requires(not empty and index <= (size - 1)) constexpr const auto&& get() const && noexcept
+        requires(valid_index<index>) constexpr const auto&& get() const&& noexcept
         {
             return std::move(storage(type_index<index>{}));
         }
