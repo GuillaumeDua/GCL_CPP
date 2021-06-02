@@ -134,6 +134,13 @@ namespace gcl::mp
         return std::move(value.template get<I>());
     }
 
+    template <class...>
+    struct tuple_size;
+    template <class... Types>
+    struct tuple_size<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
+    template <class T>
+    constexpr auto tuple_size_v = tuple_size<T>::value;
+
     template <class T, class... Types>
     constexpr T& get(tuple<Types...>& value) noexcept;
     template <class T, class... Types>
@@ -143,26 +150,11 @@ namespace gcl::mp
     template <class T, class... Types>
     constexpr const T&& get(const tuple<Types...>&& value) noexcept;
 }
-namespace gcl::mp::tests::tuples::get
-{
-    using namespace gcl::mp;
-    using tuple_type = tuple<int, char>;
-
-    static_assert(std::is_same_v<char&, decltype(std::declval<tuple_type&>().get<1>())>);
-    static_assert(std::is_same_v<char&&, decltype(std::declval<tuple_type&&>().get<1>())>);
-    static_assert(std::is_same_v<const char&, decltype(std::declval<const tuple_type&>().get<1>())>);
-    static_assert(std::is_same_v<const char&&, decltype(std::declval<const tuple_type&&>().get<1>())>);
-
-    static_assert(std::is_same_v<char&, decltype(gcl::mp::get<1>(std::declval<tuple_type&>()))>);
-    static_assert(std::is_same_v<char&&, decltype(gcl::mp::get<1>(std::declval<tuple_type&&>()))>);
-    static_assert(std::is_same_v<const char&, decltype(gcl::mp::get<1>(std::declval<const tuple_type&>()))>);
-    static_assert(std::is_same_v<const char&&, decltype(gcl::mp::get<1>(std::declval<const tuple_type&&>()))>);
-}
 
 #if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 #include <stdexcept>
 #include <exception>
-namespace gcl::mp::tests::tuples
+namespace gcl::mp::tests::tuples::values
 {
     using namespace gcl::mp;
 
@@ -195,5 +187,30 @@ namespace gcl::mp::tests::tuples
         [[maybe_unused]] const auto faillible_tuple_default_init = faillible_tuple{};
         [[maybe_unused]] const auto faillible_tuple_value_init = faillible_tuple{can_throw_constructor{}};
     }
+}
+namespace gcl::mp::tests::tuples::get
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    static_assert(std::is_same_v<char&, decltype(std::declval<tuple_type&>().get<1>())>);
+    static_assert(std::is_same_v<char&&, decltype(std::declval<tuple_type&&>().get<1>())>);
+    static_assert(std::is_same_v<const char&, decltype(std::declval<const tuple_type&>().get<1>())>);
+    static_assert(std::is_same_v<const char&&, decltype(std::declval<const tuple_type&&>().get<1>())>);
+
+    static_assert(std::is_same_v<char&, decltype(gcl::mp::get<1>(std::declval<tuple_type&>()))>);
+    static_assert(std::is_same_v<char&&, decltype(gcl::mp::get<1>(std::declval<tuple_type&&>()))>);
+    static_assert(std::is_same_v<const char&, decltype(gcl::mp::get<1>(std::declval<const tuple_type&>()))>);
+    static_assert(std::is_same_v<const char&&, decltype(gcl::mp::get<1>(std::declval<const tuple_type&&>()))>);
+}
+namespace gcl::mp::tests::tuples::size
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    static_assert(tuple<>::size == 0);
+    static_assert(tuple<>::size == tuple_size_v<tuple<>>);
+    static_assert(tuple_type::size == 2);
+    static_assert(tuple_type::size == tuple_size_v<tuple_type>);
 }
 #endif
