@@ -1,6 +1,9 @@
 #pragma once
 
 #include <gcl/mp/meta/functional.hpp>
+#include <type_traits>
+
+// todo : filter, apply, for_each, for_each_index
 
 namespace gcl::mp
 {
@@ -65,17 +68,17 @@ namespace gcl::mp
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(valid_index<index>) constexpr const auto& get() const& noexcept
+        requires(valid_index<index>) [[nodiscard]] constexpr const auto& get() const& noexcept
         {
             return storage(type_index<index>{});
         }
         template <std::size_t index>
-        requires(valid_index<index>) constexpr auto&& get() && noexcept
+        requires(valid_index<index>) [[nodiscard]] constexpr auto&& get() && noexcept
         {
             return std::move(storage(type_index<index>{}));
         }
         template <std::size_t index>
-        requires(valid_index<index>) constexpr const auto&& get() const&& noexcept
+        requires(valid_index<index>) [[nodiscard]] constexpr const auto&& get() const&& noexcept
         {
             return std::move(storage(type_index<index>{}));
         }
@@ -113,34 +116,50 @@ namespace gcl::mp
 namespace gcl::mp
 {
     template <std::size_t I, class... Types>
-    constexpr auto & get(tuple<Types...>& value) noexcept
-    {
-        return value.template get<I>();
-    }
-
-    template <std::size_t I, class... Types>
-    constexpr auto && get(tuple<Types...>&& value) noexcept
-    {
-        return std::move(value.template get<I>());
-    }
-    template <std::size_t I, class... Types>
-    constexpr auto const& get(const tuple<Types...>& value) noexcept
+    [[nodiscard]] constexpr auto& get(tuple<Types...>& value) noexcept
     {
         return value.template get<I>();
     }
     template <std::size_t I, class... Types>
-    constexpr auto const&& get(const tuple<Types...>&& value) noexcept
+    [[nodiscard]] constexpr auto&& get(tuple<Types...>&& value) noexcept
+    {
+        return std::move(value.template get<I>());
+    }
+    template <std::size_t I, class... Types>
+    [[nodiscard]] constexpr auto const& get(const tuple<Types...>& value) noexcept
+    {
+        return value.template get<I>();
+    }
+    template <std::size_t I, class... Types>
+    [[nodiscard]] constexpr auto const&& get(const tuple<Types...>&& value) noexcept
     {
         return std::move(value.template get<I>());
     }
 
-    template <class...>
+    template <class tuple_type>
     struct tuple_size;
     template <class... Types>
     struct tuple_size<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
     template <class T>
     constexpr auto tuple_size_v = tuple_size<T>::value;
 
+    // how to implement this without recursion ?
+    template <std::size_t index, class tuple_type>
+    struct tuple_element;
+    template <std::size_t index, class first, class... rest>
+    struct tuple_element<index, tuple<first, rest...>> : tuple_element<(index - 1), tuple<rest...>> {};
+    template <class first, class... rest>
+    struct tuple_element<0, tuple<first, rest...>> {
+        using type = first;        
+    };
+    template <size_t index>
+    struct tuple_element<index, tuple<>> {
+        static_assert([]() constexpr { return false; }(), "gcl::mp::tuple : out of range");
+    };
+    template <std::size_t index, class tuple_type>
+    using tuple_element_t = typename tuple_element<index, tuple_type>::type;
+
+    // https://quick-bench.com/q/va85-AzD0ppFuVO6zUTzrC1B6bE
     template <class T, class... Types>
     constexpr T& get(tuple<Types...>& value) noexcept;
     template <class T, class... Types>
@@ -212,5 +231,13 @@ namespace gcl::mp::tests::tuples::size
     static_assert(tuple<>::size == tuple_size_v<tuple<>>);
     static_assert(tuple_type::size == 2);
     static_assert(tuple_type::size == tuple_size_v<tuple_type>);
+}
+namespace gcl::mp::tests::tuples::tuple_element
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    static_assert(std::is_same_v<tuple_element_t<0, tuple_type>, int>);
+    static_assert(std::is_same_v<tuple_element_t<1, tuple_type>, char>);
 }
 #endif
