@@ -16,7 +16,7 @@ namespace gcl::mp
         constexpr static auto size = sizeof...(types);
         constexpr static auto empty = size == 0;
         template <std::size_t index>
-        constexpr static auto valid_index = not empty and index <= (size - 1);
+        constexpr static bool valid_index = not empty and index <= (size - 1);
 
         constexpr tuple() requires(not empty)
             : storage{generate_storage(types{}...)}
