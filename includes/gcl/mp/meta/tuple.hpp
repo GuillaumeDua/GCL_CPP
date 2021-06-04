@@ -3,7 +3,7 @@
 #include <gcl/mp/meta/functional.hpp>
 #include <type_traits>
 
-// todo : filter, apply, for_each, for_each_index
+// todo : filter, apply, for_each, for_each_index, swap, operator=
 
 namespace gcl::mp
 {
@@ -62,10 +62,10 @@ namespace gcl::mp
         using type_at = typename type_at_impl<index>::type;
 
         template <typename T>
-        constexpr static auto contains = ((std::size_t{std::is_same_v<T, types>} + ...)) == 1;
+        constexpr static bool contains = ((std::size_t{std::is_same_v<T, types>} + ...)) == 1;
 
         template <typename T>
-        constexpr static auto index_of = []() constexpr noexcept
+        constexpr static std::size_t index_of = []() constexpr noexcept -> std::size_t
         {
             static_assert(contains<T>, "only one occurence allowed");
             return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr
@@ -97,8 +97,6 @@ namespace gcl::mp
         {
             return std::move(storage(type_index<index>{}));
         }
-
-
 
         template <typename... arg_types>
         requires(sizeof...(arg_types) == size) constexpr bool operator==(
