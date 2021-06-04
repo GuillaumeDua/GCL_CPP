@@ -65,6 +65,13 @@ namespace gcl::mp::type_traits
         template <typename T>
         using type = first_trait<T>;
     };
+
+    template <typename...>
+    struct dependent_false {
+        constexpr static auto value = false;
+    };
+    template <typename... args>
+    constexpr auto dependent_false_v = dependent_false<args...>::value;
 }
 
 #include <bitset>
@@ -215,5 +222,15 @@ namespace gcl::mp::type_traits::tests::trait_results
     using results_as_type_pack = results::as_t<type_pack>;
     using expected_result_as_type_pack = type_pack<std::false_type, std::true_type, std::false_type>;
     static_assert(std::is_same_v<results_as_type_pack, expected_result_as_type_pack>);
+}
+namespace gcl::mp::type_traits::tests::dependent_false
+{
+    constexpr auto qwe = []<typename T>() -> bool { 
+        if constexpr (true)
+            ;
+        else
+            static_assert(gcl::mp::type_traits::dependent_false_v<T>);
+        return {};
+    }. template operator()<int>();
 }
 #endif
