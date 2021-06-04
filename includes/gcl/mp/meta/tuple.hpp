@@ -61,6 +61,21 @@ namespace gcl::mp
         requires(valid_index<index>)
         using type_at = typename type_at_impl<index>::type;
 
+        template <typename T>
+        constexpr static auto contains = ((std::size_t{std::is_same_v<T, types>} + ...)) == 1;
+
+        template <typename T>
+        constexpr static auto index_of = []() constexpr noexcept
+        {
+            static_assert(contains<T>, "only one occurence allowed");
+            return []<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr
+            {
+                return ((std::is_same_v<T, types> ? indexes : 0) + ...);
+            }
+            (std::make_index_sequence<size>{});
+        }
+        ();
+
         template <std::size_t index>
         requires(valid_index<index>)
         constexpr auto& get() & noexcept
@@ -82,6 +97,8 @@ namespace gcl::mp
         {
             return std::move(storage(type_index<index>{}));
         }
+
+
 
         template <typename... arg_types>
         requires(sizeof...(arg_types) == size) constexpr bool operator==(
@@ -231,6 +248,23 @@ namespace gcl::mp::tests::tuples::size
     static_assert(tuple<>::size == tuple_size_v<tuple<>>);
     static_assert(tuple_type::size == 2);
     static_assert(tuple_type::size == tuple_size_v<tuple_type>);
+}
+namespace gcl::mp::tests::tuples::contains
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    static_assert(tuple_type::contains<int>);
+    static_assert(tuple_type::contains<char>);
+    static_assert(not tuple_type::contains<double>);
+}
+namespace gcl::mp::tests::tuples::index_of
+{
+    using namespace gcl::mp;
+    using tuple_type = tuple<int, char>;
+
+    static_assert(tuple_type::index_of<int> == 0);
+    static_assert(tuple_type::index_of<char> == 1);
 }
 namespace gcl::mp::tests::tuples::tuple_element
 {
