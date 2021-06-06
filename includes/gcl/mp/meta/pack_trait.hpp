@@ -6,10 +6,19 @@
 namespace gcl::mp
 {
     template <typename T, typename tuple_type>
+    struct count_of;
+    template <typename T, template <typename...> class tuple_type, typename... types>
+    struct count_of<T, tuple_type<types...>> {
+        constexpr static std::size_t value = ((std::size_t{std::is_same_v<T, types>} + ...));
+    };
+    template <typename T, typename tuple_type>
+    constexpr bool count_of_v = count_of<T, tuple_type>::value;
+
+    template <typename T, typename tuple_type>
     struct contains;
     template <typename T, template <typename...> class tuple_type, typename... types>
     struct contains<T, tuple_type<types...>> {
-        constexpr static bool value = ((std::size_t{std::is_same_v<T, types>} + ...)) == 1;
+        constexpr static bool value = (count_of_v<T, tuple_type<types...>> == 1);
     };
     template <typename T, typename tuple_type>
     constexpr bool contains_v = contains<T, tuple_type>::value;
@@ -90,6 +99,44 @@ namespace gcl::mp
     template <template <typename...> class T, typename... Ts>
     using pack_as_t = typename pack_as<T, Ts...>::type;
 }
+
+#if false
+// GCC only
+namespace gcl::mp::experimental
+{   // see WIP https://godbolt.org/z/qoo5KsTY1
+
+    template <typename T>
+    struct is_template : std::false_type {};
+    template <template <typename...> typename T, typename... Ts>
+    struct is_template<T<Ts...>> : std::true_type {};
+
+    template <typename tuple_type, typename functor_type>
+    requires(is_template<tuple_type>::value) constexpr functor_type for_each_index(functor_type&& func_value)
+    {
+        [&]<template <typename...> class pack, typename... types>(pack<types...>) constexpr
+        {
+            [&]<std::size_t... indexes>(std::index_sequence<indexes...>) constexpr
+            {
+                (func_value.template operator()<types, indexes>(), ...);
+            }
+            (std::make_index_sequence<sizeof...(types)>{});
+        }
+        (tuple_type{});
+        return std::move(func_value);
+    };
+
+    template <typename tuple_type, typename functor_type>
+    requires(is_template<tuple_type>::value) constexpr functor_type for_each(functor_type&& func_value)
+    {
+        [&]<template <typename...> class pack, typename... types>(pack<types...>)
+        {
+            ((func_value.template operator()<types>()), ...);
+        }
+        (tuple_type{});
+        return std::move(func_value);
+    };
+}
+#endif
 
 namespace gcl::mp::meta::tests::pack_traits
 {
