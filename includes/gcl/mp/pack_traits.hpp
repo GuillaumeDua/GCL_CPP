@@ -58,6 +58,17 @@ namespace gcl::mp::type_traits
     template <typename T, typename... Ts>
     constexpr inline auto count_of_v = count_of<T, Ts...>::value;
 
+    template <typename T, typename... Ts>
+    struct are_unique {
+        constexpr static bool value = (not(std::is_same_v<T, Ts> or ...)) and are_unique<Ts...>::value;
+    };
+    template <typename T>
+    struct are_unique<T> {
+        constexpr static bool value = true;
+    };
+    template <typename... Ts>
+    constexpr auto are_unique_v = are_unique<Ts...>::value;
+
     template <typename T, template <typename> typename transformation>
     struct transform;
     template <template <typename...> typename TypePack, template <typename> typename transformation, typename... Ts>
@@ -352,6 +363,12 @@ namespace gcl::mp::type_traits::tests
         static_assert(gcl::mp::type_traits::index_of_v<int, int, double, char, float> == 0);
         static_assert(gcl::mp::type_traits::index_of_v<float, type_pack> == 3);
         static_assert(gcl::mp::type_traits::index_of_v<float, int, double, char, float> == 3);
+    }
+    namespace are_unique
+    {
+        static_assert(are_unique_v<int, double, char>);
+        static_assert(not are_unique_v<int, double, int, char>);
+        static_assert(not are_unique_v<bool, int, double, int, char>);
     }
     namespace reverse
     {

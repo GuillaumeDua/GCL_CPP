@@ -23,6 +23,19 @@ namespace gcl::mp
     template <typename T, typename tuple_type>
     constexpr bool contains_v = contains<T, tuple_type>::value;
 
+    template <typename tuple_type>
+    struct unique;
+    template <template <typename...> class tuple_type, typename first, typename... rest>
+    struct unique<tuple_type<first, rest...>> {
+        constexpr static bool value = (not(std::is_same_v<first, rest> or ...)) and unique<tuple_type<rest...>>::value;
+    };
+    template <template <typename...> class tuple_type, typename types>
+    struct unique<tuple_type<types>> {
+        constexpr static bool value = true;
+    };
+    template <typename T>
+    constexpr bool unique_v = unique<T>::value;
+
     template <typename T, typename tuple_type>
     struct index_of;
     template <typename T, template <typename...> class tuple_type, typename... types>
@@ -150,6 +163,11 @@ namespace gcl::mp::meta::tests::pack_traits
         static_assert(gcl::mp::contains_v<int, pack_t>);
         static_assert(gcl::mp::contains_v<char, pack_t>);
         static_assert(not gcl::mp::contains_v<double, pack_t>);
+    }
+    namespace unique {
+        static_assert(gcl::mp::unique_v<pack_type<int, double, char>>);
+        static_assert(not gcl::mp::unique_v<pack_type<int, double, int, char>>);
+        static_assert(not gcl::mp::unique_v<pack_type<bool, int, double, int, char>>);
     }
     namespace index_of
     {
