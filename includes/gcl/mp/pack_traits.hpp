@@ -273,12 +273,6 @@ namespace gcl::mp
     };
     template <typename... Ts>
     struct super : Ts... {};
-    template <template <typename...> class base_type, typename... Ts>
-    struct partial {
-        // differs type instanciation with partial template-type parameters
-        template <typename... Us>
-        requires(sizeof...(Us) >= 1) using type = base_type<Ts..., Us...>;
-    };
 }
 
 #if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
@@ -286,9 +280,6 @@ namespace gcl::mp::type_traits::tests
 {
     static_assert(std::is_same_v<gcl::mp::type_traits::type_at_t<2, char, bool, int, float>, int>);
     static_assert(gcl::mp::type_traits::contains_v<int, char, bool, int, float>);
-
-    static_assert(gcl::mp::partial<std::is_same, int>::type<int>::value);
-    static_assert(gcl::mp::partial<std::is_same>::type<int, int>::value);
 
     static_assert(gcl::mp::type_traits::count_of_v<int, char, double, int, char> == 1);
     static_assert(gcl::mp::type_traits::count_of_v<int, std::tuple<char, double, int, char>> == 1);

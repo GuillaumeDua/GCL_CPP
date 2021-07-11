@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 namespace gcl::mp::type_traits
 {
     template <class T>
@@ -81,6 +82,29 @@ namespace gcl::mp::type_traits
     struct merge_traits<first_trait> {
         template <typename T>
         using type = first_trait<T>::type;
+    };
+
+    template <template <typename...> class base_type, typename... Ts>
+    class partial {
+        // differs type instanciation with partial template-type parameters
+        template <typename... Us>
+        struct impl {
+            // workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59498
+            using type = base_type<Ts..., Us...>;
+        };
+        template <typename U>
+        struct impl<U> {
+            using type = base_type<Ts..., U>;
+        };
+
+      public:
+        template <typename... Us>
+        requires(sizeof...(Us) >= 1) using type = impl<Us...>::type;
+    };
+    template <template <typename...> class base_type, typename... Ts>
+    struct partial_t {
+        template <typename... Us>
+        using type = typename partial<base_type, Ts...>::type<Us...>::type;
     };
 }
 
@@ -248,5 +272,14 @@ namespace gcl::mp::type_traits::tests::dependent_false
             static_assert(gcl::mp::type_traits::dependent_false_v<T>);
         return {};
     }. template operator()<int>();
+}
+namespace gcl::mp::type_traits::tests::partial
+{
+    static_assert(gcl::mp::type_traits::partial<std::is_same, int>::type<int>::value);
+    static_assert(gcl::mp::type_traits::partial<std::is_same>::type<int, int>::value);
+
+    template <typename T>
+    using add_const_t = partial_t<std::add_const>::type<T>;
+    static_assert(std::is_same_v<add_const_t<int>, std::add_const_t<int>>);
 }
 #endif
