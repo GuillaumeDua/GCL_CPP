@@ -7,4 +7,5 @@
 #include <gcl/mp/type_traits.hpp>
 #include <gcl/mp/utility.hpp>
 #include <gcl/mp/value_traits.hpp>
+#include <gcl/mp/cast.hpp>
 #include <gcl/mp/meta/meta.hpp>
