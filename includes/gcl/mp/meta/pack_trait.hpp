@@ -36,6 +36,9 @@ namespace gcl::mp
     template <typename T>
     constexpr bool unique_v = unique<T>::value;
 
+    #if defined(_MSC_VER) and not defined(__clang__)
+    # pragma message("gcl::mp::index_of : disabled on msvc-cl")
+    #else
     template <typename T, typename tuple_type>
     struct index_of;
     template <typename T, template <typename...> class tuple_type, typename... types>
@@ -51,6 +54,7 @@ namespace gcl::mp
     };
     template <typename T, typename tuple_type>
     constexpr std::size_t index_of_v = index_of<T, tuple_type>::value;
+    #endif
 
     template <std::size_t index, class tuple_type>
     struct type_at;
@@ -169,19 +173,20 @@ namespace gcl::mp::meta::tests::pack_traits
         static_assert(not gcl::mp::unique_v<pack_type<int, double, int, char>>);
         static_assert(not gcl::mp::unique_v<pack_type<bool, int, double, int, char>>);
     }
-    namespace index_of
-    {
-        static_assert(gcl::mp::index_of_v<int, pack_t> == 0);
-        static_assert(gcl::mp::index_of_v<char, pack_t> == 1);
-    }
     namespace type_at
     {
         static_assert(std::is_same_v<gcl::mp::type_at_t<0, pack_t>, int>);
         static_assert(std::is_same_v<gcl::mp::type_at_t<1, pack_t>, char>);
-        static_assert(std::is_same_v<gcl::mp::type_at_t<
-            gcl::mp::index_of_v<int, pack_t>, pack_t>,
-            int>);
     }
+    #if defined(_MSC_VER) and not defined(__clang__)
+    #else
+    namespace index_of
+    {
+        static_assert(gcl::mp::index_of_v<int, pack_t> == 0);
+        static_assert(gcl::mp::index_of_v<char, pack_t> == 1);
+        static_assert(std::is_same_v<gcl::mp::type_at_t<gcl::mp::index_of_v<int, pack_t>, pack_t>, int>);
+    }
+    #endif
     namespace size
     {
         static_assert(gcl::mp::size_v<pack_t> == 2);

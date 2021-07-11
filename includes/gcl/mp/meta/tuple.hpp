@@ -64,6 +64,9 @@ namespace gcl::mp
         template <typename T>
         constexpr static bool contains = ((std::size_t{std::is_same_v<T, types>} + ...)) == 1;
 
+        #if defined(_MSC_VER) and not defined(__clang__)
+        #pragma message("gcl::mp::tuple::index_of : disabled on msvc-cl")
+        #else
         template <typename T>
         constexpr static std::size_t index_of = []() constexpr noexcept -> std::size_t
         {
@@ -75,6 +78,7 @@ namespace gcl::mp
             (std::make_index_sequence<size>{});
         }
         ();
+        #endif
 
         template <std::size_t index>
         requires(valid_index<index>)
@@ -256,6 +260,8 @@ namespace gcl::mp::tests::tuples::contains
     static_assert(tuple_type::contains<char>);
     static_assert(not tuple_type::contains<double>);
 }
+#if defined(_MSC_VER) and not defined(__clang__)
+#else
 namespace gcl::mp::tests::tuples::index_of
 {
     using namespace gcl::mp;
@@ -264,6 +270,7 @@ namespace gcl::mp::tests::tuples::index_of
     static_assert(tuple_type::index_of<int> == 0);
     static_assert(tuple_type::index_of<char> == 1);
 }
+#endif
 namespace gcl::mp::tests::tuples::tuple_element
 {
     using namespace gcl::mp;

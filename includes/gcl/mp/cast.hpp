@@ -30,7 +30,7 @@ namespace gcl::mp::type_traits::transpose_qualifier
         gcl::mp::type_traits::partial<const_t, from_type>::template type,
         gcl::mp::type_traits::partial<volatile_t, from_type>::template type,
         gcl::mp::type_traits::partial<lvalue_ref_t, from_type>::template type,
-        gcl::mp::type_traits::partial<rvalue_ref_t, from_type>::template type>::type<to_type>;
+        gcl::mp::type_traits::partial<rvalue_ref_t, from_type>::template type>::template type<to_type>;
 }
 namespace gcl::mp::cast
 {
