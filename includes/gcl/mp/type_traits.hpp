@@ -54,24 +54,34 @@ namespace gcl::mp::type_traits
     template <bool evaluation>
     constexpr inline auto if_v = std::conditional_t<evaluation, std::true_type, std::false_type>::value;
 
-    template <template <typename> typename first_trait, template<typename> typename... traits>
-    struct merge_traits
-    {
-        template <typename T>
-        using type = typename merge_traits<traits...>::template type<first_trait<T>>;
-    };
-    template <template <typename> typename first_trait>
-    struct merge_traits<first_trait> {
-        template <typename T>
-        using type = first_trait<T>;
-    };
-
     template <typename...>
     struct dependent_false {
         constexpr static auto value = false;
     };
     template <typename... args>
     constexpr auto dependent_false_v = dependent_false<args...>::value;
+
+    template <template <typename> typename first_trait, template <typename> typename... traits>
+    struct merge_traits_t {
+        template <typename T>
+        using type = typename merge_traits_t<traits...>::template type<first_trait<T>>;
+    };
+    template <template <typename> typename first_trait>
+    struct merge_traits_t<first_trait> {
+        template <typename T>
+        using type = first_trait<T>;
+    };
+
+    template <template <typename> typename first_trait, template <typename> typename... traits>
+    struct merge_traits {
+        template <typename T>
+        using type = first_trait<typename merge_traits<traits...>::template type<T>>::type;
+    };
+    template <template <typename> typename first_trait>
+    struct merge_traits<first_trait> {
+        template <typename T>
+        using type = first_trait<T>::type;
+    };
 }
 
 #include <bitset>
@@ -177,12 +187,18 @@ namespace gcl::mp::type_traits::tests::if_t
     static_assert(is_red_colored<smthg_red>);
 }
 
-namespace gcl::mp::type_traits::tests::merge_traits
+namespace gcl::mp::type_traits::tests::merge_traits_t
 {
-    using remove_cv_and_ref = gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
+    using remove_cv_and_ref = gcl::mp::type_traits::merge_traits_t<std::remove_reference_t, std::decay_t>;
     static_assert(std::is_same_v<int, remove_cv_and_ref::type<const int&&>>);
 }
-
+namespace gcl::mp::type_traits::tests::merge_traits
+{
+    template <typename T>
+    using add_cvref_t =
+        gcl::mp::type_traits::merge_traits<std::add_lvalue_reference, std::add_const, std::add_volatile>::type<T>;
+    static_assert(std::is_same_v<add_cvref_t<int>, const volatile int&>);
+}
 namespace gcl::mp::type_traits::tests::trait_results
 {
     template <typename T>

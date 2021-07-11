@@ -116,7 +116,7 @@ namespace gcl::io::serialization
                             if constexpr (type_traits::has_decltype_deductible_parenthesis_op_v<T>)
                             {
                                 using remove_cv_and_ref =
-                                    gcl::mp::type_traits::merge_traits<std::remove_reference_t, std::decay_t>;
+                                    gcl::mp::type_traits::merge_traits_t<std::remove_reference_t, std::decay_t>;
                                 ((register_signature(
                                     gcl::mp::type_traits::transform_t<
                                         typename gcl::mp::function_traits_t<decltype(&T::operator())>::arguments,
