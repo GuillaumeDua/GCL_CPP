@@ -20,7 +20,11 @@ namespace gcl::container
 }
 
 #if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
-static_assert(
-    std::is_same_v<decltype(make_container_of_variants<std::array>(42, 'a')), std::array<std::variant<int, char>, 2>>);
-static_assert(make_container_of_variants<std::array>(42, 'a') == std::array<std::variant<int, char>, 2>{42, 'a'});
+namespace gcl::container::test
+{
+    static_assert(std::is_same_v<
+                  decltype(make_container_of_variants<std::array>(42, 'a')),
+                  std::array<std::variant<int, char>, 2>>);
+    static_assert(make_container_of_variants<std::array>(42, 'a') == std::array<std::variant<int, char>, 2>{42, 'a'});
+}
 #endif
