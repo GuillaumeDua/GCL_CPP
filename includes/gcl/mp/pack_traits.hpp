@@ -58,16 +58,52 @@ namespace gcl::mp::type_traits
     template <typename T, typename... Ts>
     constexpr inline auto count_of_v = count_of<T, Ts...>::value;
 
+    // todo :
+    //  unique : universal template parameter, to merge ttps/nttps
+
     template <typename T, typename... Ts>
-    struct are_unique {
-        constexpr static bool value = (not(std::is_same_v<T, Ts> or ...)) and are_unique<Ts...>::value;
+    struct are_unique_ttps {
+        constexpr static bool value = (not(std::is_same_v<T, Ts> or ...)) and are_unique_ttps<Ts...>::value;
     };
     template <typename T>
-    struct are_unique<T> {
+    struct are_unique_ttps<T> {
         constexpr static bool value = true;
     };
     template <typename... Ts>
-    constexpr auto are_unique_v = are_unique<Ts...>::value;
+    constexpr auto are_unique_ttps_v = are_unique_ttps<Ts...>::value;
+
+    template <auto first, auto... values>
+    struct are_unique_nttps {
+        constexpr static bool value = (not((first == values) or ...)) and are_unique_nttps<values...>::value;
+    };
+    template <auto arg>
+    struct are_unique_nttps<arg> {
+        constexpr static bool value = true;
+    };
+    template <auto... values>
+    constexpr auto are_unique_nttps_v = are_unique_nttps<values...>::value;
+
+    template <typename T>
+    struct unique_ttps {
+        static_assert([]() { return false; }(), "unique_ttps : not a template-template parameter");
+    };
+    template <template <typename...> typename T, typename... Ts>
+    struct unique_ttps<T<Ts...>> {
+        constexpr static bool value = are_unique_ttps_v<Ts...>;
+    };
+    template <typename T>
+    constexpr bool has_unique_ttps_v = unique_ttps<T>::value;
+
+    template <typename T>
+    struct unique_nttps {
+        static_assert([]() { return false; }(), "unique_ttps : not a template-template parameter");
+    };
+    template <template <auto...> typename T, auto... values>
+    struct unique_nttps<T<values...>> {
+        constexpr static bool value = are_unique_nttps_v<values...>;
+    };
+    template <typename T>
+    constexpr bool has_unique_nttps_v = unique_nttps<T>::value;
 
     template <typename T, template <typename> typename transformation>
     struct transform;
@@ -357,9 +393,9 @@ namespace gcl::mp::type_traits::tests
     }
     namespace are_unique
     {
-        static_assert(are_unique_v<int, double, char>);
-        static_assert(not are_unique_v<int, double, int, char>);
-        static_assert(not are_unique_v<bool, int, double, int, char>);
+        static_assert(are_unique_ttps_v<int, double, char>);
+        static_assert(not are_unique_ttps_v<int, double, int, char>);
+        static_assert(not are_unique_ttps_v<bool, int, double, int, char>);
     }
     namespace reverse
     {
