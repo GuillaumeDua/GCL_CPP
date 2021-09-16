@@ -16,6 +16,7 @@ static_assert(false, "GCL_ENABLE_COMPILE_TIME_TESTS required to build compile-ti
 // dynamic tests (GCL_ENABLE_RUNTIME_TESTS)
 #include <gcl/io/io.hpp>
 #include <gcl/container/interval_map.hpp>
+#include <gcl/container/tuple_view.hpp>
 #include <gcl/algorithms/algorithms.hpp>
 
 #include <stdexcept>
