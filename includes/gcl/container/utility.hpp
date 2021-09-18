@@ -2,6 +2,7 @@
 
 #include <variant>
 #include <array>
+#include <type_traits>
 
 namespace gcl::container
 {
@@ -16,6 +17,13 @@ namespace gcl::container
     {
         using value_type = std::variant<std::remove_cvref_t<Ts>...>;
         return container_type{value_type{std::forward<decltype(values)>(values)}...};
+    }
+
+    template <typename... Ts>
+    auto generate_array_of_variants(auto&&... args)
+    {
+        using element_type = std::variant<std::remove_cvref_t<Ts>...>;
+        return std::array<element_type, sizeof...(Ts)>{Ts{args...}...};
     }
 }
 
