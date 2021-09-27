@@ -9,29 +9,29 @@
 
 namespace gcl::mp::type_traits
 {
-    // is_pack
-    template <typename T>
+    // is_pack<(ttp|ttps)> -> true if tttp<ttps...>
+    template <typename...>
     struct is_pack {
         constexpr static bool value = false;
     };
-    template <template <typename...> typename pack_type, typename ... Ts>
+    template <template <typename...> typename pack_type, typename... Ts>
     struct is_pack<pack_type<Ts...>> {
         constexpr static bool value = true;
     };
-    template <typename T>
-    constexpr bool is_pack_v = is_pack<T>::value;
+    template <typename... Ts>
+    constexpr bool is_pack_v = is_pack<Ts...>::value;
 
     // repack_into
-    template <template <typename...> typename destination, typename from>
+    template <template <typename...> typename destination, typename ... Ts>
     struct repack_into {
-        static_assert([](){ return false; }(), "invalid usage");
+        using type = destination<Ts...>;
     };
     template <template <typename...> typename destination, template <typename...> typename from, typename ... Ts>
     struct repack_into<destination, from<Ts...>> {
         using type = destination<Ts...>;
     };
-    template <template <typename...> typename destination, typename from>
-    using repack_into_t = typename repack_into<destination, from>::type;
+    template <template <typename...> typename destination, typename ... from>
+    using repack_into_t = typename repack_into<destination, from...>::type;
 
     // pack_arguments_as<tttp, (ttps...|tttp)>
     template <template <typename...> class T, typename... Ts>
@@ -206,38 +206,45 @@ namespace gcl::mp::type_traits
     template <class T>
     using reverse_t = typename reverse<T>::type;
 
-    // rindex_of
-    template <typename tuple_type, typename T>
-    struct rindex_of;
-    template <template <typename...> typename tuple_type, typename T>
-    struct rindex_of<tuple_type<>, T> {
-        static_assert([]() { return false; }(), "(r)index_of : not found");
-    };
-    template <template <typename...> typename tuple_type, typename... rest, typename T>
-    struct rindex_of<tuple_type<T, rest...>, T> {
-        constexpr static std::size_t value = sizeof...(rest);
-    };
-    template <template <typename...> typename tuple_type, typename first, typename... rest, typename T>
-    struct rindex_of<tuple_type<first, rest...>, T> {
-        constexpr static std::size_t value = rindex_of<tuple_type<rest...>, T>::value;
-    };
-    template <typename tuple_type, typename T>
-    constexpr std::size_t rindex_of_v = rindex_of<tuple_type, T>::value;
-
-    // index_of
-    template <typename tuple_type, typename T>
-    struct index_of {
-        constexpr static auto value =
-            std::tuple_size_v<std::remove_cvref_t<tuple_type>> - rindex_of<tuple_type, T>::value - 1;
-    };
-    template <typename tuple_type, typename T>
-    constexpr std::size_t index_of_v = index_of<tuple_type, T>::value;
-
+    // contains
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
     template <typename T, typename... Ts>
     constexpr inline auto contains_v = contains<T, Ts...>::value;
 
+    // rindex_of
+    template <typename T, typename... Ts>
+    struct rindex_of {
+        constexpr static std::size_t value = rindex_of<T, repack_into_t<std::tuple, Ts...>>::value;
+    };
+    template <typename T, template <typename...> typename tuple_type>
+    struct rindex_of<T, tuple_type<>> {
+        static_assert([]() { return false; }(), "(r)index_of : not found");
+    };
+    template <typename T, template <typename...> typename tuple_type, typename... rest>
+    struct rindex_of<T, tuple_type<T, rest...>> {
+        constexpr static std::size_t value = sizeof...(rest);
+    };
+    template <typename T, template <typename...> typename tuple_type, typename first, typename... rest>
+    struct rindex_of<T, tuple_type<first, rest...>> {
+        constexpr static std::size_t value = rindex_of<T, tuple_type<rest...>>::value;
+    };
+    template <typename T, typename... Ts>
+    constexpr std::size_t rindex_of_v = rindex_of<T, Ts...>::value;
+
+    // index_of
+    template <typename T, typename... Ts>
+    struct index_of {
+        constexpr static std::size_t value = sizeof...(Ts) - rindex_of_v<T, Ts...> - 1;
+    };
+    template <typename T, template <typename...> typename tuple_type, typename... Ts>
+    struct index_of<T, tuple_type<Ts...>> {
+        constexpr static std::size_t value = sizeof...(Ts) - rindex_of_v<T, tuple_type<Ts...>> - 1;
+    };
+    template <typename T, typename... Ts>
+    constexpr std::size_t index_of_v = index_of<T, Ts...>::value;
+
+    // filters
     template <typename T, template <typename> typename trait>
     struct filters;
     template <template <typename...> typename T, template <typename> typename trait, typename... Ts>
@@ -437,8 +444,7 @@ namespace gcl::mp::tests::pack_traits
     //  see https://stackoverflow.com/questions/67123073/clang-constexpr-function-evaluation
     #if not __clang__
     static_assert(pack_type_with_repetitions_trait::index_of_v<char> == 1);
-    static_assert(pack_type_with_repetitions_trait::first_index_of_v<char> == 1);
-    static_assert(pack_type_with_repetitions_trait::last_index_of_v<char> == 4);
+    static_assert(pack_type_with_repetitions_trait::rindex_of_v<char> == 3);
     #endif
 
     namespace filters
