@@ -76,12 +76,12 @@ namespace gcl::mp::type_traits
     template <template <typename> typename first_trait, template <typename> typename... traits>
     struct merge_traits {
         template <typename T>
-        using type = first_trait<typename merge_traits<traits...>::template type<T>>::type;
+        using type = typename first_trait<typename merge_traits<traits...>::template type<T>>::type;
     };
     template <template <typename> typename first_trait>
     struct merge_traits<first_trait> {
         template <typename T>
-        using type = first_trait<T>::type;
+        using type = typename first_trait<T>::type;
     };
 
     template <template <typename...> class base_type, typename... Ts>
@@ -99,12 +99,12 @@ namespace gcl::mp::type_traits
 
       public:
         template <typename... Us>
-        requires(sizeof...(Us) >= 1) using type = impl<Us...>::type;
+        requires(sizeof...(Us) >= 1) using type = typename impl<Us...>::type;
     };
     template <template <typename...> class base_type, typename... Ts>
     struct partial_t {
         template <typename... Us>
-        using type = typename partial<base_type, Ts...>::type<Us...>::type;
+        using type = typename partial<base_type, Ts...>::template type<Us...>::type;
     };
 }
 

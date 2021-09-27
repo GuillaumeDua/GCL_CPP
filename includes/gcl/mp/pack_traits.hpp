@@ -9,6 +9,18 @@
 
 namespace gcl::mp::type_traits
 {
+    // is_pack
+    template <typename T>
+    struct is_pack {
+        constexpr static bool value = false;
+    };
+    template <template <typename...> typename pack_type, typename ... Ts>
+    struct is_pack<pack_type<Ts...>> {
+        constexpr static bool value = true;
+    };
+    template <typename T>
+    constexpr bool is_pack_v = is_pack<T>::value;
+
     // repack_into
     template <template <typename...> typename destination, typename from>
     struct repack_into {
@@ -19,8 +31,9 @@ namespace gcl::mp::type_traits
         using type = destination<Ts...>;
     };
     template <template <typename...> typename destination, typename from>
-    using repack_into_t = repack_into<destination, from>::type;
+    using repack_into_t = typename repack_into<destination, from>::type;
 
+    // pack_arguments_as<tttp, (ttps...|tttp)>
     template <template <typename...> class T, typename... Ts>
     class pack_arguments_as {
         template <template <typename...> class PackType, typename... PackArgs>
@@ -43,6 +56,7 @@ namespace gcl::mp::type_traits
     using arguments_index_sequence_t =
         decltype(std::make_index_sequence<std::tuple_size_v<pack_arguments_as_t<std::tuple, Ts...>>>{});
 
+    // concate / merge
     template <typename T, typename U>
     struct concatenate;
     template <template <typename...> typename T, typename... Ts, typename... Us>
@@ -52,11 +66,13 @@ namespace gcl::mp::type_traits
     template <typename T, typename U>
     using concatenate_t = typename concatenate<T, U>::type;
 
+    // type_at
     template <std::size_t N, typename... Ts>
     using type_at = typename std::tuple_element<N, std::tuple<Ts...>>;
     template <std::size_t N, typename... Ts>
     using type_at_t = typename type_at<N, Ts...>::type;
 
+    // count_of
     template <typename T, typename... Ts>
     struct count_of {
         constexpr inline static auto value = []<typename ... Us>(std::tuple<Us...>) constexpr
@@ -73,6 +89,7 @@ namespace gcl::mp::type_traits
     // todo :
     //  unique : universal template parameter, to merge ttps/nttps
 
+    // are unique_(n)ttps
     template <typename... Ts>
     struct are_unique_ttps {
         constexpr static bool value = []<typename first, typename... rest>()
@@ -103,6 +120,7 @@ namespace gcl::mp::type_traits
     template <auto... values>
     constexpr auto are_unique_nttps_v = are_unique_nttps<values...>::value;
 
+    // unique
     template <typename T>
     struct unique_ttps {
         static_assert([]() { return false; }(), "unique_ttps : not a template-template parameter");
@@ -125,6 +143,7 @@ namespace gcl::mp::type_traits
     template <typename T>
     constexpr bool has_unique_nttps_v = unique_nttps<T>::value;
 
+    // transform
     template <typename T, template <typename> typename transformation>
     struct transform;
     template <template <typename...> typename TypePack, template <typename> typename transformation, typename... Ts>
@@ -134,6 +153,7 @@ namespace gcl::mp::type_traits
     template <typename T, template <typename> typename transformation>
     using transform_t = typename transform<T, transformation>::type;
 
+    // trait_as_mask / filter
     template <template <typename...> class T, typename... Ts>
     struct trait_as_mask {
 
@@ -151,6 +171,7 @@ namespace gcl::mp::type_traits
     template <template <typename...> class T, typename... Ts>
     constexpr auto trait_as_mask_v = trait_as_mask<T, Ts...>::value;
 
+    // reverse
     template <class T>
     class reverse {
         static_assert(gcl::mp::type_traits::is_template_v<T>);
@@ -249,9 +270,7 @@ namespace gcl::mp
         template <typename U>
         static constexpr inline auto index_of_v = gcl::mp::type_traits::index_of_v<U, arguments_as<>>;
         template <typename U>
-        static constexpr inline auto first_index_of_v = gcl::mp::type_traits::first_index_of_v<U, Ts...>;
-        template <typename U>
-        static constexpr inline auto last_index_of_v = gcl::mp::type_traits::last_index_of_v<U, arguments_as<>>;
+        static constexpr inline auto rindex_of_v = gcl::mp::type_traits::rindex_of_v<U, arguments_as<>>;
 
         static constexpr inline auto size = std::tuple_size_v<arguments_as<std::tuple>>;
         template <typename U>
