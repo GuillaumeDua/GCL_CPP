@@ -9,6 +9,18 @@
 
 namespace gcl::mp::type_traits
 {
+    // repack_into
+    template <template <typename...> typename destination, typename from>
+    struct repack_into {
+        static_assert([](){ return false; }(), "invalid usage");
+    };
+    template <template <typename...> typename destination, template <typename...> typename from, typename ... Ts>
+    struct repack_into<destination, from<Ts...>> {
+        using type = destination<Ts...>;
+    };
+    template <template <typename...> typename destination, typename from>
+    using repack_into_t = repack_into<destination, from>::type;
+
     template <template <typename...> class T, typename... Ts>
     class pack_arguments_as {
         template <template <typename...> class PackType, typename... PackArgs>
@@ -173,87 +185,32 @@ namespace gcl::mp::type_traits
     template <class T>
     using reverse_t = typename reverse<T>::type;
 
-#if __clang__
-#pragma message(                                                                                                       \
-    "gcl::mp::type_traits::index_of : switching to clang-specific implementation ... (see details in comment)")
-    // Clang specific implementation, that use recursion instead of parameter-pack expansion,
-    //  as Clang 12.0.0 does not correctly evaluate some expressions/functions as constexpr
-    // (recursive implementation)
-    template <typename T, typename... Ts>
-    class index_of {
-        static_assert(sizeof...(Ts) > 0);
-        using TsArgsAsTuple = gcl::mp::type_traits::pack_arguments_as_t<std::tuple, Ts...>;
-        static_assert(std::tuple_size_v<TsArgsAsTuple> > 0);
-
-        template <typename TupleType>
-        struct impl;
-
-        template <typename first, typename... Us>
-        struct impl<std::tuple<first, Us...>> {
-            constexpr inline static auto value = []() constexpr
-            {
-                if constexpr (std::is_same_v<T, first>)
-                    return (std::tuple_size_v<TsArgsAsTuple> - sizeof...(Us) - 1);
-                else
-                    return impl<std::tuple<Us...>>::value;
-            }
-            ();
-        };
-        template <typename first>
-        struct impl<std::tuple<first>> {
-            static_assert(std::is_same_v<T, first>, "gcl::mp::index_of : no match found");
-            constexpr inline static auto value = std::tuple_size_v<TsArgsAsTuple> - 1;
-        };
-
-      public:
-        constexpr inline static auto value = impl<TsArgsAsTuple>::value;
-        constexpr static inline auto first_value = value;
-        constexpr static inline auto last_value = impl<reverse_t<TsArgsAsTuple>>::value;
+    // rindex_of
+    template <typename tuple_type, typename T>
+    struct rindex_of;
+    template <template <typename...> typename tuple_type, typename T>
+    struct rindex_of<tuple_type<>, T> {
+        static_assert([]() { return false; }(), "(r)index_of : not found");
     };
-#else
-    // (non-recursive implementation)
-    template <typename to_find, typename... Ts>
-    class index_of {
-        template <auto distance_algorithm>
-        consteval static auto impl()
-        {
-            using ArgsAsTuple = pack_arguments_as_t<std::tuple, Ts...>;
-            constexpr auto index = []<std::size_t... I>(std::index_sequence<I...>) constexpr
-            {
-                constexpr auto matches = std::array{std::is_same_v<to_find, std::tuple_element_t<I, ArgsAsTuple>>...};
-                static_assert(
-                    gcl::mp::value_traits::equal_v<std::size(matches), sizeof...(I), std::tuple_size_v<ArgsAsTuple>>);
-                return distance_algorithm(matches);
-            }
-            (arguments_index_sequence_t<Ts...>{});
-            static_assert(index != std::tuple_size_v<ArgsAsTuple>, "index_of : no match");
-            return index;
-        }
-
-        constexpr static auto from_begin = []<class ContainerType>(ContainerType container) constexpr
-        {
-            return std::distance(std::cbegin(container), std::find(std::cbegin(container), std::cend(container), true));
-        };
-        constexpr static auto from_end = []<class ContainerType>(ContainerType container) constexpr
-        {
-            return std::size(container) - 1 -
-                   std::distance(
-                       std::crbegin(container), std::find(std::crbegin(container), std::crend(container), true));
-        };
-
-      public:
-        constexpr static inline auto value = impl<from_begin>();
-        constexpr static inline auto first_value = value;
-        constexpr static inline auto last_value = impl<from_end>();
+    template <template <typename...> typename tuple_type, typename... rest, typename T>
+    struct rindex_of<tuple_type<T, rest...>, T> {
+        constexpr static std::size_t value = sizeof...(rest);
     };
-#endif
+    template <template <typename...> typename tuple_type, typename first, typename... rest, typename T>
+    struct rindex_of<tuple_type<first, rest...>, T> {
+        constexpr static std::size_t value = rindex_of<tuple_type<rest...>, T>::value;
+    };
+    template <typename tuple_type, typename T>
+    constexpr std::size_t rindex_of_v = rindex_of<tuple_type, T>::value;
 
-    template <typename to_find, typename... Ts>
-    constexpr inline auto index_of_v = index_of<to_find, Ts...>::value;
-    template <typename to_find, typename... Ts>
-    constexpr inline auto first_index_of_v = index_of<to_find, Ts...>::first_value;
-    template <typename to_find, typename... Ts>
-    constexpr inline auto last_index_of_v = index_of<to_find, Ts...>::last_value;
+    // index_of
+    template <typename tuple_type, typename T>
+    struct index_of {
+        constexpr static auto value =
+            std::tuple_size_v<std::remove_cvref_t<tuple_type>> - rindex_of<tuple_type, T>::value - 1;
+    };
+    template <typename tuple_type, typename T>
+    constexpr std::size_t index_of_v = index_of<tuple_type, T>::value;
 
     template <typename T, typename... Ts>
     using contains = std::disjunction<std::is_same<T, Ts>...>;
