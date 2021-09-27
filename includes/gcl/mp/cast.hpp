@@ -3,6 +3,8 @@
 #include <gcl/mp/type_traits.hpp>
 #include <type_traits>
 
+#if not defined(__clang__)
+
 namespace gcl::mp::type_traits::transpose_qualifier
 {
     template <typename from_type, typename to_type>
@@ -58,4 +60,5 @@ namespace gcl::mp::cast::tests::static_cast_preserving_cvref
         const int &
     >);
 }
+#endif
 #endif

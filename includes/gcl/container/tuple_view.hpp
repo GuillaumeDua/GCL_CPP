@@ -37,7 +37,7 @@ namespace gcl::container
     }
     {
         using result_type = tuple_const_view_type<components_ts...>;
-        return tuple_const_view_type{std::get<components_ts>(storage)...};
+        return result_type{std::get<components_ts>(storage)...};
     }
 }
 
