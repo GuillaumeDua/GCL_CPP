@@ -382,6 +382,17 @@ namespace gcl::mp::type_traits::tests
         static_assert(gcl::mp::type_traits::index_of_v<float, type_pack> == 3);
         static_assert(gcl::mp::type_traits::index_of_v<float, int, double, char, float> == 3);
     }
+    namespace rindex_of
+    {
+        // todo : not first -> sizeof...(rest)
+        /*using type_pack = std::tuple<char, char, float, float, char, bool, int, int, int, bool>;
+        static_assert(7 == gcl::mp::type_traits::rindex_of_v<float, type_pack>);*/
+
+        using type_pack = std::tuple<char, char, float, char, bool, int, int, int, bool>;
+        static_assert(6 == gcl::mp::type_traits::rindex_of_v<float, type_pack>);
+        static_assert(6 == gcl::mp::type_traits::rindex_of_v<float,
+            char, char, float, char, bool, int, int, int, bool>);
+    }
     namespace are_unique
     {
         static_assert(are_unique_ttps_v<int, double, char>);
