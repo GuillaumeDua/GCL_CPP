@@ -5,6 +5,39 @@
 
 namespace gcl::mp
 {
+    // is_pack<(ttp|ttps)> -> true if tttp<ttps...>
+    template <typename...>
+    struct is_pack {
+        constexpr static bool value = false;
+    };
+    template <template <typename...> typename pack_type, typename... Ts>
+    struct is_pack<pack_type<Ts...>> {
+        constexpr static bool value = true;
+    };
+    template <typename... Ts>
+    constexpr bool is_pack_v = is_pack<Ts...>::value;
+
+    template <typename T>
+    concept PackType = is_pack_v<T>;
+
+    template <template <typename...> class T, typename... Ts>
+    class pack_as {
+
+        template <typename... types>
+        struct impl {
+            using type = T<types...>;
+        };
+        template <template <typename...> class tuple_type, typename... types>
+        struct impl<tuple_type<types...>> {
+            using type = T<types...>;
+        };
+
+      public:
+        using type = typename impl<Ts...>::type;
+    };
+    template <template <typename...> class T, typename... Ts>
+    using pack_as_t = typename pack_as<T, Ts...>::type;
+
     template <typename T, typename tuple_type>
     struct count_of;
     template <typename T, template <typename...> class tuple_type, typename... types>
@@ -18,7 +51,7 @@ namespace gcl::mp
     struct contains;
     template <typename T, template <typename...> class tuple_type, typename... types>
     struct contains<T, tuple_type<types...>> {
-        constexpr static bool value = (count_of_v<T, tuple_type<types...>> == 1);
+        constexpr static bool value = (std::is_same_v<T, types> or ...);
     };
     template <typename T, typename tuple_type>
     constexpr bool contains_v = contains<T, tuple_type>::value;
@@ -35,6 +68,33 @@ namespace gcl::mp
     };
     template <typename T>
     constexpr bool unique_v = unique<T>::value;
+    
+    // wip : remove dependency to std::tuple, add index_of
+    #ifdef false
+    template <typename tuple_type>
+    class deduplicate_types {
+        static constexpr decltype(auto) deduplicate(tuple_type&& value) // noexcept(auto)
+        {
+            using tuple_type_t = std::remove_cvref_t<tuple_type>;
+            return [&]<std::size_t... indexes>(std::index_sequence<indexes...>)
+            {
+                return std::tuple_cat([&]<std::size_t index>() {
+                    using type_at_index = std::tuple_element_t<index, tuple_type_t>;
+                    if constexpr (mp::index_of_v<type_at_index, tuple_type_t> == index)
+                        return std::tuple<type_at_index>(std::get<index>(value));
+                    else
+                        return std::tuple<>{};
+                }.template operator()<indexes>()...);
+            }
+            (std::make_index_sequence<std::tuple_size_v<tuple_type_t>>());
+        }
+
+      public:
+        using type = decltype(deduplicate(std::declval<tuple_type>()));
+    };
+    template <typename tuple_type>
+    using deduplicate_types_t = deduplicate_types<tuple_type>::type;
+    #endif
 
     #if defined(_MSC_VER) and not defined(__clang__)
     # pragma message("gcl::mp::index_of : disabled on msvc-cl")
@@ -97,24 +157,6 @@ namespace gcl::mp
     };
     template <typename tuple_type>
     using first_t = typename first<tuple_type>::type;
-
-    template <template <typename...> class T, typename... Ts>
-    class pack_as {
-
-        template <typename... types>
-        struct impl {
-            using type = T<types...>;
-        };
-        template <template <typename...> class tuple_type, typename... types>
-        struct impl<tuple_type<types...>> {
-            using type = T<types...>;
-        };
-
-      public:
-        using type = typename impl<Ts...>::type;
-    };
-    template <template <typename...> class T, typename... Ts>
-    using pack_as_t = typename pack_as<T, Ts...>::type;
 }
 
 #if false
@@ -173,6 +215,15 @@ namespace gcl::mp::meta::tests::pack_traits
         static_assert(not gcl::mp::unique_v<pack_type<int, double, int, char>>);
         static_assert(not gcl::mp::unique_v<pack_type<bool, int, double, int, char>>);
     }
+    #ifdef false
+    namespace deduplicate
+    {
+        using type = std::tuple<char, char, float, float, char, bool, int, int, int, bool>;
+        using expected = std::tuple<char, float, bool, int>;
+
+        static_assert(std::is_same_v<decltype(tuple_utils::deduplicate(std::declval<deduplicated_type>())), expected>);
+    }
+    #endif
     namespace type_at
     {
         static_assert(std::is_same_v<gcl::mp::type_at_t<0, pack_t>, int>);
