@@ -1,12 +1,28 @@
 #pragma once
 
+#include <gcl/container/concepts.hpp>
+
 #include <iterator>
 #include <type_traits>
 #include <ranges>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace gcl::algorithms::ranges
 {
+    template <gcl::container::concepts::Container ... Ts>
+    requires
+        requires { typename std::common_type_t<typename Ts::value_type...>; }
+    auto merge_uniques(const Ts & ... names) {
+        using value_type = typename std::common_type_t<typename Ts::value_type...>;
+        auto value = std::unordered_set<value_type>{};
+        (value.insert(std::cbegin(names), std::cend(names)), ...);
+        return std::vector<value_type> {
+            std::move_iterator{std::begin(value)},
+            std::move_iterator{std::end(value)}
+        };
+}
+
     template <typename RangeIterator, typename InputIterator>
     constexpr bool is_in_range(RangeIterator range_begin, RangeIterator range_end, InputIterator input)
     {
