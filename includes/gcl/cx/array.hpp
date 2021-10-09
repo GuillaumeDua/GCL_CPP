@@ -3,7 +3,14 @@
 #include <array>
 #include <algorithm>
 #include <type_traits>
-#include <ranges>
+
+#if defined(__clang__)
+# pragma message("[gcl] in " __FILE__ " : clang/clang-cl does not support ranges yet")
+#elif not defined(__cpp_lib_ranges)
+# pragma message("[gcl] in " __FILE__ " : missing __cpp_lib_ranges")
+#else
+# include <ranges>
+#endif
 
 namespace gcl::mp::type_traits
 { // detection not covered by `is_instance_of`
@@ -29,21 +36,41 @@ namespace gcl::cx::array::literals
 {
     template <typename T, std::size_t N>
     struct std_array_value {
-        std::array<T, N - 1> value;
+        using value_type = std::array<T, N>;
+        value_type value;
 
-        constexpr std_array_value(T const (&arg)[N])
+        constexpr std_array_value(value_type&& arg)
+            : value{std::forward<value_type>(arg)}
+        {}
+        constexpr std_array_value(T const (&arg)[N + 1])
         {
             std::copy_n(std::begin(arg), std::size(value), std::begin(value));
         };
-        constexpr std_array_value(std::array<T, N> arg) { std::ranges::copy(arg, std::begin(value)); };
+
+        operator value_type&() { return value; }
+        operator const value_type&() const { return value; }
+        operator value_type&&() { return std::move(value); }
     };
-#if defined(__GNUC__)
+    template <typename T, std::size_t N>
+    std_array_value(T const (&arg)[N]) -> std_array_value<T, N - 1>;
+    template <typename T, std::size_t N>
+    std_array_value(std::array<T, N>) -> std_array_value<T, N>;
+
+    #if defined(_MSC_VER) and defined(__clang__)
+    # pragma message("[gcl] in " __FILE__ " : literal _std_array with char... disabled for clang-cl")
+    #else
     template <std_array_value str_arg>
     constexpr auto operator"" _std_array()
     {
         return str_arg.value;
     }
-#endif
+    #endif
+
+    template <char... values>
+    constexpr auto operator"" _std_array()
+    {
+        return std::array{values...};
+    }
 }
 namespace gcl::cx::array
 {
@@ -111,9 +138,18 @@ namespace gcl::mp::type_traits::tests::is_std_array
 }
 namespace gcl::cx::array::literals::tests::operator_std_array
 {
-#if defined(__GNUC__)
-    static_assert("a"_std_array == std::array<char, 1>{'a'});
-#endif
+    using namespace gcl::cx::array::literals;
+    static_assert(1234_std_array == std::array{'1', '2', '3', '4'});
+
+    #if defined(_MSC_VER)
+    # pragma message("[gcl] in " __FILE__ " : literal _std_array with char... disabled for msvc-cl/clang-cl")
+    #else
+    static_assert("1234"_std_array == std::array{'1', '2', '3', '4'});    
+    #endif
+
+    constexpr auto v1 = std_array_value{"toto"}.value;
+    constexpr auto v2 = std_array_value{std::array{'t', 'o', 't', 'o'}}.value;
+    static_assert(v1 == v2);
 }
 namespace gcl::cx::tests::array
 {
