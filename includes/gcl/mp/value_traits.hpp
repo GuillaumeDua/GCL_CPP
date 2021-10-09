@@ -13,28 +13,18 @@ namespace gcl::mp::value_traits
         constexpr static auto size = sizeof...(values);
     };
 
-    #if not defined(_LIBCPP_VERSION) or _LIBCPP_VERSION >= 13000
-    template <auto... values>
-    requires(std::equality_comparable_with<
-             decltype(std::get<0>(std::tuple{values...})),
-             decltype(values)>&&...) constexpr auto equal_v = []() consteval
-    {
-        return ((values == std::get<0>(std::tuple{values...})) && ...);
-    }
-    ();
+    template <auto ... values>
+    struct equal : std::bool_constant<(sizeof...(values) == 0)>{};
+    template <auto V, auto ... Vs>
+    requires (std::equality_comparable_with<decltype(V), decltype(Vs)> and ...)
+    struct equal<V, Vs...> : std::bool_constant<((V == Vs) and ...)>{};
+    template <auto ... values>
+    constexpr inline bool equal_v = equal<values...>::value;
 
-    // Only works for Clang yet, since 11.0.0 
-    // template <auto first_value = int{}, std::equality_comparable_with<decltype(first_value)> auto... values>
-    // constexpr inline auto equal_v = []() consteval
-    // {
-    //     return ((values == first_value) && ...);
-    // }
-    // ();
-    template <auto... values>
-    constexpr inline auto not_equal_v = not equal_v<values...>;
-#else
-#pragma message("libc++ (prior to 13) detected, disabling gcl::mp::value_traits::equal_v, not_equal_v features")
-#endif
+    template <auto ... values>
+    struct not_equal : std::negation<equal<values...>>{};
+    template <auto ... values>
+    constexpr inline bool not_equal_v = not_equal<values...>::value;
 }
 #include <cstdint>
 #include <climits>
@@ -55,24 +45,15 @@ namespace gcl::mp::value_traits
 #if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::mp::value_traits::tests::equal
 {
-#if not defined(_LIBCPP_VERSION) or _LIBCPP_VERSION >= 13000
     static_assert(equal_v<>);
-    static_assert(equal_v<true>);
-    static_assert(equal_v<true, true>);
-    static_assert(equal_v<true, true, true>);
-    static_assert(equal_v<true, true, true, true>);
+    static_assert(equal_v<42>);
+    static_assert(equal_v<42, char{42}>);
+    static_assert(equal_v<42, char{42}, std::size_t{42}>);
 
-    static_assert(not not_equal_v<true>);
-    static_assert(not_equal_v<true, false>);
-    static_assert(not_equal_v<false, true>);
-    static_assert(not_equal_v<false, true, true>);
-    static_assert(not_equal_v<true, false, true>);
-    static_assert(not_equal_v<true, true, false>);
-    static_assert(not_equal_v<false, true, true, true>);
-    static_assert(not_equal_v<true, false, true, true>);
-    static_assert(not_equal_v<true, true, false, true>);
-    static_assert(not_equal_v<true, true, true, false>);
-#endif
+    static_assert(not not_equal_v<>);
+    static_assert(not not_equal_v<42>);
+    static_assert(not not_equal_v<42, char{42}>);
+    static_assert(not not_equal_v<42, char{42}, std::size_t{42}>);
 }
 
 #include <gcl/mp/preprocessor.hpp>
