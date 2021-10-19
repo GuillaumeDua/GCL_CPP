@@ -10,17 +10,18 @@
 
 namespace gcl::algorithms
 {
+    // todo :
+    //  for_each that detected if the projection takes an iterator or value as parameter ?
+
     // Similar to `std::for_each` by defaut
     // but add the ability to project iterator (not values)
     // for values, simply use common projections
-    template <class iterator_type, class UnaryFunction, class Projection = decltype([](iterator_type it) {
-                                                            return *it;
-                                                        })>
+    template <class iterator_type, class UnaryFunction, class Projection = std::identity>
     // requires
     //     std::invocable<Projection, iterator_type> and
     //     std::invocable<UnaryFunction, std::add_rvalue_reference_t<std::invoke_result_t<Projection, iterator_type>>>
 
-    constexpr UnaryFunction for_each_it_projection(
+    constexpr UnaryFunction for_each_it(
         iterator_type range_begin, iterator_type range_end, UnaryFunction f, Projection proj = {})
     // noexcept(...)
     {
@@ -39,10 +40,32 @@ namespace gcl::algorithms
     template <typename container_type>
     constexpr auto adjacent(container_type& container, typename container_type::iterator it) noexcept
     {
-        if (it == std::end(container)) // avoid precondition
+        if (it == std::end(container))
             return std::pair{it, it};
         return std::pair{
             it == std::begin(container) ? std::end(container) : std::prev(it),
             it == std::end(container) ? it : std::next(it)};
     }
 }
+
+#ifdef GCL_ENABLE_COMPILE_TIME_TESTS
+#include <vector>
+namespace gcl::algorithms::tests
+{
+    constexpr void for_each_(){
+
+        constexpr auto values = std::array{'a', 'b', 'c', 'd'};
+        // same as std::for_each
+        gcl::algorithms::for_each_it(
+            std::cbegin(values), std::cend(values), [](const auto& value) { });
+        // same as std::for_each with projection on it
+        gcl::algorithms::for_each_it(
+            std::cbegin(values),
+            std::cend(values),
+            [](const auto& projected_element) { const auto& [index, value] = projected_element; },
+            [range_begin = std::cbegin(values)](const auto& it) {
+                return std::pair{std::distance(range_begin, it), *it};
+            });
+    }
+}
+#endif
