@@ -56,6 +56,10 @@ namespace gcl::cx::array::literals
     template <typename T, std::size_t N>
     std_array_value(std::array<T, N>) -> std_array_value<T, N>;
 
+    // todo :
+    // #if __cpp_nontype_template_args < 201911
+    // operator"" _x2(const char* str, std::size_t)
+
     #if defined(_MSC_VER) and defined(__clang__)
     # pragma message("[gcl] in " __FILE__ " : literal _std_array with char... disabled for clang-cl")
     #else
