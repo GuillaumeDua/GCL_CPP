@@ -1,6 +1,6 @@
 #pragma once 
 
-#include <type_traits>
+#include <concepts>
 
 namespace gcl::pattern
 {
@@ -12,11 +12,11 @@ namespace gcl::pattern
         using const_reference = const T &;
 
         explicit strong_type(const_reference arg)
-        requires std::is_copy_constructible_v<T> // is_trivially_copy_constructible_v ?
+        requires std::copy_constructible<T> // is_trivially_copy_constructible_v ?
         : value(arg)
         {}
         explicit strong_type(T&& arg)
-        requires std::is_move_constructible_v<T>
+        requires std::move_constructible<T>
         : value{ std::forward<decltype(arg)>(arg) }
         {}
 
