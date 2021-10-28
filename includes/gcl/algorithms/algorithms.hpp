@@ -46,6 +46,19 @@ namespace gcl::algorithms
             it == std::begin(container) ? std::end(container) : std::prev(it),
             it == std::end(container) ? it : std::next(it)};
     }
+    template <typename container_type, typename Predicate>
+    constexpr auto adjacent_if(container_type & container, typename container_type::iterator it, Predicate predicate)
+    noexcept(std::is_nothrow_invocable_v<Predicate, const typename container_type::value_type&>) {
+
+        auto [lhs, rhs] = adjacent(container, it);
+
+        static_assert(std::is_invocable_v<Predicate, decltype(*lhs)>);
+        static_assert(std::is_invocable_v<Predicate, decltype(*rhs)>);
+        return std::pair{
+            predicate(*lhs) ? lhs : std::end(container),
+            predicate(*rhs) ? rhs : std::end(container)
+        };
+    }
 }
 
 #ifdef GCL_ENABLE_COMPILE_TIME_TESTS
