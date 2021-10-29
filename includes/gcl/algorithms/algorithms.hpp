@@ -37,27 +37,32 @@ namespace gcl::algorithms
         return f;
     }
 
-    template <typename container_type>
-    constexpr auto adjacent(container_type& container, typename container_type::iterator it) noexcept
+    template <typename container_type, typename iterator_type>
+    [[nodiscard]] constexpr auto adjacent(container_type& container, iterator_type it) noexcept
+    -> std::pair<iterator_type, iterator_type>
     {
-        if (it == std::end(container))
+        if (it == std::cend(container))
             return std::pair{it, it};
         return std::pair{
             it == std::begin(container) ? std::end(container) : std::prev(it),
             it == std::end(container) ? it : std::next(it)};
     }
-    template <typename container_type, typename Predicate>
-    constexpr auto adjacent_if(container_type & container, typename container_type::iterator it, Predicate predicate)
-    noexcept(std::is_nothrow_invocable_v<Predicate, const typename container_type::value_type&>) {
+    template <typename container_type, typename iterator_type, typename Predicate>
+    [[nodiscard]] constexpr auto adjacent_if(container_type & container, iterator_type it, Predicate predicate)
+    noexcept(std::is_nothrow_invocable_v<Predicate, const typename container_type::value_type&>)
+    -> decltype(adjacent(container, it)) {
 
-        auto [lhs, rhs] = adjacent(container, it);
-
-        static_assert(std::is_invocable_v<Predicate, decltype(*lhs)>);
-        static_assert(std::is_invocable_v<Predicate, decltype(*rhs)>);
-        return std::pair{
-            predicate(*lhs) ? lhs : std::end(container),
-            predicate(*rhs) ? rhs : std::end(container)
+        auto adjacent_result = adjacent(container, it);
+        auto transformation = [&](auto & value){
+            if (value not_eq std::end(container) and not predicate(*value))
+                value = std::end(container);
         };
+
+        [&]<std::size_t ... indexes>(std::index_sequence<indexes...>){
+            static_assert((std::is_invocable_v<Predicate, decltype(std::get<indexes>(adjacent_result))> && ...));
+            ((transformation(std::get<indexes>(adjacent_result))), ...);
+        }(std::make_index_sequence<std::tuple_size_v<decltype(adjacent_result)>>{});
+        return adjacent_result;
     }
 }
 
@@ -65,7 +70,7 @@ namespace gcl::algorithms
 #include <vector>
 namespace gcl::algorithms::tests
 {
-    constexpr void for_each_(){
+    consteval void for_each_(){
 
         constexpr auto values = std::array{'a', 'b', 'c', 'd'};
         // same as std::for_each
@@ -79,6 +84,28 @@ namespace gcl::algorithms::tests
             [range_begin = std::cbegin(values)](const auto& it) {
                 return std::pair{std::distance(range_begin, it), *it};
             });
+    }
+    consteval void adjacent_() {
+        using namespace gcl::algorithms;
+        {   // adjacent(container, const_iterator)
+            constexpr auto datas = std::array{1,2,3,4};
+            static_assert(
+                adjacent(datas, std::cbegin(datas)) ==
+                std::pair{ std::cend(datas), std::next(std::cbegin(datas)) }
+            );
+            static_assert(
+                adjacent(datas, std::next(std::cbegin(datas))) ==
+                std::pair{ std::cbegin(datas), std::next(std::cbegin(datas), 2) }
+            );
+        }
+        { // adjacent(container, iterator)
+        }
+        { // adajacent_if(container, const_iterator, Predicate)
+
+        }
+        { // adajacent_if(container, iterator, Predicate)
+
+        }
     }
 }
 #endif
