@@ -37,6 +37,17 @@ namespace gcl::mp::type_traits
     template <class T_concrete, template <class...> class T>
     inline constexpr auto is_instance_of_v = is_instance_of<T_concrete, T>::value;
 
+    template <typename T, typename U>
+    struct is_same_cvref_qualifiers {
+        constexpr static bool value =
+            (std::is_lvalue_reference_v<T> == std::is_lvalue_reference_v<U> and
+             std::is_rvalue_reference_v<T> == std::is_rvalue_reference_v<U> and
+             std::is_const_v<std::remove_reference_t<T>> == std::is_const_v<std::remove_reference_t<U>> and
+             std::is_volatile_v<std::remove_reference_t<T>> == std::is_volatile_v<std::remove_reference_t<U>>);
+    };
+    template <typename T, typename U>
+    constexpr bool is_same_cvref_qualifiers_v = is_same_cvref_qualifiers<T, U>::value;
+
     template <class T, typename... Args>
     class is_brace_constructible {
         template <typename /*= void*/, typename U, typename... U_args>
