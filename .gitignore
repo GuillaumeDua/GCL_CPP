@@ -8,6 +8,9 @@ Release/
 *.idb
 *.pdb
 
+# CMake
+build/
+
 # Outputs
 *.o
 *.obj
