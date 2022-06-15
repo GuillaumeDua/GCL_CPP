@@ -1,13 +1,43 @@
 #pragma once
 
+#include <gcl/cx/crc32_hash.hpp>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
-#include <gcl/cx/crc32_hash.hpp>
+
+namespace gcl::cx::typeinfo::details
+{
+    struct type_prefix_tag {
+        constexpr static std::string_view value = "T = ";
+    };
+    struct value_prefix_tag {
+        constexpr static std::string_view value = "value = ";
+    };
+
+    template <typename prefix_tag_t>
+    static constexpr auto parse_mangling(std::string_view value, std::string_view function)
+    {
+        value.remove_prefix(value.find(function) + std::size(function));
+#if defined(__GNUC__) or defined(__clang__)
+        value.remove_prefix(value.find(prefix_tag_t::value) + std::size(prefix_tag_t::value));
+#if defined(__clang__)
+        value.remove_suffix(value.length() - value.rfind(']'));
+#elif defined(__GNUC__) // GCC
+        value.remove_suffix(value.length() - value.find(';'));
+#endif
+#elif defined(_MSC_VER)
+        value.remove_prefix(value.find('<') + 1);
+        if (auto enum_token_pos = value.find("enum "); enum_token_pos == 0)
+            value.remove_prefix(enum_token_pos + sizeof("enum ") - 1);
+        value.remove_suffix(value.length() - value.rfind(">(void)"));
+#endif
+        return value;
+    }
+}
 
 namespace gcl::cx::typeinfo
-{   // constexpr typeinfo that does not relies on __cpp_rtti
+{ // constexpr typeinfo that does not relies on __cpp_rtti
     //
     // Known limitations :
     //  type_name : type aliases
@@ -25,21 +55,12 @@ namespace gcl::cx::typeinfo
     static constexpr /*consteval*/ auto type_name(/*no parameters allowed*/) -> std::string_view
     {
 #if defined(__GNUC__) or defined(__clang__)
-        std::string_view str_view = __PRETTY_FUNCTION__;
-        str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
-        constexpr std::string_view prefix = "T = ";
-        str_view.remove_prefix(str_view.find(prefix) + prefix.length());
-        str_view.remove_suffix(str_view.length() - str_view.find_first_of(";]"));
+        return details::parse_mangling<details::type_prefix_tag>(__PRETTY_FUNCTION__, __FUNCTION__);
 #elif defined(_MSC_VER)
-        std::string_view str_view = __FUNCSIG__;
-        str_view.remove_prefix(str_view.find(__func__) + sizeof(__func__));
-        if (auto enum_token_pos = str_view.find("enum "); enum_token_pos == 0)
-            str_view.remove_prefix(enum_token_pos + sizeof("enum ") - 1);
-        str_view.remove_suffix(str_view.length() - str_view.rfind(">(void)"));
+        return details::parse_mangling<details::type_prefix_tag>(__FUNCSIG__, __func__);
 #else
         static_assert(false, "gcl::cx::typeinfo : unhandled plateform");
 #endif
-        return str_view;
     }
     template <typename T>
     constexpr inline auto type_name_v = type_name<T>();
@@ -53,28 +74,19 @@ namespace gcl::cx::typeinfo
     static constexpr auto value_name(/*no parameters allowed*/) -> std::string_view
     {
 #if defined(__GNUC__) or defined(__clang__)
-        std::string_view str_view = __PRETTY_FUNCTION__;
-        str_view.remove_prefix(str_view.find(__FUNCTION__) + sizeof(__FUNCTION__));
-        constexpr std::string_view prefix = "value = ";
-        str_view.remove_prefix(str_view.find(prefix) + prefix.length());
-        str_view.remove_suffix(str_view.length() - str_view.find_first_of(";]"));
+        return details::parse_mangling<details::value_prefix_tag>(__PRETTY_FUNCTION__, __FUNCTION__);
 #elif defined(_MSC_VER)
-        std::string_view str_view = __FUNCSIG__;
-        str_view.remove_prefix(str_view.find(__func__) + sizeof(__func__));
-        if (auto enum_token_pos = str_view.find("enum "); enum_token_pos == 0)
-            str_view.remove_prefix(enum_token_pos + sizeof("enum ") - 1);
-        str_view.remove_suffix(str_view.length() - str_view.rfind(">(void)"));
+        return details::parse_mangling<details::value_prefix_tag>(__FUNCSIG__, __func__);
 #else
         static_assert(false, "gcl::cx::typeinfo : unhandled plateform");
 #endif
-        return str_view;
     }
     template <auto value>
     constexpr inline auto value_name_v = value_name<value>();
 
     template <typename T>
     static constexpr auto hashcode()
-    {   // as template<> struct hash<std::string_view>; is not consteval
+    { // as template<> struct hash<std::string_view>; is not consteval
         constexpr auto type_name = gcl::cx::typeinfo::type_name<T>();
         return gcl::cx::crc_32::hash(type_name);
     }
@@ -83,8 +95,8 @@ namespace gcl::cx::typeinfo
     constexpr inline hashcode_t hashcode_v = hashcode<T>();
 }
 
-#include <gcl/mp/pack_traits.hpp>
 #include <array>
+#include <gcl/mp/pack_traits.hpp>
 namespace gcl::cx::typeinfo
 {
     template <typename Type>
@@ -107,38 +119,36 @@ namespace gcl::cx::typeinfo
     }
 }
 
-#if defined(GCL_ENABLE_COMPILE_TIME_TESTS)
 namespace gcl::cx::typeinfo::test
 {
-     // basic type
-     static_assert(gcl::cx::typeinfo::type_name<int(42)>() == "int");
+    // basic type
+    static_assert(gcl::cx::typeinfo::type_name<int(42)>() == "int");
 #if defined(__GNUC__) or defined(__clang__)
-     static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "42");
+    static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "42");
 #else
-     static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "0x2a");
+    static_assert(gcl::cx::typeinfo::value_name<int(42)>() == "0x2a");
 #endif
-     
-     // namespace, scoped
-     enum global_ns_colors : int
-     {
-         red,
-         blue,
-         yellow,
-         orange,
-         green,
-         purple
-     };
-     static_assert(gcl::cx::typeinfo::type_name<global_ns_colors::red>() == "gcl::cx::typeinfo::test::global_ns_colors");
-     static_assert(gcl::cx::typeinfo::value_name<global_ns_colors::red>() == "gcl::cx::typeinfo::test::red");
 
-     // to_hashcode_array
-     template <typename ... Ts>
-     struct type_with_variadic_type_parameters{};
-     using type = type_with_variadic_type_parameters<int, bool, float>;
+    // namespace, scoped
+    enum global_ns_colors : int
+    {
+        red,
+        blue,
+        yellow,
+        orange,
+        green,
+        purple
+    };
+    static_assert(gcl::cx::typeinfo::type_name<global_ns_colors::red>() == "gcl::cx::typeinfo::test::global_ns_colors");
+    static_assert(gcl::cx::typeinfo::value_name<global_ns_colors::red>() == "gcl::cx::typeinfo::test::red");
 
-     constexpr auto mapping = to_hashcode_array<type>();
-     static_assert(mapping[0] == gcl::cx::typeinfo::hashcode_v<int>);
-     static_assert(mapping[1] == gcl::cx::typeinfo::hashcode_v<bool>);
-     static_assert(mapping[2] == gcl::cx::typeinfo::hashcode_v<float>);
+    // to_hashcode_array
+    template <typename... Ts>
+    struct type_with_variadic_type_parameters {};
+    using type = type_with_variadic_type_parameters<int, bool, float>;
+
+    constexpr auto mapping = to_hashcode_array<type>();
+    static_assert(mapping[0] == gcl::cx::typeinfo::hashcode_v<int>);
+    static_assert(mapping[1] == gcl::cx::typeinfo::hashcode_v<bool>);
+    static_assert(mapping[2] == gcl::cx::typeinfo::hashcode_v<float>);
 }
-#endif
